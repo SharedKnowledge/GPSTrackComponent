@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/map_item"
+        android:title="@string/gpstracker_menu_map_button_text"
+        app:showAsAction="always|withText"
+        />
+    <item android:id="@+id/track_item"
+        android:title="@string/gpstracker_menu_tracks_button_text"
+        app:showAsAction="always|withText">
+
+        <menu>
+            <item android:id="@+id/record_item"
+                android:title="@string/gpstracker_item_tracks_record_button_text"
+                app:showAsAction="always|withText"
+                />
+            <group>
+                <item android:id="@+id/show_all_item"
+                    android:title="@string/gpstracker_item_tracks_show_all_button_text"
+                    app:showAsAction="always|withText"
+                    />
+                <item android:id="@+id/display_item"
+                    android:title="@string/gpstracker_item_tracks_display_button_text"
+                    app:showAsAction="always|withText"
+                    />
+                <item android:id="@+id/import_export_item"
+                    android:title="@string/gpstracker_item_tracks_import_export_button_text"
+                    app:showAsAction="always|withText"
+                    />
+            </group>
+        </menu>
+
+        </item>
+</menu>
