@@ -2,8 +2,8 @@
     <string name="app_name">GPSTrackApp</string>
     <string name="gpstracker_menu_map_button_text">Map</string>
     <string name="gpstracker_menu_tracks_button_text">Tracks</string>
-    <string name="gpstracker_item_tracks_record_button_text">Record new track</string>
-    <string name="gpstracker_item_tracks_show_all_button_text">Show all</string>
+    <string name="gpstracker_item_tracks_record_button_text">Start recording</string>
     <string name="gpstracker_item_tracks_display_button_text">Display</string>
-    <string name="gpstracker_item_tracks_import_export_button_text">Import / Export</string>
+    <string name="gpstracker_item_tracks_import_button_text">Import</string>
+    <string name="gpstracker_item_tracks_export_button_text">Export</string>
 </resources>

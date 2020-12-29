@@ -16,16 +16,16 @@
                 app:showAsAction="always|withText"
                 />
             <group>
-                <item android:id="@+id/show_all_item"
-                    android:title="@string/gpstracker_item_tracks_show_all_button_text"
-                    app:showAsAction="always|withText"
-                    />
                 <item android:id="@+id/display_item"
                     android:title="@string/gpstracker_item_tracks_display_button_text"
                     app:showAsAction="always|withText"
                     />
-                <item android:id="@+id/import_export_item"
-                    android:title="@string/gpstracker_item_tracks_import_export_button_text"
+                <item android:id="@+id/import_item"
+                    android:title="@string/gpstracker_item_tracks_import_button_text"
+                    app:showAsAction="always|withText"
+                    />
+                <item android:id="@+id/export_item"
+                    android:title="@string/gpstracker_item_tracks_export_button_text"
                     app:showAsAction="always|withText"
                     />
             </group>

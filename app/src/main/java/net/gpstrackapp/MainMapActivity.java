@@ -15,6 +15,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.ViewGroup;
+
+import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -23,23 +27,28 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
-public class MapActivity extends AppCompatActivity {
+//TODO permission handling, maybe in superclass or split up
+public class MainMapActivity extends MapViewActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-    private MapView mapView = null;
-    private RecyclerView recyclerView;
+    private Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        Log.d("MainMapActivity", String.valueOf(android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)));
+        Log.d("MainMapActivity", String.valueOf(Environment.isExternalStorageRemovable()));
+        Log.d("MainMapActivity", String.valueOf(Configuration.getInstance().getOsmdroidBasePath()));
 
-        Log.d("MapActivity", String.valueOf(android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)));
-        Log.d("MapActivity", String.valueOf(Environment.isExternalStorageRemovable()));
-        Log.d("MapActivity", String.valueOf(Configuration.getInstance().getOsmdroidBasePath()));
-
-        Context ctx = getApplicationContext();
+        try {
+            ctx = GPSComponent.getGPSComponent().getContext();
+        } catch (ASAPException e) {
+            //TODO anpassen
+            e.printStackTrace();
+        }
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
         requestPermissionsIfNecessary(new String[] {
@@ -49,57 +58,85 @@ public class MapActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
-        setContentView(R.layout.gpstracker_map_drawer_layout);
-
-        Toolbar toolbar = findViewById(R.id.gpstracker_with_all_actions_toolbar);
-        setSupportActionBar(toolbar);
-
+        super.onCreate(savedInstanceState);
         /*
         recyclerView = (RecyclerView) findViewById(R.id.gpstracker_map_recycler_view);
         RecyclerView.LayoutManager mLayoutManager =
                 new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
          */
+    }
 
-        setUpLayout(ctx);
+    ////////////////////////////////////////////////////////////////////////
+    //                           mapView methods                          //
+    ////////////////////////////////////////////////////////////////////////
+
+    @Override
+    protected MapView setUpMapViewAndGet() {
+        Context ctx = getApplicationContext();
+        MapView mapView = ReusableMapView.getInstance(ctx, TileSourceFactory.MAPNIK);
+        return mapView;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d("MapActivity", "init Toolbar");
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.gpstracker_action_buttons, menu);
-        return true;
-    }
+    protected ViewGroup setUpLayoutAndGet() {
+        setContentView(R.layout.gpstracker_map_drawer_layout);
+        Toolbar toolbar = findViewById(R.id.gpstracker_with_all_actions_toolbar);
+        setSupportActionBar(toolbar);
 
-    private void setUpLayout(Context ctx) {
         DrawerLayout drawerLayout = findViewById(R.id.gpstracker_map_drawer_layout);
-        mapView = CentralMapView.init(ctx);
         DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
                 MapView.LayoutParams.MATCH_PARENT);
         params.setMargins(0, (int) getResources().getDimension(R.dimen.marginUnderToolbar), 0, 0);
         mapView.setLayoutParams(params);
 
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-        //map.setTileSource(TileSourceFactory.USGS_SAT);
-
-        addOverlays(ctx);
-
-        mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
-        mapView.setMultiTouchControls(true);
-        drawerLayout.addView(mapView);
-        //recyclerView.addView(mapView);
-        Log.d("MapActivity", "init Layout");
+        return drawerLayout;
     }
 
-    private void addOverlays(Context ctx) {
-        IMapController mapController = mapView.getController();
-        mapController.setZoom(9.5);
-        GeoPoint startPoint = new GeoPoint(52.5200, 13.4050);
-        mapController.setCenter(startPoint);
+    @Override
+    protected void setPerspectiveParameters() {
+        setZoom(9.5);
+        setCenterCoordinates(52.5200, 13.4050);
+    }
 
+    @Override
+    protected void addOverlays() {
         //add more overlays
         mapView.getOverlays().add(new CopyrightOverlay(ctx));
+
+        MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), mapView);
+        myLocationNewOverlay.enableMyLocation();
+        mapView.getOverlays().add(myLocationNewOverlay);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d("MainMapActivity", "init Toolbar");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.gpstracker_action_buttons, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        try {
+            //TODO add actions with do...()-Methods
+            switch (item.getItemId()) {
+                case R.id.record_item:
+                    return true;
+                case R.id.display_item:
+                    return true;
+                case R.id.import_item:
+                    return true;
+                case R.id.export_item:
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        } catch (Exception e) {
+            Log.d(this.getLogStart(), e.getLocalizedMessage());
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -131,5 +168,9 @@ public class MapActivity extends AppCompatActivity {
                     permissionsToRequest.toArray(new String[0]),
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
+    }
+
+    private String getLogStart() {
+        return "GPSApp MainMapActivity";
     }
 }
