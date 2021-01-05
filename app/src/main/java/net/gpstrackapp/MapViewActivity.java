@@ -1,5 +1,7 @@
 package net.gpstrackapp;
 
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
@@ -13,7 +15,6 @@ public abstract class MapViewActivity extends AppCompatActivity {
     protected ViewGroup layout = null;
 
     protected abstract MapView setUpMapViewAndGet();
-    protected abstract void addOverlays();
     protected abstract ViewGroup setUpLayoutAndGet();
     protected abstract void setPerspectiveParameters();
 
@@ -43,7 +44,6 @@ public abstract class MapViewActivity extends AppCompatActivity {
     private void finishMapSetup() {
         setPerspectiveParameters();
         addZoomControls();
-        addOverlays();
         layout = this.setUpLayoutAndGet();
         layout.addView(mapView);
     }

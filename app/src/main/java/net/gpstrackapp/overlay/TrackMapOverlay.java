@@ -1,22 +1,24 @@
-package net.gpstrackapp;
+package net.gpstrackapp.overlay;
 
 import android.graphics.Color;
+import android.widget.Toast;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //TODO schreiben: Decorator-Pattern fuer getComponentsToDisplay(), da es die gleiche Methode seiner Superklasse aufruft
-//TODO schreiben: leider ist TrackMapObject an eine Map gebunden (durch Marker), muss neues erstellen um es einer anderen Map hinzuzufuegen
-public class TrackMapObject extends PolyLineMapObject {
+//TODO schreiben: leider ist TrackMapOverlay an eine Map gebunden (durch Marker), muss neues erstellen um es einer anderen Map hinzuzufuegen
+public class TrackMapOverlay extends PolyLineMapOverlay {
     private Marker start, end;
-    private PolyLineMapObject line;
+    private PolyLineMapOverlay line;
 
-    public TrackMapObject(PolyLineMapObject line, MapView mapView) {
+    public TrackMapOverlay(PolyLineMapOverlay line, MapView mapView) {
         super(line.getLinePoints());
         this.line = line;
         List<GeoPoint> trackPoints = line.getLinePoints();

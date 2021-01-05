@@ -1,9 +1,11 @@
-package net.gpstrackapp;
+package net.gpstrackapp.geomodel;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
-public abstract class GeoModel {
+public abstract class GeoModel<T extends GeoModel> {
     private String objectId = UUID.randomUUID().toString();
     private CharSequence objectName;
     private final Date dateOfCreation;

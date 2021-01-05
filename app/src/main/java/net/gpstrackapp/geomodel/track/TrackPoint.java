@@ -1,4 +1,6 @@
-package net.gpstrackapp;
+package net.gpstrackapp.geomodel.track;
+
+import android.location.Location;
 
 import org.osmdroid.util.GeoPoint;
 

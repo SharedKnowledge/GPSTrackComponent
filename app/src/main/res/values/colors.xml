@@ -3,4 +3,14 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <!-- to make recyclerview running -->
+    <color name="message">#999999</color>
+    <color name="topic">#222222</color>
+    <color name="snMessage">#999999</color>
+    <color name="makanSentDate">#999999</color>
+    <color name="snSender">#999999</color>
+
+    <color name="personName">#999999</color>
+    <color name="personIdentityAssuranceLevel">#999999</color>
 </resources>

@@ -21,7 +21,7 @@ public class GPSComponent implements ASAPApplicationComponent {
         //TODO choose a tile source
         TileSourceHandler.init(TileSourceFactory.USGS_TOPO);
 
-        //TrackMapObject trackMapObject = new TrackMapObject(new PolyLineMapObject(new ArrayList<GeoPoint>()), CentralMapView.getInstance());
+        //TrackMapOverlay trackMapObject = new TrackMapOverlay(new PolyLineMapOverlay(new ArrayList<GeoPoint>()), CentralMapView.getInstance());
     }
 
     //TODO evtl. add AndroidASAPKeyStorage

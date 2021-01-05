@@ -2,6 +2,7 @@ package net.gpstrackapp;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -9,33 +10,39 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
+import net.gpstrackapp.geomodel.LocationProvider;
+import net.gpstrackapp.geomodel.track.Track;
+import net.gpstrackapp.geomodel.track.TrackManager;
+import net.gpstrackapp.overlay.DisplayTrackCommand;
+import net.gpstrackapp.overlay.TrackOverlay;
 import net.sharksystem.asap.ASAPException;
 
-import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.CopyrightOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 //TODO permission handling, maybe in superclass or split up
 public class MainMapActivity extends MapViewActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private Context ctx;
+    private IMyLocationProvider locationProvider;
+    private Track recordedTrack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,11 @@ public class MainMapActivity extends MapViewActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
 
+        locationProvider = new GpsMyLocationProvider(this);
+
         super.onCreate(savedInstanceState);
+
+
         /*
         recyclerView = (RecyclerView) findViewById(R.id.gpstracker_map_recycler_view);
         RecyclerView.LayoutManager mLayoutManager =
@@ -73,8 +84,7 @@ public class MainMapActivity extends MapViewActivity {
 
     @Override
     protected MapView setUpMapViewAndGet() {
-        Context ctx = getApplicationContext();
-        MapView mapView = ReusableMapView.getInstance(ctx, TileSourceFactory.MAPNIK);
+        MapView mapView = ReusableMapView.getInstance(this, TileSourceFactory.MAPNIK);
         return mapView;
     }
 
@@ -100,16 +110,6 @@ public class MainMapActivity extends MapViewActivity {
     }
 
     @Override
-    protected void addOverlays() {
-        //add more overlays
-        mapView.getOverlays().add(new CopyrightOverlay(ctx));
-
-        MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), mapView);
-        myLocationNewOverlay.enableMyLocation();
-        mapView.getOverlays().add(myLocationNewOverlay);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d("MainMapActivity", "init Toolbar");
         MenuInflater inflater = getMenuInflater();
@@ -123,6 +123,12 @@ public class MainMapActivity extends MapViewActivity {
             //TODO add actions with do...()-Methods
             switch (item.getItemId()) {
                 case R.id.record_item:
+                    if (!isRecordingTrack()) {
+                        showTrackNameDialog();
+                    } else {
+                        stopTrackRecording();
+                    }
+                    //TODO Stop Track Recording
                     return true;
                 case R.id.display_item:
                     return true;
@@ -137,6 +143,53 @@ public class MainMapActivity extends MapViewActivity {
             Log.d(this.getLogStart(), e.getLocalizedMessage());
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showTrackNameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose a name for the new track");
+
+        final EditText input = new EditText(this);
+
+        //TODO integrate Creator in String
+        input.setText(Calendar.getInstance().getTime().toString());
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String trackName = input.getText().toString();
+                startTrackRecording(trackName);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void startTrackRecording(String trackName) {
+        Log.d(getLogStart(), "Start Track Recording");
+        Track track = new Track(trackName);
+        locationProvider.startLocationProvider(track);
+        recordedTrack = track;
+        TrackManager.addTrack(track);
+    }
+
+    private void stopTrackRecording() {
+        Log.d(getLogStart(), "Stop Track Recording");
+        locationProvider.stopLocationProvider();
+        recordedTrack = null;
+    }
+
+    public boolean isRecordingTrack() {
+        if (recordedTrack != null)
+            return true;
+        return false;
     }
 
     @Override

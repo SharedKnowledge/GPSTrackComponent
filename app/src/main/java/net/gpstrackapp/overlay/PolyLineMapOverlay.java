@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.overlay;
 
 import android.widget.Toast;
 
@@ -10,10 +10,10 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PolyLineMapObject {
+public class PolyLineMapOverlay {
     private Polyline line;
 
-    public PolyLineMapObject(List<GeoPoint> linePoints) {
+    public PolyLineMapOverlay(List<GeoPoint> linePoints) {
         this.line = createLine(linePoints);
     }
 

@@ -28,7 +28,6 @@ public class GPSApp extends ASAPApplication {
             Collection<CharSequence> formats = new ArrayList<>();
             formats.add(GPS_APPNAME);
 
-            // create
             GPSApp.singleton = new GPSApp(formats, initialActivity);
 
             GPSComponent.initialize(GPSApp.singleton);
