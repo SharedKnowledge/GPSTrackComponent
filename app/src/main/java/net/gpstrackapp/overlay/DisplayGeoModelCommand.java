@@ -2,5 +2,5 @@ package net.gpstrackapp.overlay;
 
 //TODO write: Command-Pattern
 public interface DisplayGeoModelCommand {
-    boolean addToMap();
+    boolean execute();
 }

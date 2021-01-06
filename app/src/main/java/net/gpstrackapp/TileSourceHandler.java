@@ -19,7 +19,7 @@ public class TileSourceHandler {
         return TileSourceHandler.instance;
 }
 
-    public static TileSourceHandler getInstance() {
+    public static synchronized TileSourceHandler getInstance() {
         return instance;
     }
 

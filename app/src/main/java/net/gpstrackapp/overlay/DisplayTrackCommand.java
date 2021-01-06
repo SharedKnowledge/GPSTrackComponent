@@ -13,7 +13,7 @@ public class DisplayTrackCommand implements DisplayGeoModelCommand {
     }
 
     @Override
-    public boolean addToMap() {
+    public boolean execute() {
         return trackDisplayer.addTrackToMap(track);
     }
 }

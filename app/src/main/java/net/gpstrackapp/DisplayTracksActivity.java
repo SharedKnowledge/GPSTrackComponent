@@ -1,28 +1,55 @@
 package net.gpstrackapp;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
 
 import net.gpstrackapp.geomodel.track.Track;
+import net.gpstrackapp.geomodel.track.TrackManager;
 import net.gpstrackapp.overlay.DisplayTrackCommand;
 import net.gpstrackapp.overlay.HideTrackCommand;
-import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.overlay.TrackDisplayer;
 
-public class DisplayTracksActivity extends MapObjectListActivity {
+import java.util.Iterator;
+import java.util.Set;
 
-    private void addTrackToMap(Track track) {
-        TrackOverlay trackOverlay = new TrackOverlay(track.getGeoPoints());
-        ReusableMapView mapView = ReusableMapView.getInstance(this);
-        mapView.getTrackDisplayMap().put(track, trackOverlay);
+public class DisplayTracksActivity extends MapObjectListSelectionActivity {
+    private ReusableTrackMapView trackDisplayer;
 
-        DisplayTrackCommand displayTrackCommand = new DisplayTrackCommand(mapView, track);
-        displayTrackCommand.addToMap();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.trackDisplayer = GPSComponent.getGPSComponent().getAttributeContainer().getReusableTrackMapView();
     }
 
-    private void removeTrackFromMap(Track track) {
-        ReusableMapView mapView = ReusableMapView.getInstance(this);
-        mapView.getTrackDisplayMap().remove(track);
+    @Override
+    protected void onSelectionFinished(Set<String> selectedItemIDs) {
+        Set<Track> displayedTracks = trackDisplayer.getTracksWithOverlaysHolder().keySet();
 
-        HideTrackCommand hideTrackCommand = new HideTrackCommand(mapView, track);
-        hideTrackCommand.removeFromMap();
+        // Set that stores the Tracks that are still displayed
+        Set<Track> tracksToRemoveFromMap = displayedTracks;
+
+        Iterator<String> iterSelect = selectedItemIDs.iterator();
+        while (iterSelect.hasNext()) {
+            String itemID = iterSelect.next();
+            // add every Track that is not yet displayed to the map
+            if (!displayedTracks.contains(itemID)) {
+                Track track = TrackManager.getTrackByID(itemID);
+                DisplayTrackCommand displayTrackCommand = new DisplayTrackCommand(trackDisplayer, track);
+                displayTrackCommand.execute();
+            }
+            // remove all Tracks that have to get displayed again from the Set
+            tracksToRemoveFromMap.remove(TrackManager.getTrackByID(itemID));
+        }
+
+        // for every Track that is still displayed and has to be removed create a hideTrackCommand
+        Iterator<Track> iterRemove = tracksToRemoveFromMap.iterator();
+        while (iterRemove.hasNext()) {
+            Track trackToRemove = iterRemove.next();
+            HideTrackCommand hideTrackCommand = new HideTrackCommand(trackDisplayer, trackToRemove);
+            hideTrackCommand.execute();
+        }
+
+        Intent intent = new Intent(this, MainMapActivity.class);
+        startActivity(intent);
     }
 }

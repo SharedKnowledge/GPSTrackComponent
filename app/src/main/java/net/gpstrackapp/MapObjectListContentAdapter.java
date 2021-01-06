@@ -14,6 +14,7 @@ public class MapObjectListContentAdapter extends
         implements View.OnClickListener {
 
     private final Context ctx;
+    protected final SelectableMapObjectListContentAdapterHelper helper;
     private View.OnClickListener clickListener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -33,10 +34,11 @@ public class MapObjectListContentAdapter extends
         }
     }
 
-    public MapObjectListContentAdapter(Context ctx) {
+    public MapObjectListContentAdapter(Context ctx, SelectableMapObjectListContentAdapterHelper helper) {
         Log.d(this.getLogStart(), "constructor");
         this.ctx = ctx;
         this.clickListener = this;
+        this.helper = helper;
     }
 
     @NonNull

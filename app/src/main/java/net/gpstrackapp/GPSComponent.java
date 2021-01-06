@@ -1,6 +1,7 @@
 package net.gpstrackapp;
 
 import android.content.Context;
+import android.util.Log;
 
 import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.android.apps.ASAPApplication;
@@ -8,18 +9,20 @@ import net.sharksystem.asap.android.apps.ASAPApplicationComponent;
 import net.sharksystem.asap.android.apps.ASAPApplicationComponentHelper;
 import net.sharksystem.asap.android.apps.ASAPComponentNotYetInitializedException;
 
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-
 public class GPSComponent implements ASAPApplicationComponent {
     private final ASAPApplicationComponentHelper asapComponentHelper;
     private static GPSComponent instance = null;
+    private AttributeContainer attributeContainer = null;
 
     private GPSComponent(ASAPApplication asapApplication) {
         this.asapComponentHelper = new ASAPApplicationComponentHelper();
         this.asapComponentHelper.setASAPApplication(asapApplication);
 
-        //TODO choose a tile source
-        TileSourceHandler.init(TileSourceFactory.USGS_TOPO);
+        try {
+            this.attributeContainer = new AttributeContainer(getContext());
+        } catch (Exception e) {
+            Log.d(this.getLogStart(), "Could not get context");
+        }
 
         //TrackMapOverlay trackMapObject = new TrackMapOverlay(new PolyLineMapOverlay(new ArrayList<GeoPoint>()), CentralMapView.getInstance());
     }
@@ -36,6 +39,10 @@ public class GPSComponent implements ASAPApplicationComponent {
         return instance;
     }
 
+    public AttributeContainer getAttributeContainer() {
+        return attributeContainer;
+    }
+
     @Override
     public Context getContext() throws ASAPException {
         return this.asapComponentHelper.getContext();
@@ -44,5 +51,9 @@ public class GPSComponent implements ASAPApplicationComponent {
     @Override
     public ASAPApplication getASAPApplication() {
         return this.asapComponentHelper.getASAPApplication();
+    }
+
+    private String getLogStart() {
+        return this.getClass().getSimpleName();
     }
 }

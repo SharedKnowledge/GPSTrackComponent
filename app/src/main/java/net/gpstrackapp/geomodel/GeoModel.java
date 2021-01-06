@@ -5,12 +5,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class GeoModel<T extends GeoModel> {
+public abstract class GeoModel {
     private String objectId = UUID.randomUUID().toString();
     private CharSequence objectName;
     private final Date dateOfCreation;
     private CharSequence creator;
-    private boolean displayed = false;
 
     public GeoModel(CharSequence objectName, Date dateOfCreation, CharSequence creator) {
         this.objectName = objectName;
@@ -32,9 +31,5 @@ public abstract class GeoModel<T extends GeoModel> {
 
     public CharSequence getCreator() {
         return creator;
-    }
-
-    public boolean isDisplayed() {
-        return displayed;
     }
 }

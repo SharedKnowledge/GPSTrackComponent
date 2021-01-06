@@ -4,6 +4,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import org.osmdroid.util.GeoPoint;
@@ -12,21 +14,18 @@ import org.osmdroid.views.MapView;
 
 public abstract class MapViewActivity extends AppCompatActivity {
     protected MapView mapView = null;
-    protected ViewGroup layout = null;
+    protected ViewGroup parentView = null;
 
-    protected abstract MapView setUpMapViewAndGet();
-    protected abstract ViewGroup setUpLayoutAndGet();
-    protected abstract void setPerspectiveParameters();
+    protected abstract MapView setupMapViewAndGet();
+    protected abstract ViewGroup setupLayoutAndGet();
+    protected abstract double setupZoomLevel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mapView = setUpMapViewAndGet();
-        if (mapView != null) {
-            finishMapSetup();
-        } else {
-            throw new NullPointerException("mapView is null!");
-        }
+
+        mapView = setupMapViewAndGet();
+        finishMapSetup();
     }
 
     @Override
@@ -41,24 +40,30 @@ public abstract class MapViewActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    protected void onDestroy() {
+        parentView.removeView(mapView);
+        super.onDestroy();
+    }
+
     private void finishMapSetup() {
-        setPerspectiveParameters();
+        setZoom(setupZoomLevel());
         addZoomControls();
-        layout = this.setUpLayoutAndGet();
-        layout.addView(mapView);
+        parentView = this.setupLayoutAndGet();
+        parentView.addView(mapView);
     }
 
-    protected void setZoom(double zoom) {
+    private void setZoom(double zoom) {
         mapView.getController().setZoom(zoom);
-    }
-
-    protected void setCenterCoordinates(double lat, double lon) {
-        GeoPoint centerPoint = new GeoPoint(lat, lon);
-        mapView.getController().setCenter(centerPoint);
     }
 
     private void addZoomControls() {
         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
         mapView.setMultiTouchControls(true);
+    }
+
+    protected void setCenterCoordinates(GeoPoint locaction) {
+        GeoPoint centerPoint = new GeoPoint(locaction.getLatitude(), locaction.getLongitude());
+        mapView.getController().setCenter(centerPoint);
     }
 }

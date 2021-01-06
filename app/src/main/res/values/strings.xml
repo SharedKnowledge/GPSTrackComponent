@@ -6,4 +6,6 @@
     <string name="gpstracker_item_tracks_display_button_text">Display</string>
     <string name="gpstracker_item_tracks_import_button_text">Import</string>
     <string name="gpstracker_item_tracks_export_button_text">Export</string>
+    <string name="mapObjectListSelectionDoneText">Done Selection</string>
+    <string name="abort">Abort</string>
 </resources>

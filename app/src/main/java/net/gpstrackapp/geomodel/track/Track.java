@@ -17,19 +17,13 @@ import java.util.Date;
 import java.util.List;
 
 public class Track extends GeoModel implements IMyLocationConsumer {
-    private List<TrackPoint> trackPoints;
+    private List<TrackPoint> trackPoints = new ArrayList<>();
 
-    public Track(List<TrackPoint> trackPoints, CharSequence objectName, Date dateOfCreation) {
+    public Track(CharSequence objectName, Date dateOfCreation, List<TrackPoint> trackPoints) {
         super(objectName, dateOfCreation, GPSComponent.getGPSComponent().getASAPApplication().getOwnerName());
-        this.trackPoints = trackPoints;
-    }
-
-    public Track(List<TrackPoint> trackPoints, CharSequence objectName) {
-        this(trackPoints, objectName, null);
-    }
-
-    public Track(CharSequence objectName) {
-        this(new ArrayList<TrackPoint>(), objectName, null);
+        if (trackPoints != null) {
+            this.trackPoints.addAll(trackPoints);
+        }
     }
 
     public void addTrackPoint(TrackPoint trackPoint) {

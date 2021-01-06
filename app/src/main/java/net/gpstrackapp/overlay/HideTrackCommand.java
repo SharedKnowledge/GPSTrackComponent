@@ -12,7 +12,7 @@ public class HideTrackCommand implements HideGeoModelCommand {
     }
 
     @Override
-    public boolean removeFromMap() {
+    public boolean execute() {
         return trackDisplayer.removeTrackFromMap(track);
     }
 }
