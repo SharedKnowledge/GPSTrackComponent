@@ -10,7 +10,7 @@ import java.util.Set;
 public abstract class MapObjectListSelectionActivity extends MapObjectListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(this.getLogStart(), "onCreateOptionsMenu called");
+        Log.d(getLogStart(), "init Toolbar");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_list_selection_action_buttons, menu);
         return true;
@@ -32,16 +32,20 @@ public abstract class MapObjectListSelectionActivity extends MapObjectListActivi
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.d(this.getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
+            Log.d(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
         }
         return false;
     }
 
     private void doDone() {
-        Log.d(this.getLogStart(), "doDone");
+        Log.d(getLogStart(), "doDone");
         onSelectionFinished(this.getSelectedItemIDs());
         this.finish();
     }
 
     protected abstract void onSelectionFinished(Set<String> selectedItemIDs);
+
+    private String getLogStart() {
+        return this.getClass().getSimpleName();
+    }
 }

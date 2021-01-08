@@ -6,17 +6,13 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/gpstracker_with_all_actions_toolbar"
+        android:id="@+id/gpstracker_tracker_mapview_with_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-    />
-
-    <!--
-    <include layout="@layout/gpstracker_map_recycler_view"/>
-    -->
+        />
 
 </android.support.constraint.ConstraintLayout>

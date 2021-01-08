@@ -1,7 +1,6 @@
 package net.gpstrackapp;
 
 import android.content.Context;
-import android.util.Log;
 
 import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.android.apps.ASAPApplication;
@@ -12,19 +11,10 @@ import net.sharksystem.asap.android.apps.ASAPComponentNotYetInitializedException
 public class GPSComponent implements ASAPApplicationComponent {
     private final ASAPApplicationComponentHelper asapComponentHelper;
     private static GPSComponent instance = null;
-    private AttributeContainer attributeContainer = null;
 
     private GPSComponent(ASAPApplication asapApplication) {
         this.asapComponentHelper = new ASAPApplicationComponentHelper();
         this.asapComponentHelper.setASAPApplication(asapApplication);
-
-        try {
-            this.attributeContainer = new AttributeContainer(getContext());
-        } catch (Exception e) {
-            Log.d(this.getLogStart(), "Could not get context");
-        }
-
-        //TrackMapOverlay trackMapObject = new TrackMapOverlay(new PolyLineMapOverlay(new ArrayList<GeoPoint>()), CentralMapView.getInstance());
     }
 
     //TODO evtl. add AndroidASAPKeyStorage
@@ -37,10 +27,6 @@ public class GPSComponent implements ASAPApplicationComponent {
             throw new ASAPComponentNotYetInitializedException("GPSComponent not yet initialized");
         }
         return instance;
-    }
-
-    public AttributeContainer getAttributeContainer() {
-        return attributeContainer;
     }
 
     @Override

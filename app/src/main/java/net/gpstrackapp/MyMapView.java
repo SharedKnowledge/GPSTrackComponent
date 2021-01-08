@@ -1,12 +1,15 @@
 package net.gpstrackapp;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -15,8 +18,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ReusableMapView extends MapView {
-    private MyLocationNewOverlay myLocationNewOverlay;
+public class MyMapView extends MapView {
+    private MyLocationNewOverlay locationOverlay;
     //TODO change TileSource (nicht Mapnik) und in validTileSources entfernen, besser ist jedoch validTileSources nur fuer Download und Laden von Offline-Tiles zu verwenden
     private static final ITileSource DEFAULT_TILE_SOURCE = TileSourceFactory.MAPNIK;
     private ITileSource tileSource = DEFAULT_TILE_SOURCE;
@@ -25,24 +28,32 @@ public class ReusableMapView extends MapView {
             TileSourceFactory.USGS_TOPO,
             TileSourceFactory.USGS_SAT));
 
-    public ReusableMapView(Context ctx) {
+    public MyMapView(Context ctx) {
         super(ctx);
+        Log.d(getLogStart(), "Constructor");
         addOverlays(ctx);
     }
 
     private void addOverlays(Context ctx) {
+        Log.d(getLogStart(), "add Overlays");
         this.getOverlays().add(new CopyrightOverlay(ctx));
 
-        myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), this);
-        myLocationNewOverlay.enableMyLocation();
-        myLocationNewOverlay.enableFollowLocation();
-        this.getOverlays().add(myLocationNewOverlay);
+        locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), this);
+        locationOverlay.enableMyLocation();
+        locationOverlay.enableFollowLocation();
+        this.getOverlays().add(locationOverlay);
+
+        RotationGestureOverlay rotationGestureOverlay = new RotationGestureOverlay(this);
+        rotationGestureOverlay.setEnabled(true);
+        this.getOverlays().add(rotationGestureOverlay);
+
+        this.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
+        this.setMultiTouchControls(true);
     }
 
     public GeoPoint getLastLocation() {
-        if (myLocationNewOverlay != null) {
-            myLocationNewOverlay.getLastFix();
-            return myLocationNewOverlay.getMyLocation();
+        if (locationOverlay != null) {
+            return locationOverlay.getMyLocation();
         }
         return null;
     }
@@ -74,6 +85,6 @@ public class ReusableMapView extends MapView {
     }
 
     private String getLogStart() {
-        return "ReusableTrackMapView: ";
+        return this.getClass().getSimpleName();
     }
 }

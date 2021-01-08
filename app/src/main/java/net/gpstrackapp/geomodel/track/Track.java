@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Track extends GeoModel implements IMyLocationConsumer {
+public class Track extends GeoModel implements ILocationConsumer {
     private List<TrackPoint> trackPoints = new ArrayList<>();
 
     public Track(CharSequence objectName, Date dateOfCreation, List<TrackPoint> trackPoints) {
@@ -43,7 +43,7 @@ public class Track extends GeoModel implements IMyLocationConsumer {
     }
 
     @Override
-    public void onLocationChanged(Location location, IMyLocationProvider source) {
+    public void onLocationChanged(Location location) {
         GeoPoint geoPoint = new GeoPoint(
                 location.getLatitude(),
                 location.getLongitude(),

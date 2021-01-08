@@ -9,6 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import net.gpstrackapp.geomodel.GeoModel;
+import net.gpstrackapp.geomodel.track.TrackManager;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MapObjectListContentAdapter extends
         RecyclerView.Adapter<MapObjectListContentAdapter.MyViewHolder>
         implements View.OnClickListener {
@@ -25,15 +31,16 @@ public class MapObjectListContentAdapter extends
 
         public MyViewHolder(View view) {
             super(view);
-            mapObjectName = view.findViewById(R.id.gpstracker_list_geoobjects_row_name);
-            mapObjectDate = view.findViewById(R.id.gpstracker_list_geoobjects_row_date);
-            mapObjectCreator = view.findViewById(R.id.gpstracker_list_geoobjects_row_creator);
-            mapObjectSelected = view.findViewById(R.id.gpstracker_list_geoobjects_row_selected);
+            mapObjectName = view.findViewById(R.id.gpstracker_list_geomodels_row_name);
+            mapObjectDate = view.findViewById(R.id.gpstracker_list_geomodels_row_date);
+            mapObjectCreator = view.findViewById(R.id.gpstracker_list_geomodels_row_creator);
+            mapObjectSelected = view.findViewById(R.id.gpstracker_list_geomodels_row_selected);
 
             view.setOnClickListener(clickListener);
         }
     }
 
+    //TODO zusaetzlich GeoModelManager uebergeben
     public MapObjectListContentAdapter(Context ctx, SelectableMapObjectListContentAdapterHelper helper) {
         Log.d(this.getLogStart(), "constructor");
         this.ctx = ctx;
@@ -47,18 +54,33 @@ public class MapObjectListContentAdapter extends
         Log.d(this.getLogStart(), "onCreateViewHolder");
         View itemView = LayoutInflater
                 .from(parent.getContext())
-                .inflate(R.layout.gpstracker_list_geoobjects_row, parent, false);
+                .inflate(R.layout.gpstracker_list_geomodel_row, parent, false);
         return new MapObjectListContentAdapter.MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MapObjectListContentAdapter.MyViewHolder holder, int position) {
         Log.d(this.getLogStart(), "onBindViewHolder with position: " + position);
+
+        //TODO im Konstruktor zu uebergebenden GeoModelManager stattdessen nutzen
+        GeoModel geoModel = TrackManager.getTrackByPosition(position);
+
+        CharSequence geoModelID = geoModel.getObjectId();
+        CharSequence geoModelName = geoModel.getObjectName();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = df.format(geoModel.getDateOfCreation());
+        CharSequence creator = geoModel.getCreator();
+
+        holder.itemView.setTag(R.id.geomodel_id_tag, geoModelID);
+        holder.mapObjectName.setText(geoModelName);
+        holder.mapObjectDate.setText(date);
+        holder.mapObjectCreator.setText(creator);
     }
 
+    //TODO
     @Override
     public int getItemCount() {
-        return 0;
+        return TrackManager.getNumberOfTracks();
     }
 
     @Override

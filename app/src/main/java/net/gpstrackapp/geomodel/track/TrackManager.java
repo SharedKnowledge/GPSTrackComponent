@@ -1,16 +1,20 @@
 package net.gpstrackapp.geomodel.track;
 
+import net.gpstrackapp.overlay.TrackOverlay;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class TrackManager {
     private static List<Track> tracks = new ArrayList<>();
 
     public static Track createTrack(CharSequence objectName, Date dateOfCreation, List<TrackPoint> trackPoints) {
         Track track = new Track(objectName, dateOfCreation, trackPoints);
+        tracks.add(track);
         return track;
     }
 
@@ -32,7 +36,15 @@ public class TrackManager {
         return null;
     }
 
+    public static Track getTrackByPosition(int position) {
+        return tracks.get(position);
+    }
+
     public static List<Track> getAllTracks() {
         return tracks;
+    }
+
+    public static int getNumberOfTracks() {
+        return tracks.size();
     }
 }

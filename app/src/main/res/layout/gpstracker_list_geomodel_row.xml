@@ -11,8 +11,10 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/row_padding_vertical">
 
+    <tag android:id="@+id/geomodel_id_tag" />
+
     <TextView
-        android:id="@+id/gpstracker_list_geoobjects_row_name"
+        android:id="@+id/gpstracker_list_geomodels_row_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -21,27 +23,27 @@
         />
 
     <TextView
-        android:id="@+id/gpstracker_list_geoobjects_row_date"
+        android:id="@+id/gpstracker_list_geomodels_row_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/recyclerRowEntryTextSize"
-        android:layout_below="@id/gpstracker_list_geoobjects_row_name"
+        android:layout_below="@id/gpstracker_list_geomodels_row_name"
         />
 
     <TextView
-        android:id="@+id/gpstracker_list_geoobjects_row_creator"
+        android:id="@+id/gpstracker_list_geomodels_row_creator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/recyclerRowEntryTextSize"
-        android:layout_below="@id/gpstracker_list_geoobjects_row_date"
+        android:layout_below="@id/gpstracker_list_geomodels_row_date"
         />
 
     <TextView
-        android:id="@+id/gpstracker_list_geoobjects_row_selected"
+        android:id="@+id/gpstracker_list_geomodels_row_selected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/recyclerRowEntryTextSize"
-        android:layout_below="@id/gpstracker_list_geoobjects_row_creator"
+        android:layout_below="@id/gpstracker_list_geomodels_row_creator"
         />
 
 </RelativeLayout>

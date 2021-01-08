@@ -15,11 +15,11 @@ public class InitActivity extends AppCompatActivity {
             GPSApp.initializeGPSApp(this);
         }
 
-        Intent intent = new Intent(this, MainMapActivity.class);
+        Intent intent = new Intent(this, TrackRecordingMapActivity.class);
         startActivity(intent);
     }
 
     private String getLogStart() {
-        return "GPSApp InitActivity: ";
+        return this.getClass().getSimpleName();
     }
 }

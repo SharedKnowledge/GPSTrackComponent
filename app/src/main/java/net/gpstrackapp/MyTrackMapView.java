@@ -6,20 +6,13 @@ import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.overlay.TrackDisplayer;
 import net.gpstrackapp.overlay.TrackOverlay;
 
-import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
-public class ReusableTrackMapView extends ReusableMapView implements TrackDisplayer {
+public class MyTrackMapView extends MyMapView implements TrackDisplayer {
     private Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
 
-    public ReusableTrackMapView(Context ctx) {
+    public MyTrackMapView(Context ctx) {
         super(ctx);
     }
 
@@ -45,13 +38,14 @@ public class ReusableTrackMapView extends ReusableMapView implements TrackDispla
         this.invalidate();
         return removed;
     }
+
 /*
     public void setDisplayedTracks(Set<String> selectedItemIDs, Context ctx) {
         //clear all overlays
-        ReusableTrackMapView.instance.getOverlays().clear();
+        MyTrackMapView.instance.getOverlays().clear();
 
         //add standard overlays
-        ReusableTrackMapView.instance.addOverlays(ctx);
+        MyTrackMapView.instance.addOverlays(ctx);
 
         //add track overlays
         List<Track> trackList = TrackManager.getAllTracks();

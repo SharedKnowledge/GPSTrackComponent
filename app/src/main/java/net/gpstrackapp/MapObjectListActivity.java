@@ -1,11 +1,10 @@
 package net.gpstrackapp;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import net.sharksystem.asap.android.Util;
@@ -17,23 +16,30 @@ public abstract class MapObjectListActivity extends SelectableListMapObjectActiv
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(this.getLogStart(), "onCreate");
+        Log.d(getLogStart(), "onCreate");
 
         try {
-            setContentView(R.layout.gpstracker_map_drawer_layout);
+            setContentView(R.layout.gpstracker_list_drawer_layout);
 
-            this.getASAPApplication().setupDrawerLayout(this);
+            GPSComponent.getGPSComponent().getASAPApplication().setupDrawerLayout(this);
 
-            recyclerView = (RecyclerView) findViewById(R.id.gpstracker_map_recycler_view);
+            //TODO preselect in subclass (by using abstract method and implementing it e.g. in DisplayTracksActivity)
 
+            // setup toolbar
+            Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_with_toolbar);
+            setSupportActionBar(toolbar);
+
+            recyclerView = (RecyclerView) findViewById(R.id.gpstracker_list_recycler_view);
+
+            //TODO zusaetzlich GeoModelManager uebergeben, da dieser gebraucht wird
             adapter = new MapObjectListContentAdapter(this, this.selectableContentSource);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setAdapter(adapter);
-            Log.d(this.getLogStart(), "attached content adapter");
+            Log.d(getLogStart(), "attached content adapter");
         } catch (Exception e) {
-            Log.d(this.getLogStart(), "problems while setting up activity and content adapter: " + e.getLocalizedMessage());
+            Log.d(getLogStart(), "problems while setting up activity and content adapter: " + e.getLocalizedMessage());
         }
     }
 
@@ -45,5 +51,9 @@ public abstract class MapObjectListActivity extends SelectableListMapObjectActiv
         } else {
             Log.e(Util.getLogStart(this), "onResume: content adapter not initialized?!");
         }
+    }
+
+    private String getLogStart() {
+        return this.getClass().getSimpleName();
     }
 }
