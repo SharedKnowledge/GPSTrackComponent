@@ -9,6 +9,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -27,15 +28,25 @@ public class MyMapView extends MapView {
             TileSourceFactory.MAPNIK,
             TileSourceFactory.USGS_TOPO,
             TileSourceFactory.USGS_SAT));
+    private Context ctx;
 
     public MyMapView(Context ctx) {
         super(ctx);
+        this.ctx = ctx;
+        setupOverlays(ctx);
+        getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
+        setMultiTouchControls(true);
         Log.d(getLogStart(), "Constructor");
-        addOverlays(ctx);
     }
 
-    private void addOverlays(Context ctx) {
-        Log.d(getLogStart(), "add Overlays");
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    private void setupOverlays(Context ctx) {
+        Log.d(getLogStart(), "setup Overlays");
+        this.getOverlays().clear();
         this.getOverlays().add(new CopyrightOverlay(ctx));
 
         locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), this);
@@ -46,9 +57,6 @@ public class MyMapView extends MapView {
         RotationGestureOverlay rotationGestureOverlay = new RotationGestureOverlay(this);
         rotationGestureOverlay.setEnabled(true);
         this.getOverlays().add(rotationGestureOverlay);
-
-        this.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
-        this.setMultiTouchControls(true);
     }
 
     public GeoPoint getLastLocation() {

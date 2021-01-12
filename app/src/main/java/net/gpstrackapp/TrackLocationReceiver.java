@@ -19,6 +19,7 @@ public class TrackLocationReceiver extends BroadcastReceiver {
         Bundle bundle = intent.getExtras();
         Location location = (Location) bundle.get("location");
         if (recordedTrack != null) {
+            Log.d(getLogStart(), "Location added to track");
             recordedTrack.onLocationChanged(location);
         }
     }

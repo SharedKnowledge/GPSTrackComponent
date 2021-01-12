@@ -9,13 +9,12 @@ import net.gpstrackapp.overlay.TrackOverlay;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MyTrackMapView extends MyMapView implements TrackDisplayer {
-    private Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
-
+public class MyTrackMapView extends MyMapView {
     public MyTrackMapView(Context ctx) {
         super(ctx);
     }
 
+    /*
     @Override
     public Map<Track, TrackOverlay> getTracksWithOverlaysHolder() {
         return trackWithOverlayHolder;
@@ -38,6 +37,7 @@ public class MyTrackMapView extends MyMapView implements TrackDisplayer {
         this.invalidate();
         return removed;
     }
+     */
 
 /*
     public void setDisplayedTracks(Set<String> selectedItemIDs, Context ctx) {

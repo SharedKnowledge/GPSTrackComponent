@@ -1,5 +1,7 @@
 package net.gpstrackapp;
 
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -7,16 +9,53 @@ import java.util.HashSet;
 import java.util.Set;
 
 class SelectableMapObjectListContentAdapterHelper {
-    private Set<String> selectedItemIDs = new HashSet<>();
-    private Set<String> uuidSet = new HashSet<>();
+    private Set<CharSequence> selectedItemIDs = new HashSet<>();
+    private Set<CharSequence> uuidSet = new HashSet<>();
+    private Set<CharSequence> preselectedUUIDSet = null;
+
+    void setPreselection(Set<CharSequence> preselection) {
+        this.preselectedUUIDSet = preselection;
+    }
 
     void setSelectedText(CharSequence itemID, View selectableItemView, TextView selectedTextView) {
+        Log.d(getLogStart(), "setSelectedText()");
         selectableItemView.setTag(itemID);
         selectedTextView.setText(
                 this.selectedItemIDs.contains(itemID) ? "SELECTED" : "");
     }
 
-    Set<String> getSelectedUUIDs() {
+    void setSelectedText(CharSequence itemID, CharSequence uid,
+                         View selectableItemView, TextView selectedTextView) {
+
+        if(this.preselectedUUIDSet != null && !preselectedUUIDSet.isEmpty()) {
+            if(this.preselectedUUIDSet.remove(uid)) { // pre-select once
+                this.selectedItemIDs.add(itemID);
+                this.uuidSet.add(uid);
+            }
+        }
+
+        this.setSelectedText(itemID, selectableItemView, selectedTextView);
+    }
+
+    void onAction(RecyclerView.Adapter adapter, View view, CharSequence uid) {
+        CharSequence itemID = (CharSequence) view.getTag();
+
+        if(this.selectedItemIDs.contains(itemID)) {
+            this.selectedItemIDs.remove(itemID);
+            this.uuidSet.remove(uid);
+        } else {
+            this.selectedItemIDs.add(itemID);
+            this.uuidSet.add(uid);
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
+    Set<CharSequence> getSelectedUUIDs() {
         return this.uuidSet;
+    }
+
+    private String getLogStart() {
+        return this.getClass().getSimpleName();
     }
 }

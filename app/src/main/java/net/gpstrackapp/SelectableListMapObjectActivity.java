@@ -9,7 +9,7 @@ import java.util.Set;
 public abstract class SelectableListMapObjectActivity extends AppCompatActivity {
     protected SelectableMapObjectListContentAdapterHelper selectableContentSource = new SelectableMapObjectListContentAdapterHelper();
 
-    Set<String> getSelectedItemIDs() {
+    Set<CharSequence> getSelectedItemIDs() {
         return this.selectableContentSource.getSelectedUUIDs();
     }
 }

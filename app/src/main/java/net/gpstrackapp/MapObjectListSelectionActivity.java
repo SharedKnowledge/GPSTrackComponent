@@ -40,10 +40,9 @@ public abstract class MapObjectListSelectionActivity extends MapObjectListActivi
     private void doDone() {
         Log.d(getLogStart(), "doDone");
         onSelectionFinished(this.getSelectedItemIDs());
-        this.finish();
     }
 
-    protected abstract void onSelectionFinished(Set<String> selectedItemIDs);
+    protected abstract void onSelectionFinished(Set<CharSequence> selectedItemIDs);
 
     private String getLogStart() {
         return this.getClass().getSimpleName();

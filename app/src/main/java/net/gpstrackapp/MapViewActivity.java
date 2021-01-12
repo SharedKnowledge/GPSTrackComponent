@@ -18,10 +18,12 @@ import org.osmdroid.views.MapView;
 public abstract class MapViewActivity extends AppCompatActivity {
     protected MyMapView mapView = null;
     protected ViewGroup parentView = null;
+    protected Presenter presenter = null;
     private final double DEFAULT_ZOOM_LEVEL = 18;
 
     protected abstract MyMapView setupMapViewAndGet();
     protected abstract ViewGroup setupLayoutAndGet();
+    protected abstract Presenter setupPresenterAndGet();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,24 +31,30 @@ public abstract class MapViewActivity extends AppCompatActivity {
 
         mapView = setupMapViewAndGet();
         finishMapSetup();
+
+        presenter = setupPresenterAndGet();
+        presenter.onCreate();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mapView.onPause();
+        presenter.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        presenter.onResume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         parentView.removeView(mapView);
+        presenter.onDestroy();
     }
 
     @Override

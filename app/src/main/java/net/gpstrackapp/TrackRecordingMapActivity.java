@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -29,22 +28,22 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 //TODO permission handling, maybe in superclass or split up
 public class TrackRecordingMapActivity extends MapViewActivity {
+    private static final int DISPLAY_ACTIVITY_REQUEST_CODE = 0;
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private Context ctx;
     private static Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
+    private TrackRecordingPresenter trackRecordingPresenter;
 
     private MenuItem recordingItem;
-    private Intent serviceIntent;
-    private TrackLocationReceiver trackLocationReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,16 +68,40 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                 // WRITE_EXTERNAL_STORAGE is required in order to show the map
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
-
-        //start service here so that user can navigate to other components in SN2 without ending the service
-        startLocationService();
-        trackLocationReceiver = new TrackLocationReceiver();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopLocationService();
+    protected Presenter setupPresenterAndGet() {
+        trackRecordingPresenter = new TrackRecordingPresenter(mapView);
+        return trackRecordingPresenter;
+    }
+
+    // Always called before onResume, so the overlays can be added/removed in onResume
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == DISPLAY_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                List<CharSequence> selectedItemIDsList = data.getCharSequenceArrayListExtra("selectedItemIDs");
+                Set<CharSequence> selectedItemIDs = new HashSet<>(selectedItemIDsList);
+                trackRecordingPresenter.getTrackManager().setSelectedItemIDs(selectedItemIDs);
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putCharSequenceArrayList("savedItemIDs", new ArrayList<>(trackRecordingPresenter.getTrackManager().getSelectedItemIDs()));
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.containsKey("savedItemIDs")) {
+            Set<CharSequence> selectedItemIDs = new HashSet<>(savedInstanceState.getCharSequenceArrayList("savedItemIDs"));
+            trackRecordingPresenter.getTrackManager().setSelectedItemIDs(selectedItemIDs);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -124,10 +147,10 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         try {
             switch (item.getItemId()) {
                 case R.id.record_item:
-                    if (!isRecordingTrack()) {
+                    if (!trackRecordingPresenter.isRecordingTrack()) {
                         showTrackNameDialog();
                     } else {
-                        stopTrackRecording();
+                        trackRecordingPresenter.stopTrackRecording();
                     }
                     return true;
                 case R.id.display_item:
@@ -153,7 +176,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         final EditText input = new EditText(this);
 
         //TODO integrate Creator in String
-        String name = "My Track " + TrackManager.getNumberOfTracks() + 1;
+        String name = "My Track " + (TrackManager.getNumberOfTracks() + 1);
         input.setText(name);
         input.setSelectAllOnFocus(true);
 
@@ -162,7 +185,8 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String trackName = input.getText().toString();
-                startTrackRecording(trackName);
+                trackRecordingPresenter.startTrackRecording(trackName);
+                changeUIState(true);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -174,63 +198,15 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         builder.show();
     }
 
-    private void startTrackRecording(String trackName) {
-        Log.d(getLogStart(), "Start Track Recording");
-        Track trackToRecord = TrackManager.createTrack(trackName, Calendar.getInstance().getTime(), null);
-        registerTrackLocationReceiver(trackToRecord);
-
-        changeUIState(isRecordingTrack());
-    }
-
-    private void stopTrackRecording() {
-        Log.d(getLogStart(), "Stop Track Recording");
-
-        unregisterTrackLocationReceiver();
-    }
-
-    private boolean isRecordingTrack() {
-        return trackLocationReceiver.getRecordedTrack() != null;
-    }
-
     private void changeUIState(boolean recording) {
 
     }
 
-    private void startLocationService() {
-        serviceIntent = new Intent(getApplicationContext(), LocationService.class);
-        /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(serviceIntent);
-        } else {
-            this.startService(serviceIntent);
-        }
-        */
-        this.startService(serviceIntent);
-        Log.d(getLogStart(), "start location service");
-    }
-
-    private void stopLocationService() {
-        this.stopService(serviceIntent);
-        Log.d(getLogStart(), "stop location service");
-    }
-
-    //TODO Interface fuer das Registrieren eines Receivers?
-    private void registerTrackLocationReceiver(Track trackToRecord) {
-        trackLocationReceiver.registerRecordedTrack(trackToRecord);
-        IntentFilter filter = new IntentFilter("LOCATION UPDATE");
-        registerReceiver(trackLocationReceiver, filter);
-        Log.d(getLogStart(), "register receiver");
-    }
-
-    private void unregisterTrackLocationReceiver() {
-        trackLocationReceiver.unregisterRecordedTrack();
-        unregisterReceiver(trackLocationReceiver);
-        Log.d(getLogStart(), "unregister receiver");
-    }
-
     private void startDisplayTracksActivity() {
         Intent intent = new Intent(this, DisplayTracksActivity.class);
-        startActivity(intent);
+        Set<CharSequence> selectedItemIDs = trackRecordingPresenter.getTrackManager().getSelectedItemIDs();
+        intent.putCharSequenceArrayListExtra("selectedItemIDs", new ArrayList<>(selectedItemIDs));
+        startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.widget.Toast;
 
 import net.gpstrackapp.geomodel.GeoModel;
+import net.gpstrackapp.geomodel.track.GeoModelManager;
 import net.gpstrackapp.geomodel.track.Track;
 
 import org.osmdroid.util.GeoPoint;
@@ -15,7 +16,7 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.List;
 
 //TODO Interface, von dem diese Klasse ableitet waere gut
-public class TrackOverlay extends FolderOverlay {
+public class TrackOverlay extends GeoModelOverlay {
     private Marker start, end;
     private Polyline line;
 

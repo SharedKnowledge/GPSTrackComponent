@@ -1,50 +1,62 @@
 package net.gpstrackapp.geomodel.track;
 
+import net.gpstrackapp.MyMapView;
 import net.gpstrackapp.overlay.TrackOverlay;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
-public class TrackManager {
+public class TrackManager extends GeoModelManager<Track, TrackOverlay> {
     private static List<Track> tracks = new ArrayList<>();
+
+    public TrackManager(MyMapView mapView) {
+        super(mapView);
+    }
 
     public static Track createTrack(CharSequence objectName, Date dateOfCreation, List<TrackPoint> trackPoints) {
         Track track = new Track(objectName, dateOfCreation, trackPoints);
-        tracks.add(track);
+        TrackManager.tracks.add(track);
         return track;
     }
 
-    public static boolean destroyTrack(String objectID) {
-        Track track = getTrackByID(objectID);
+    public static boolean destroyTrack(CharSequence uuid) {
+        Track track = TrackManager.getTrackByUUID(uuid);
         if (track != null) {
-            return tracks.remove(track);
+            return TrackManager.tracks.remove(track);
         } else {
             return false;
         }
     }
 
-    public static Track getTrackByID(String objectID) {
+    public static Track getTrackByUUID(CharSequence uuid) {
         for (int i = 0; i < tracks.size(); i++) {
-            if (tracks.get(i).getObjectId().equals(objectID)) {
-                return tracks.get(i);
+            if (TrackManager.tracks.get(i).getObjectId().equals(uuid)) {
+                return TrackManager.tracks.get(i);
             }
         }
         return null;
     }
 
     public static Track getTrackByPosition(int position) {
-        return tracks.get(position);
+        return TrackManager.tracks.get(position);
     }
 
     public static List<Track> getAllTracks() {
-        return tracks;
+        return TrackManager.tracks;
     }
 
     public static int getNumberOfTracks() {
-        return tracks.size();
+        return TrackManager.tracks.size();
+    }
+
+    @Override
+    protected TrackOverlay createGeoModelOverlay(Track track) {
+        return new TrackOverlay(track.getGeoPoints());
+    }
+
+    @Override
+    protected Track getGeoModelByUUID(CharSequence uuid) {
+        return TrackManager.getTrackByUUID(uuid);
     }
 }

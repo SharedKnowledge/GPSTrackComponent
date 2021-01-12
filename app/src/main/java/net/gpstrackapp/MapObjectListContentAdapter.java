@@ -22,6 +22,7 @@ public class MapObjectListContentAdapter extends
     private final Context ctx;
     protected final SelectableMapObjectListContentAdapterHelper helper;
     private View.OnClickListener clickListener;
+    private boolean firstClick = true;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView mapObjectName,
@@ -66,6 +67,9 @@ public class MapObjectListContentAdapter extends
         GeoModel geoModel = TrackManager.getTrackByPosition(position);
 
         CharSequence geoModelID = geoModel.getObjectId();
+        helper.setSelectedText(Integer.toString(position), geoModelID,
+                holder.itemView, holder.mapObjectSelected);
+
         CharSequence geoModelName = geoModel.getObjectName();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = df.format(geoModel.getDateOfCreation());
@@ -83,9 +87,15 @@ public class MapObjectListContentAdapter extends
         return TrackManager.getNumberOfTracks();
     }
 
-    @Override
-    public void onClick(View v) {
+    //TODO onLongClick to edit GeoModel?
 
+    @Override
+    public void onClick(View view) {
+        if (firstClick) {
+            firstClick = false;
+        }
+        CharSequence geoModelID = (CharSequence) view.getTag(R.id.geomodel_id_tag);
+        helper.onAction(this, view, geoModelID);
     }
 
     protected String getLogStart() {

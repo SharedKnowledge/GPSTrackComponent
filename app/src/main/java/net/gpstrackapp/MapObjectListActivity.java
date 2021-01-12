@@ -9,6 +9,10 @@ import android.util.Log;
 
 import net.sharksystem.asap.android.Util;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public abstract class MapObjectListActivity extends SelectableListMapObjectActivity {
     private RecyclerView recyclerView;
     private MapObjectListContentAdapter adapter;
@@ -23,7 +27,11 @@ public abstract class MapObjectListActivity extends SelectableListMapObjectActiv
 
             GPSComponent.getGPSComponent().getASAPApplication().setupDrawerLayout(this);
 
-            //TODO preselect in subclass (by using abstract method and implementing it e.g. in DisplayTracksActivity)
+            List<CharSequence> selectedItemIDsList = getIntent().getCharSequenceArrayListExtra("selectedItemIDs");
+            if (selectedItemIDsList != null) {
+                Set<CharSequence> selectedItemIDs = new HashSet<>(selectedItemIDsList);
+                this.selectableContentSource.setPreselection(selectedItemIDs);
+            }
 
             // setup toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_with_toolbar);
@@ -31,7 +39,6 @@ public abstract class MapObjectListActivity extends SelectableListMapObjectActiv
 
             recyclerView = (RecyclerView) findViewById(R.id.gpstracker_list_recycler_view);
 
-            //TODO zusaetzlich GeoModelManager uebergeben, da dieser gebraucht wird
             adapter = new MapObjectListContentAdapter(this, this.selectableContentSource);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(layoutManager);
