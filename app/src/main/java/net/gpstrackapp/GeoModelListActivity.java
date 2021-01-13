@@ -7,15 +7,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
+import net.gpstrackapp.geomodel.GeoModel;
 import net.sharksystem.asap.android.Util;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class MapObjectListActivity extends SelectableListMapObjectActivity {
+public abstract class GeoModelListActivity extends SelectableListGeoModelActivity {
     private RecyclerView recyclerView;
-    private MapObjectListContentAdapter adapter;
+    private GeoModelListContentAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,7 @@ public abstract class MapObjectListActivity extends SelectableListMapObjectActiv
 
             recyclerView = (RecyclerView) findViewById(R.id.gpstracker_list_recycler_view);
 
-            adapter = new MapObjectListContentAdapter(this, this.selectableContentSource);
+            adapter = new GeoModelListContentAdapter(this, this.selectableContentSource, createRequestGeoModelsCommand());
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -49,6 +50,8 @@ public abstract class MapObjectListActivity extends SelectableListMapObjectActiv
             Log.d(getLogStart(), "problems while setting up activity and content adapter: " + e.getLocalizedMessage());
         }
     }
+
+    protected abstract RequestGeoModelsCommand createRequestGeoModelsCommand();
 
     protected void onResume() {
         super.onResume();

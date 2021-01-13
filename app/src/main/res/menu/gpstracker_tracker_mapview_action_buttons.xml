@@ -12,12 +12,16 @@
 
         <menu>
             <item android:id="@+id/record_item"
-                android:title="@string/gpstracker_item_tracks_record_button_text"
+                android:title="@string/gpstracker_item_tracks_start_record_button_text"
                 app:showAsAction="always|withText"
                 />
-            <group>
+            <group android:id="@+id/group_track_actions">
                 <item android:id="@+id/display_item"
                     android:title="@string/gpstracker_item_tracks_display_button_text"
+                    app:showAsAction="always|withText"
+                    />
+                <item android:id="@+id/save_item"
+                    android:title="@string/gpstracker_item_tracks_save_button_text"
                     app:showAsAction="always|withText"
                     />
                 <item android:id="@+id/import_item"

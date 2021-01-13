@@ -6,8 +6,8 @@ import net.sharksystem.asap.android.apps.ASAPActivity;
 
 import java.util.Set;
 
-public abstract class SelectableListMapObjectActivity extends AppCompatActivity {
-    protected SelectableMapObjectListContentAdapterHelper selectableContentSource = new SelectableMapObjectListContentAdapterHelper();
+public abstract class SelectableListGeoModelActivity extends AppCompatActivity {
+    protected SelectableGeoModelListContentAdapterHelper selectableContentSource = new SelectableGeoModelListContentAdapterHelper();
 
     Set<CharSequence> getSelectedItemIDs() {
         return this.selectableContentSource.getSelectedUUIDs();

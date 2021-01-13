@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".MapObjectListSelectionActivity">
+    tools:context=".GeoModelListSelectionActivity">
 
     <!-- TODO Description of available actions, as method in activity which is abstract
             in parent activity and sets text -->

@@ -4,23 +4,20 @@ import android.location.Location;
 
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModel;
-import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.geomodel.ILocationConsumer;
 
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.FolderOverlay;
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
-import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Track extends GeoModel implements ILocationConsumer {
+public class Track extends GeoModel implements ILocationConsumer, Serializable {
     private List<TrackPoint> trackPoints = new ArrayList<>();
 
-    public Track(CharSequence objectName, Date dateOfCreation, List<TrackPoint> trackPoints) {
-        super(objectName, dateOfCreation, GPSComponent.getGPSComponent().getASAPApplication().getOwnerName());
+    public Track(CharSequence objectID, CharSequence objectName, CharSequence creator, Date dateOfCreation, List<TrackPoint> trackPoints) {
+        super(objectID, objectName, creator, dateOfCreation);
         if (trackPoints != null) {
             this.trackPoints.addAll(trackPoints);
         }

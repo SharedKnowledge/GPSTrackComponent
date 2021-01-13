@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="net.gpstrackapp">
 
-    <!-- for Offline tile provider and storing tiles -->
+    <!-- for Offline tile provider and storing tiles as well as saving and loading geomodels -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <!-- for Location provider -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -32,6 +33,7 @@
         </activity>
         <activity android:name=".TrackRecordingMapActivity"/>
         <activity android:name=".DisplayTracksActivity"/>
+        <activity android:name=".SaveTracksActivity"/>
         <activity android:name=".ImportTracksActivity"/>
         <activity android:name=".ExportTracksActivity"/>
 

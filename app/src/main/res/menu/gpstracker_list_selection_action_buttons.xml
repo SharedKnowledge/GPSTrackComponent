@@ -4,7 +4,7 @@
     <item
         android:id="@+id/gpstrackerListSelectionDoneButton"
         android:checkable="true"
-        android:title="@string/mapObjectListSelectionDoneText"
+        android:title="@string/GeoModelListSelectionDoneText"
         app:showAsAction="always|withText"
         />
     <item

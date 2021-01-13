@@ -10,81 +10,82 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.gpstrackapp.geomodel.GeoModel;
+import net.gpstrackapp.geomodel.GeoModelManager;
 import net.gpstrackapp.geomodel.track.TrackManager;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class MapObjectListContentAdapter extends
-        RecyclerView.Adapter<MapObjectListContentAdapter.MyViewHolder>
+public class GeoModelListContentAdapter extends
+        RecyclerView.Adapter<GeoModelListContentAdapter.MyViewHolder>
         implements View.OnClickListener {
 
     private final Context ctx;
-    protected final SelectableMapObjectListContentAdapterHelper helper;
+    protected final SelectableGeoModelListContentAdapterHelper helper;
     private View.OnClickListener clickListener;
     private boolean firstClick = true;
+    private RequestGeoModelsCommand requestGeoModelsCommand;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView mapObjectName,
-                mapObjectDate,
-                mapObjectCreator,
-                mapObjectSelected;
+        public TextView GeoModelName,
+                GeoModelDate,
+                GeoModelCreator,
+                GeoModelSelected;
 
         public MyViewHolder(View view) {
             super(view);
-            mapObjectName = view.findViewById(R.id.gpstracker_list_geomodels_row_name);
-            mapObjectDate = view.findViewById(R.id.gpstracker_list_geomodels_row_date);
-            mapObjectCreator = view.findViewById(R.id.gpstracker_list_geomodels_row_creator);
-            mapObjectSelected = view.findViewById(R.id.gpstracker_list_geomodels_row_selected);
+            GeoModelName = view.findViewById(R.id.gpstracker_list_geomodels_row_name);
+            GeoModelDate = view.findViewById(R.id.gpstracker_list_geomodels_row_date);
+            GeoModelCreator = view.findViewById(R.id.gpstracker_list_geomodels_row_creator);
+            GeoModelSelected = view.findViewById(R.id.gpstracker_list_geomodels_row_selected);
 
             view.setOnClickListener(clickListener);
         }
     }
 
-    //TODO zusaetzlich GeoModelManager uebergeben
-    public MapObjectListContentAdapter(Context ctx, SelectableMapObjectListContentAdapterHelper helper) {
+    public GeoModelListContentAdapter(Context ctx, SelectableGeoModelListContentAdapterHelper helper, RequestGeoModelsCommand requestGeoModelsCommand) {
         Log.d(this.getLogStart(), "constructor");
         this.ctx = ctx;
         this.clickListener = this;
         this.helper = helper;
+        this.requestGeoModelsCommand = requestGeoModelsCommand;
     }
 
     @NonNull
     @Override
-    public MapObjectListContentAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public GeoModelListContentAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d(this.getLogStart(), "onCreateViewHolder");
         View itemView = LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.gpstracker_list_geomodel_row, parent, false);
-        return new MapObjectListContentAdapter.MyViewHolder(itemView);
+        return new GeoModelListContentAdapter.MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MapObjectListContentAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GeoModelListContentAdapter.MyViewHolder holder, int position) {
         Log.d(this.getLogStart(), "onBindViewHolder with position: " + position);
-
-        //TODO im Konstruktor zu uebergebenden GeoModelManager stattdessen nutzen
-        GeoModel geoModel = TrackManager.getTrackByPosition(position);
+        GeoModel geoModel = requestGeoModelsCommand.getGeoModels().get(position);
 
         CharSequence geoModelID = geoModel.getObjectId();
         helper.setSelectedText(Integer.toString(position), geoModelID,
-                holder.itemView, holder.mapObjectSelected);
+                holder.itemView, holder.GeoModelSelected);
 
         CharSequence geoModelName = geoModel.getObjectName();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String date = df.format(geoModel.getDateOfCreation());
+        String date = geoModel.getDateOfCreationAsFormattedString();
         CharSequence creator = geoModel.getCreator();
 
         holder.itemView.setTag(R.id.geomodel_id_tag, geoModelID);
-        holder.mapObjectName.setText(geoModelName);
-        holder.mapObjectDate.setText(date);
-        holder.mapObjectCreator.setText(creator);
+        holder.GeoModelName.setText(geoModelName);
+        holder.GeoModelDate.setText(date);
+        holder.GeoModelCreator.setText(creator);
     }
 
     //TODO
     @Override
     public int getItemCount() {
-        return TrackManager.getNumberOfTracks();
+        return requestGeoModelsCommand.getNumberOfGeoModels();
     }
 
     //TODO onLongClick to edit GeoModel?

@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
+import android.widget.Toast;
 
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackManager;
-
-import org.osmdroid.views.MapView;
 
 import java.util.Calendar;
 
@@ -19,7 +18,7 @@ public class TrackRecordingPresenter implements Presenter {
 
     private TrackManager trackManager;
 
-    public TrackRecordingPresenter(MyMapView mapView) {
+    public TrackRecordingPresenter(ConfiguredMapView mapView) {
         this.trackManager = new TrackManager(mapView);
         this.ctx = mapView.getContext();
     }
@@ -54,27 +53,40 @@ public class TrackRecordingPresenter implements Presenter {
     }
 
     public void startTrackRecording(String trackName) {
-        Log.d(getLogStart(), "Start Track Recording");
-        Track trackToRecord = TrackManager.createTrack(trackName, Calendar.getInstance().getTime(), null);
+        Track trackToRecord = TrackManager.createTrack(null, trackName,
+                GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
+                Calendar.getInstance().getTime(), null);
         trackLocationReceiver.registerRecordedTrack(trackToRecord);
+        Log.d(getLogStart(), "Track recording started");
+        Toast.makeText(ctx, "Track recording started", Toast.LENGTH_SHORT).show();
+    }
+
+    public void restartTrackRecording(Track track) {
+        trackLocationReceiver.registerRecordedTrack(track);
+        Log.d(getLogStart(), "Track recording restarted");
     }
 
     public void stopTrackRecording() {
-        Log.d(getLogStart(), "Stop Track Recording");
         trackLocationReceiver.unregisterRecordedTrack();
+        Log.d(getLogStart(), "Track recording stopped");
+        Toast.makeText(ctx, "Track recording stopped", Toast.LENGTH_SHORT).show();
     }
 
     public boolean isRecordingTrack() {
         return trackLocationReceiver.getRecordedTrack() != null;
     }
 
+    public Track getRecordedTrack() {
+        return trackLocationReceiver.getRecordedTrack();
+    }
+
     private void startLocationService() {
         serviceIntent = new Intent(ctx.getApplicationContext(), LocationService.class);
         /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(serviceIntent);
+            ctx.startForegroundService(serviceIntent);
         } else {
-            this.startService(serviceIntent);
+            ctx.startService(serviceIntent);
         }
         */
         ctx.startService(serviceIntent);

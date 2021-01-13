@@ -8,7 +8,7 @@ import android.widget.TextView;
 import java.util.HashSet;
 import java.util.Set;
 
-class SelectableMapObjectListContentAdapterHelper {
+class SelectableGeoModelListContentAdapterHelper {
     private Set<CharSequence> selectedItemIDs = new HashSet<>();
     private Set<CharSequence> uuidSet = new HashSet<>();
     private Set<CharSequence> preselectedUUIDSet = null;
@@ -37,15 +37,15 @@ class SelectableMapObjectListContentAdapterHelper {
         this.setSelectedText(itemID, selectableItemView, selectedTextView);
     }
 
-    void onAction(RecyclerView.Adapter adapter, View view, CharSequence uid) {
+    void onAction(RecyclerView.Adapter adapter, View view, CharSequence uuid) {
         CharSequence itemID = (CharSequence) view.getTag();
 
         if(this.selectedItemIDs.contains(itemID)) {
             this.selectedItemIDs.remove(itemID);
-            this.uuidSet.remove(uid);
+            this.uuidSet.remove(uuid);
         } else {
             this.selectedItemIDs.add(itemID);
-            this.uuidSet.add(uid);
+            this.uuidSet.add(uuid);
         }
 
         adapter.notifyDataSetChanged();

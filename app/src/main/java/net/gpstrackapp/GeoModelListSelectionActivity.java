@@ -5,9 +5,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import net.gpstrackapp.geomodel.GeoModel;
+
 import java.util.Set;
 
-public abstract class MapObjectListSelectionActivity extends MapObjectListActivity {
+public abstract class GeoModelListSelectionActivity extends GeoModelListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(getLogStart(), "init Toolbar");

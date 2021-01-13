@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class MyMapView extends MapView {
+public class ConfiguredMapView extends MapView {
     private MyLocationNewOverlay locationOverlay;
     //TODO change TileSource (nicht Mapnik) und in validTileSources entfernen, besser ist jedoch validTileSources nur fuer Download und Laden von Offline-Tiles zu verwenden
     private static final ITileSource DEFAULT_TILE_SOURCE = TileSourceFactory.MAPNIK;
@@ -30,7 +30,7 @@ public class MyMapView extends MapView {
             TileSourceFactory.USGS_SAT));
     private Context ctx;
 
-    public MyMapView(Context ctx) {
+    public ConfiguredMapView(Context ctx) {
         super(ctx);
         this.ctx = ctx;
         setupOverlays(ctx);

@@ -1,27 +1,19 @@
 package net.gpstrackapp;
 
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.CustomZoomButtonsController;
-import org.osmdroid.views.MapView;
 
 public abstract class MapViewActivity extends AppCompatActivity {
-    protected MyMapView mapView = null;
+    protected ConfiguredMapView mapView = null;
     protected ViewGroup parentView = null;
     protected Presenter presenter = null;
     private final double DEFAULT_ZOOM_LEVEL = 18;
 
-    protected abstract MyMapView setupMapViewAndGet();
+    protected abstract ConfiguredMapView setupMapViewAndGet();
     protected abstract ViewGroup setupLayoutAndGet();
     protected abstract Presenter setupPresenterAndGet();
 
@@ -39,6 +31,7 @@ public abstract class MapViewActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        // refresh the osmdroid configuration so that overlays can adjust
         mapView.onPause();
         presenter.onPause();
     }
@@ -46,6 +39,7 @@ public abstract class MapViewActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // refresh the osmdroid configuration so that overlays can adjust
         mapView.onResume();
         presenter.onResume();
     }

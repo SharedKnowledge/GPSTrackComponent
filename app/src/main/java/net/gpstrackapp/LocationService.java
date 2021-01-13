@@ -25,12 +25,12 @@ import java.util.List;
 public class LocationService extends Service {
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private NotificationChannel channel;
+    //private NotificationChannel channel;
 
     private long updateMinTime = 0;
     private float updateMinDistance = 0;
     // accuracy is the radius of 68% confidence
-    private float maxHorizontalAccuracy = Float.MAX_VALUE;
+    private float maxHorizontalAccuracy = 100;
 
     @Override
     public void onCreate() {

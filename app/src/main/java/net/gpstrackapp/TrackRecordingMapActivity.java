@@ -29,6 +29,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,8 +43,6 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     private Context ctx;
     private static Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
     private TrackRecordingPresenter trackRecordingPresenter;
-
-    private MenuItem recordingItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +92,9 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putCharSequenceArrayList("savedItemIDs", new ArrayList<>(trackRecordingPresenter.getTrackManager().getSelectedItemIDs()));
+        if (trackRecordingPresenter.getRecordedTrack() != null) {
+            savedInstanceState.putCharSequence("recordedTrack", trackRecordingPresenter.getRecordedTrack().getObjectId());
+        }
     }
 
     @Override
@@ -102,6 +104,11 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             Set<CharSequence> selectedItemIDs = new HashSet<>(savedInstanceState.getCharSequenceArrayList("savedItemIDs"));
             trackRecordingPresenter.getTrackManager().setSelectedItemIDs(selectedItemIDs);
         }
+        if (savedInstanceState.containsKey("recordedTrack")) {
+            CharSequence trackID = savedInstanceState.getCharSequence("recordedTrack");
+            Track track = TrackManager.getTrackByUUID(trackID);
+            trackRecordingPresenter.restartTrackRecording(track);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -109,8 +116,8 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     ////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected MyMapView setupMapViewAndGet() {
-        mapView = new MyMapView(this);
+    protected ConfiguredMapView setupMapViewAndGet() {
+        mapView = new ConfiguredMapView(this);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         return mapView;
     }
@@ -139,7 +146,27 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         Log.d(getLogStart(), "init Toolbar");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_tracker_mapview_action_buttons, menu);
+        adjustMenuToRecordingState(menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        adjustMenuToRecordingState(menu);
+        return true;
+    }
+
+    private void adjustMenuToRecordingState(Menu menu) {
+        MenuItem recordingItem = menu.findItem(R.id.record_item);
+        if (trackRecordingPresenter.isRecordingTrack()) {
+            recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_stop_record_button_text));
+            menu.findItem(R.id.track_item).getSubMenu().setGroupEnabled(R.id.group_track_actions, false);
+            Log.d(getLogStart(), "disable group");
+        } else {
+            recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_start_record_button_text));
+            menu.findItem(R.id.track_item).getSubMenu().setGroupEnabled(R.id.group_track_actions, true);
+            Log.d(getLogStart(), "enable group");
+        }
     }
 
     @Override
@@ -150,11 +177,17 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                     if (!trackRecordingPresenter.isRecordingTrack()) {
                         showTrackNameDialog();
                     } else {
+                        Track recordedTrack = trackRecordingPresenter.getRecordedTrack();
                         trackRecordingPresenter.stopTrackRecording();
+                        invalidateOptionsMenu();
+                        showSaveTrackDialog(recordedTrack);
                     }
                     return true;
                 case R.id.display_item:
                     startDisplayTracksActivity();
+                    return true;
+                case R.id.save_item:
+                    startSaveTracksActivity(null);
                     return true;
                 case R.id.import_item:
                     return true;
@@ -176,7 +209,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         final EditText input = new EditText(this);
 
         //TODO integrate Creator in String
-        String name = "My Track " + (TrackManager.getNumberOfTracks() + 1);
+        String name = GPSComponent.getGPSComponent().getASAPApplication().getOwnerName() + "\'s track " + (TrackManager.getNumberOfTracks() + 1);
         input.setText(name);
         input.setSelectAllOnFocus(true);
 
@@ -186,7 +219,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String trackName = input.getText().toString();
                 trackRecordingPresenter.startTrackRecording(trackName);
-                changeUIState(true);
+                invalidateOptionsMenu();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -198,8 +231,23 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         builder.show();
     }
 
-    private void changeUIState(boolean recording) {
+    private void showSaveTrackDialog(final Track track) {
+        DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        startSaveTracksActivity(track);
+                        break;
+                }
+            }
+        };
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Save recorded track to storage?")
+                .setPositiveButton("Yes" , clickListener)
+                .setNegativeButton("No" , clickListener)
+                .show();
     }
 
     private void startDisplayTracksActivity() {
@@ -207,6 +255,15 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         Set<CharSequence> selectedItemIDs = trackRecordingPresenter.getTrackManager().getSelectedItemIDs();
         intent.putCharSequenceArrayListExtra("selectedItemIDs", new ArrayList<>(selectedItemIDs));
         startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
+    }
+
+    private void startSaveTracksActivity(Track trackToSave) {
+        Intent intent = new Intent(this, SaveTracksActivity.class);
+        if (trackToSave != null) {
+            ArrayList<CharSequence> list = new ArrayList<>(Arrays.asList(trackToSave.getObjectId()));
+            intent.putCharSequenceArrayListExtra("selectedItemIDs", list);
+        }
+        startActivity(intent);
     }
 
     @Override

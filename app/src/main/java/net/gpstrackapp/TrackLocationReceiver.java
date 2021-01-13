@@ -15,7 +15,6 @@ public class TrackLocationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(getLogStart(), "Location update received");
         Bundle bundle = intent.getExtras();
         Location location = (Location) bundle.get("location");
         if (recordedTrack != null) {
