@@ -3,7 +3,8 @@ package net.gpstrackapp;
 import android.content.Context;
 import android.util.Log;
 
-import net.gpstrackapp.geomodel.track.TrackManager;
+import net.gpstrackapp.geomodel.track.TrackModelManager;
+import net.gpstrackapp.geomodel.track.TrackVisualizer;
 import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.android.apps.ASAPApplication;
 import net.sharksystem.asap.android.apps.ASAPApplicationComponent;
@@ -13,12 +14,13 @@ import net.sharksystem.asap.android.apps.ASAPComponentNotYetInitializedException
 public class GPSComponent implements ASAPApplicationComponent {
     private final ASAPApplicationComponentHelper asapComponentHelper;
     private static GPSComponent instance = null;
+    private static TrackModelManager trackModelManager;
 
     private GPSComponent(ASAPApplication asapApplication) {
         this.asapComponentHelper = new ASAPApplicationComponentHelper();
         this.asapComponentHelper.setASAPApplication(asapApplication);
 
-        TrackManager.loadAllTracksFromFiles(getASAPApplication().getActivity());
+        getTrackModelManager().loadAllGeoModelsFromFiles(getASAPApplication().getActivity());
         Log.d(getLogStart(), "Finished loading tracks from storage.");
     }
 
@@ -42,6 +44,13 @@ public class GPSComponent implements ASAPApplicationComponent {
     @Override
     public ASAPApplication getASAPApplication() {
         return this.asapComponentHelper.getASAPApplication();
+    }
+
+    public TrackModelManager getTrackModelManager() {
+        if (this.trackModelManager == null) {
+            this.trackModelManager = new TrackModelManager();
+        }
+        return this.trackModelManager;
     }
 
     private String getLogStart() {

@@ -1,5 +1,6 @@
 package net.gpstrackapp;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -73,6 +74,12 @@ public abstract class MapViewActivity extends AppCompatActivity {
             double lon = savedInstanceState.getDouble("lon");
             GeoPoint lastLocation = new GeoPoint(lat, lon);
             setCenterCoordinates(lastLocation);
+
+            //Update location of location overlay
+            Location location = new Location("");
+            location.setLatitude(lastLocation.getLatitude());
+            location.setLongitude(lastLocation.getLongitude());
+            mapView.getProvider().onLocationChanged(location);
         }
         if (savedInstanceState.containsKey("zoom")) {
             setZoomLevel(savedInstanceState.getDouble("zoom"));

@@ -21,6 +21,7 @@ import java.util.Set;
 
 public class ConfiguredMapView extends MapView {
     private MyLocationNewOverlay locationOverlay;
+    private GpsMyLocationProvider provider;
     //TODO change TileSource (nicht Mapnik) und in validTileSources entfernen, besser ist jedoch validTileSources nur fuer Download und Laden von Offline-Tiles zu verwenden
     private static final ITileSource DEFAULT_TILE_SOURCE = TileSourceFactory.MAPNIK;
     private ITileSource tileSource = DEFAULT_TILE_SOURCE;
@@ -49,7 +50,8 @@ public class ConfiguredMapView extends MapView {
         this.getOverlays().clear();
         this.getOverlays().add(new CopyrightOverlay(ctx));
 
-        locationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(ctx), this);
+        provider = new GpsMyLocationProvider(ctx);
+        locationOverlay = new MyLocationNewOverlay(provider, this);
         locationOverlay.enableMyLocation();
         locationOverlay.enableFollowLocation();
         this.getOverlays().add(locationOverlay);
@@ -57,6 +59,10 @@ public class ConfiguredMapView extends MapView {
         RotationGestureOverlay rotationGestureOverlay = new RotationGestureOverlay(this);
         rotationGestureOverlay.setEnabled(true);
         this.getOverlays().add(rotationGestureOverlay);
+    }
+
+    public GpsMyLocationProvider getProvider() {
+        return provider;
     }
 
     public GeoPoint getLastLocation() {

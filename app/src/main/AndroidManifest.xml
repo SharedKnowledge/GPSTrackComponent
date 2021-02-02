@@ -37,7 +37,7 @@
         <activity android:name=".ImportTracksActivity"/>
         <activity android:name=".ExportTracksActivity"/>
 
-        <service android:name=".LocationService"
+        <service android:name=".location.LocationService"
             android:enabled="true"
             />
         <!--

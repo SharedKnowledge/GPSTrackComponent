@@ -20,7 +20,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import net.gpstrackapp.geomodel.track.Track;
-import net.gpstrackapp.geomodel.track.TrackManager;
+import net.gpstrackapp.geomodel.track.TrackModelManager;
+import net.gpstrackapp.geomodel.track.TrackVisualizer;
 import net.gpstrackapp.overlay.TrackOverlay;
 import net.sharksystem.asap.ASAPException;
 
@@ -30,6 +31,7 @@ import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +45,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     private Context ctx;
     private static Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
     private TrackRecordingPresenter trackRecordingPresenter;
+    private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +86,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             if (resultCode == RESULT_OK) {
                 List<CharSequence> selectedItemIDsList = data.getCharSequenceArrayListExtra("selectedItemIDs");
                 Set<CharSequence> selectedItemIDs = new HashSet<>(selectedItemIDsList);
-                trackRecordingPresenter.getTrackManager().setSelectedItemIDs(selectedItemIDs);
+                trackRecordingPresenter.getTrackVisualizer().setSelectedItemIDs(selectedItemIDs);
             }
         }
     }
@@ -91,7 +94,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putCharSequenceArrayList("savedItemIDs", new ArrayList<>(trackRecordingPresenter.getTrackManager().getSelectedItemIDs()));
+        savedInstanceState.putCharSequenceArrayList("savedItemIDs", new ArrayList<>(trackRecordingPresenter.getTrackVisualizer().getSelectedItemIDs()));
         if (trackRecordingPresenter.getRecordedTrack() != null) {
             savedInstanceState.putCharSequence("recordedTrack", trackRecordingPresenter.getRecordedTrack().getObjectId());
         }
@@ -102,12 +105,12 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState.containsKey("savedItemIDs")) {
             Set<CharSequence> selectedItemIDs = new HashSet<>(savedInstanceState.getCharSequenceArrayList("savedItemIDs"));
-            trackRecordingPresenter.getTrackManager().setSelectedItemIDs(selectedItemIDs);
+            trackRecordingPresenter.getTrackVisualizer().setSelectedItemIDs(selectedItemIDs);
         }
         if (savedInstanceState.containsKey("recordedTrack")) {
             CharSequence trackID = savedInstanceState.getCharSequence("recordedTrack");
-            Track track = TrackManager.getTrackByUUID(trackID);
-            trackRecordingPresenter.restartTrackRecording(track);
+            Track track = trackModelManager.getGeoModelByUUID(trackID);
+            trackRecordingPresenter.registerLocationConsumer(track);
         }
     }
 
@@ -178,7 +181,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                         showTrackNameDialog();
                     } else {
                         Track recordedTrack = trackRecordingPresenter.getRecordedTrack();
-                        trackRecordingPresenter.stopTrackRecording();
+                        trackRecordingPresenter.unregisterLocationConsumer(recordedTrack);
                         invalidateOptionsMenu();
                         showSaveTrackDialog(recordedTrack);
                     }
@@ -208,8 +211,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
         final EditText input = new EditText(this);
 
-        //TODO integrate Creator in String
-        String name = GPSComponent.getGPSComponent().getASAPApplication().getOwnerName() + "\'s track " + (TrackManager.getNumberOfTracks() + 1);
+        String name = GPSComponent.getGPSComponent().getASAPApplication().getOwnerName() + "\'s track " + (trackModelManager.count() + 1);
         input.setText(name);
         input.setSelectAllOnFocus(true);
 
@@ -218,7 +220,11 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String trackName = input.getText().toString();
-                trackRecordingPresenter.startTrackRecording(trackName);
+                Track track = new Track(null, trackName,
+                        GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
+                        Calendar.getInstance().getTime(), null);
+                trackModelManager.add(track);
+                trackRecordingPresenter.registerLocationConsumer(track);
                 invalidateOptionsMenu();
             }
         });
@@ -252,7 +258,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
     private void startDisplayTracksActivity() {
         Intent intent = new Intent(this, DisplayTracksActivity.class);
-        Set<CharSequence> selectedItemIDs = trackRecordingPresenter.getTrackManager().getSelectedItemIDs();
+        Set<CharSequence> selectedItemIDs = trackRecordingPresenter.getTrackVisualizer().getSelectedItemIDs();
         intent.putCharSequenceArrayListExtra("selectedItemIDs", new ArrayList<>(selectedItemIDs));
         startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
     }

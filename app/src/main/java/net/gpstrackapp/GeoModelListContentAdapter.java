@@ -10,13 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.gpstrackapp.geomodel.GeoModel;
-import net.gpstrackapp.geomodel.GeoModelManager;
-import net.gpstrackapp.geomodel.track.TrackManager;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 
 public class GeoModelListContentAdapter extends
         RecyclerView.Adapter<GeoModelListContentAdapter.MyViewHolder>

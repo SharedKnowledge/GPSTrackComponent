@@ -2,11 +2,10 @@ package net.gpstrackapp;
 
 import android.content.Intent;
 
-import net.gpstrackapp.geomodel.GeoModel;
-import net.gpstrackapp.geomodel.track.TrackManager;
+import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
+import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class DisplayTracksActivity extends GeoModelListSelectionActivity {

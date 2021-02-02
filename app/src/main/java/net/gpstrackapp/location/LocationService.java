@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.location;
 
 import android.Manifest;
 import android.app.Notification;

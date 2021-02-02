@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
-import net.gpstrackapp.geomodel.GeoModel;
+import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.sharksystem.asap.android.Util;
 
 import java.util.HashSet;

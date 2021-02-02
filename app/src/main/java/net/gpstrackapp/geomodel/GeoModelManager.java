@@ -4,110 +4,66 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import net.gpstrackapp.ConfiguredMapView;
-import net.gpstrackapp.overlay.GeoModelOverlay;
+import net.gpstrackapp.geomodel.track.Track;
+import net.gpstrackapp.geomodel.track.TrackModelManager;
+import net.gpstrackapp.geomodel.track.TrackPoint;
+import net.gpstrackapp.geomodel.track.TrackVisualizer;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.time.Duration;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-public abstract class GeoModelManager <K extends GeoModel, V extends GeoModelOverlay> {
-    protected Map<K, V> geoModelWithOverlayHolder = new HashMap<>();
-    protected ConfiguredMapView mapView;
-    private Set<CharSequence> selectedItemIDs = new HashSet<>();
+public abstract class GeoModelManager<T extends GeoModel> {
+    protected List<T> geoModels = new ArrayList<>();
 
-    public GeoModelManager(ConfiguredMapView mapView) {
-        this.mapView = mapView;
+    public boolean add(T geoModel) {
+        return geoModels.add(geoModel);
     }
 
-    public void setSelectedItemIDs(Set<CharSequence> selectedItemIDs) {
-        this.selectedItemIDs = selectedItemIDs;
+    public boolean removeByUUID(CharSequence uuid) {
+        T track = getGeoModelByUUID(uuid);
+        if (track != null) {
+            return geoModels.remove(track);
+        } else {
+            return false;
+        }
     }
 
-    public Set<CharSequence> getSelectedItemIDs() {
-        return selectedItemIDs;
+    public List<T> getAll() {
+        return geoModels;
     }
 
-    public void updateGeoModelsOnMapView() {
-        Log.d(getLogStart(), "updateGeoModelsOnMapView");
-        Set<K> displayedGeoModels = geoModelWithOverlayHolder.keySet();
+    public int count() {
+        return geoModels.size();
+    }
 
-        Set<K> geoModelsToRemoveFromMap = new HashSet<>(displayedGeoModels);
-
-        Iterator<CharSequence> iterSelect = selectedItemIDs.iterator();
-        List<K> addedGeoModels = new ArrayList<>();
-        while (iterSelect.hasNext()) {
-            CharSequence itemID = iterSelect.next();
-            K geoModel = getGeoModelByUUID(itemID);
-            // add every Track that is not yet displayed to the map
-            if (!displayedGeoModels.contains(geoModel)) {
-                addGeoModelToHolder(geoModel);
-                addedGeoModels.add(geoModel);
+    public T getGeoModelByUUID(CharSequence uuid) {
+        for (int i = 0; i < geoModels.size(); i++) {
+            if (geoModels.get(i).getObjectId().equals(uuid)) {
+                return geoModels.get(i);
             }
-            // remove all Tracks that have to get displayed again from the Set
-            geoModelsToRemoveFromMap.remove(geoModel);
         }
-
-        Iterator<K> iterRemove = geoModelsToRemoveFromMap.iterator();
-        while (iterRemove.hasNext()) {
-            K geoModelToRemove = iterRemove.next();
-            removeGeoModelFromHolder(geoModelToRemove);
-        }
-        List<K> removedGeoModels = new ArrayList<>(geoModelsToRemoveFromMap);
-
-        String toastText = createToastText(addedGeoModels, removedGeoModels);
-        if (!toastText.isEmpty()) {
-            Toast.makeText(mapView.getContext(), toastText, Toast.LENGTH_LONG).show();
-        }
-        mapView.invalidate();
+        return null;
     }
 
-    private void addGeoModelToHolder(K geoModel) {
-        V geoModelOverlay = createGeoModelOverlay(geoModel, mapView);
-        geoModelWithOverlayHolder.put(geoModel, geoModelOverlay);
-        mapView.getOverlays().add(geoModelOverlay);
-        Log.d(getLogStart(), "Add Overlay with UUID " + geoModel.getObjectId());
-    }
-
-    private void removeGeoModelFromHolder(K geoModel) {
-        V geoModelOverlay = geoModelWithOverlayHolder.get(geoModel);
-        geoModelWithOverlayHolder.remove(geoModel);
-        mapView.getOverlays().remove(geoModelOverlay);
-        Log.d(getLogStart(), "Remove Overlay with UUID " + geoModel.getObjectId());
-    }
-
-    private String createToastText(List<K> addedGeoModels, List<K> removedGeoModels) {
-        String toastText = "";
-        if (addedGeoModels.size() > 0) {
-            toastText += "Added \"" + addedGeoModels.get(0).getObjectName() + "\"";
-            if (addedGeoModels.size() > 1) {
-                toastText += " and " + (addedGeoModels.size() - 1) + " more";
+    public Set<T> getGeoModelsByUUIDs(Set<CharSequence> uuids) {
+        Iterator<CharSequence> iterator = uuids.iterator();
+        Set<T> selectedGeoModels = new HashSet<>();
+        while (iterator.hasNext()) {
+            T geoModel = getGeoModelByUUID(iterator.next());
+            if (geoModel != null) {
+                selectedGeoModels.add(geoModel);
             }
-            toastText += " to the map.";
         }
-        if (removedGeoModels.size() > 0) {
-            toastText += toastText.equals("") ? "" : System.lineSeparator();
-            toastText += "Removed \"" + removedGeoModels.get(0).getObjectName() + "\"";
-            if (removedGeoModels.size() > 1) {
-                toastText += " and " + (removedGeoModels.size() - 1) + " more";
-            }
-            toastText += " from the map.";
-        }
-        return toastText;
+        return selectedGeoModels;
     }
-
-    protected abstract V createGeoModelOverlay(K geoModel, ConfiguredMapView mapView);
-    protected abstract K getGeoModelByUUID(CharSequence uuid);
-
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
-    }
-
-
 }

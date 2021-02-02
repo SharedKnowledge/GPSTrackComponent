@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.geomodel;
 
 import net.gpstrackapp.geomodel.GeoModel;
 

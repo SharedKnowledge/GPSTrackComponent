@@ -6,20 +6,23 @@ import android.content.IntentFilter;
 import android.util.Log;
 import android.widget.Toast;
 
+import net.gpstrackapp.geomodel.ILocationConsumer;
 import net.gpstrackapp.geomodel.track.Track;
-import net.gpstrackapp.geomodel.track.TrackManager;
+import net.gpstrackapp.geomodel.track.TrackVisualizer;
+import net.gpstrackapp.location.LocationService;
+import net.gpstrackapp.location.LocationReceiver;
 
-import java.util.Calendar;
-
-public class TrackRecordingPresenter implements Presenter {
-    private TrackLocationReceiver trackLocationReceiver;
+public class TrackRecordingPresenter implements Presenter, Recorder {
+    private LocationReceiver locationReceiver;
     private Intent serviceIntent;
     private Context ctx;
 
-    private TrackManager trackManager;
+    private Track recordedTrack;
+
+    private TrackVisualizer trackVisualizer;
 
     public TrackRecordingPresenter(ConfiguredMapView mapView) {
-        this.trackManager = new TrackManager(mapView);
+        this.trackVisualizer = new TrackVisualizer(mapView);
         this.ctx = mapView.getContext();
     }
 
@@ -27,10 +30,10 @@ public class TrackRecordingPresenter implements Presenter {
     public void onCreate() {
         //start service here so that user can navigate to other components in SN2 without ending the service
         startLocationService();
-        if (trackLocationReceiver == null) {
-            trackLocationReceiver = new TrackLocationReceiver();
+        if (locationReceiver == null) {
+            locationReceiver = new LocationReceiver();
         }
-        registerTrackLocationReceiver();
+        setTrackLocationReceiver();
     }
 
     @Override
@@ -39,45 +42,55 @@ public class TrackRecordingPresenter implements Presenter {
     @Override
     public void onResume() {
         //add and remove TrackOverlays
-        trackManager.updateGeoModelsOnMapView();
+        trackVisualizer.updateGeoModelsOnMapView();
     }
 
     @Override
     public void onDestroy() {
-        unregisterTrackLocationReceiver();
+        unsetTrackLocationReceiver();
         stopLocationService();
     }
 
-    public TrackManager getTrackManager() {
-        return trackManager;
+    public TrackVisualizer getTrackVisualizer() {
+        return trackVisualizer;
     }
 
-    public void startTrackRecording(String trackName) {
-        Track trackToRecord = TrackManager.createTrack(null, trackName,
-                GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
-                Calendar.getInstance().getTime(), null);
-        trackLocationReceiver.registerRecordedTrack(trackToRecord);
-        Log.d(getLogStart(), "Track recording started");
-        Toast.makeText(ctx, "Track recording started", Toast.LENGTH_SHORT).show();
+    @Override
+    public void registerLocationConsumer(ILocationConsumer consumer) {
+        if (consumer instanceof Track) {
+            if (!isRecordingTrack()) {
+                recordedTrack = (Track) consumer;
+            } else {
+                Log.d(getLogStart(), "A Track is already being recorded. Unregister the track first to record a new one.");
+                return;
+            }
+        }
+        locationReceiver.addLocationConsumer(consumer);
+        Log.d(getLogStart(), "Track recording (re)started");
+        Toast.makeText(ctx, "Track recording (re)started", Toast.LENGTH_SHORT).show();
     }
 
-    public void restartTrackRecording(Track track) {
-        trackLocationReceiver.registerRecordedTrack(track);
-        Log.d(getLogStart(), "Track recording restarted");
-    }
-
-    public void stopTrackRecording() {
-        trackLocationReceiver.unregisterRecordedTrack();
+    @Override
+    public void unregisterLocationConsumer(ILocationConsumer consumer) {
+        if (consumer.equals(recordedTrack)) {
+            recordedTrack = null;
+        }
+        locationReceiver.removeLocationConsumer(consumer);
         Log.d(getLogStart(), "Track recording stopped");
         Toast.makeText(ctx, "Track recording stopped", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public boolean isRecording() {
+        return locationReceiver.hasLocationConsumers();
+    }
+
     public boolean isRecordingTrack() {
-        return trackLocationReceiver.getRecordedTrack() != null;
+        return getRecordedTrack() == null ? false : true;
     }
 
     public Track getRecordedTrack() {
-        return trackLocationReceiver.getRecordedTrack();
+        return recordedTrack;
     }
 
     private void startLocationService() {
@@ -99,14 +112,14 @@ public class TrackRecordingPresenter implements Presenter {
     }
 
     //TODO Interface fuer das Registrieren eines Receivers?
-    private void registerTrackLocationReceiver() {
+    private void setTrackLocationReceiver() {
         IntentFilter filter = new IntentFilter("LOCATION UPDATE");
-        ctx.registerReceiver(trackLocationReceiver, filter);
+        ctx.registerReceiver(locationReceiver, filter);
         Log.d(getLogStart(), "register receiver");
     }
 
-    private void unregisterTrackLocationReceiver() {
-        ctx.unregisterReceiver(trackLocationReceiver);
+    private void unsetTrackLocationReceiver() {
+        ctx.unregisterReceiver(locationReceiver);
         Log.d(getLogStart(), "unregister receiver");
     }
 
