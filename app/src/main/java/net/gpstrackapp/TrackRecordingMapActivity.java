@@ -21,7 +21,6 @@ import android.widget.EditText;
 
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
-import net.gpstrackapp.geomodel.track.TrackVisualizer;
 import net.gpstrackapp.overlay.TrackOverlay;
 import net.sharksystem.asap.ASAPException;
 
@@ -29,6 +28,7 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -192,9 +192,14 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                 case R.id.save_item:
                     startSaveTracksActivity(null);
                     return true;
+                case R.id.delete_item:
+                    startDeleteTracksActivity();
+                    return true;
                 case R.id.import_item:
+                    startImportTracksActivity();
                     return true;
                 case R.id.export_item:
+                    startExportTracksActivity();
                     return true;
                 default:
                     return super.onOptionsItemSelected(item);
@@ -202,7 +207,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         } catch (Exception e) {
             Log.d(this.getLogStart(), e.getLocalizedMessage());
         }
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     private void showTrackNameDialog() {
@@ -216,36 +221,25 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         input.setSelectAllOnFocus(true);
 
         builder.setView(input);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String trackName = input.getText().toString();
-                Track track = new Track(null, trackName,
-                        GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
-                        Calendar.getInstance().getTime(), null);
-                trackModelManager.add(track);
-                trackRecordingPresenter.registerLocationConsumer(track);
-                invalidateOptionsMenu();
-            }
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String trackName = input.getText().toString();
+            Track track = new Track(null, trackName,
+                    GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
+                    LocalDateTime.now(), null);
+            trackModelManager.addGeoModel(track);
+            trackRecordingPresenter.registerLocationConsumer(track);
+            invalidateOptionsMenu();
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
     private void showSaveTrackDialog(final Track track) {
-        DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        startSaveTracksActivity(track);
-                        break;
-                }
+        DialogInterface.OnClickListener clickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    startSaveTracksActivity(track);
+                    break;
             }
         };
 
@@ -269,6 +263,21 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             ArrayList<CharSequence> list = new ArrayList<>(Arrays.asList(trackToSave.getObjectId()));
             intent.putCharSequenceArrayListExtra("selectedItemIDs", list);
         }
+        startActivity(intent);
+    }
+
+    private void startDeleteTracksActivity() {
+        Intent intent = new Intent(this, DeleteTracksActivity.class);
+        startActivity(intent);
+    }
+
+    private void startImportTracksActivity() {
+        Intent intent = new Intent(this, ImportTracksActivity.class);
+        startActivity(intent);
+    }
+
+    private void startExportTracksActivity() {
+        Intent intent = new Intent(this, ExportTracksActivity.class);
         startActivity(intent);
     }
 

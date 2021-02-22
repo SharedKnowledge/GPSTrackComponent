@@ -34,6 +34,7 @@
         <activity android:name=".TrackRecordingMapActivity"/>
         <activity android:name=".DisplayTracksActivity"/>
         <activity android:name=".SaveTracksActivity"/>
+        <activity android:name=".DeleteTracksActivity"/>
         <activity android:name=".ImportTracksActivity"/>
         <activity android:name=".ExportTracksActivity"/>
 

@@ -13,6 +13,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    compileOptions {
+        // desugaring is used to support Java 8 features, this can be removed if minSdkVersion is set to 26 or higher
+        coreLibraryDesugaringEnabled true
+
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -22,20 +30,22 @@ android {
 }
 
 dependencies {
+    // desugaring is used to support Java 8 features, this can be removed if minSdkVersion is set to 26 or higher
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
+    // newer versions (2.0.0 and above) require java 11
+    implementation 'io.jenetics:jpx:1.7.0'
+    // javax.xml.stream is not included in jdk but is needed for JPX (GPX export and import) so it has to be imported
+    implementation 'stax:stax:1.2.0'
     implementation files('aar\\ASAPAndroid_0.3.2.aar')
-    /*
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-     */
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-
+    // encountered problems with newer versions of osmdroid
     implementation 'org.osmdroid:osmdroid-android:6.1.4'
 }

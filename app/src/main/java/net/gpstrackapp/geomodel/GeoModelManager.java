@@ -25,17 +25,27 @@ import java.util.Set;
 public abstract class GeoModelManager<T extends GeoModel> {
     protected List<T> geoModels = new ArrayList<>();
 
-    public boolean add(T geoModel) {
+    public boolean addGeoModel(T geoModel) {
         return geoModels.add(geoModel);
     }
 
-    public boolean removeByUUID(CharSequence uuid) {
-        T track = getGeoModelByUUID(uuid);
+    public boolean removeGeoModelByUUID(CharSequence UUID) {
+        T track = getGeoModelByUUID(UUID);
         if (track != null) {
             return geoModels.remove(track);
         } else {
             return false;
         }
+    }
+
+    public boolean removeGeoModelsByUUIDs(Set<CharSequence> UUIDs) {
+        boolean allRemoved = true;
+        Iterator<CharSequence> iterator = UUIDs.iterator();
+        while (iterator.hasNext()) {
+            boolean removed = removeGeoModelByUUID(iterator.next());
+            allRemoved = allRemoved ? removed : false;
+        }
+        return allRemoved;
     }
 
     public List<T> getAll() {
@@ -46,17 +56,17 @@ public abstract class GeoModelManager<T extends GeoModel> {
         return geoModels.size();
     }
 
-    public T getGeoModelByUUID(CharSequence uuid) {
+    public T getGeoModelByUUID(CharSequence UUID) {
         for (int i = 0; i < geoModels.size(); i++) {
-            if (geoModels.get(i).getObjectId().equals(uuid)) {
+            if (geoModels.get(i).getObjectId().equals(UUID)) {
                 return geoModels.get(i);
             }
         }
         return null;
     }
 
-    public Set<T> getGeoModelsByUUIDs(Set<CharSequence> uuids) {
-        Iterator<CharSequence> iterator = uuids.iterator();
+    public Set<T> getGeoModelsByUUIDs(Set<CharSequence> UUIDs) {
+        Iterator<CharSequence> iterator = UUIDs.iterator();
         Set<T> selectedGeoModels = new HashSet<>();
         while (iterator.hasNext()) {
             T geoModel = getGeoModelByUUID(iterator.next());

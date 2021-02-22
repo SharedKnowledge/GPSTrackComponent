@@ -14,12 +14,20 @@
     <tag android:id="@+id/geomodel_id_tag" />
 
     <TextView
-        android:id="@+id/gpstracker_list_geomodels_row_name"
+        android:id="@+id/gpstracker_list_geomodels_row_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:textSize="@dimen/recyclerRowEntryTextSizeSmall"
+        />
+
+    <TextView
+        android:id="@+id/gpstracker_list_geomodels_row_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="@dimen/recyclerRowEntryTextSize"
         android:textStyle="bold"
+        android:layout_below="@id/gpstracker_list_geomodels_row_id"
         />
 
     <TextView

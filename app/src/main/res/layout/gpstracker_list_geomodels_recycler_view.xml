@@ -4,17 +4,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_below="@id/format_spinner"
+    android:paddingBottom="@dimen/row_padding_vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/row_padding_vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".GeoModelListSelectionActivity">
 
     <!-- TODO Description of available actions, as method in activity which is abstract
             in parent activity and sets text -->
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/gpstracker_list_recycler_view"
+    <!--
+    <Spinner
+        android:id="@+id/format_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginUnderToolbar"
-        android:scrollbars="vertical" />
+        android:visibility="gone"/>
+        -->
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/gpstracker_list_geomodels_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:scrollbars="vertical" />
+    <!-- android:layout_below="@+id/format_spinner" -->
+    <!-- android:layout_marginTop="@dimen/marginUnderToolbar" -->
 </RelativeLayout>

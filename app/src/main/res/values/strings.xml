@@ -6,6 +6,7 @@
     <string name="gpstracker_item_tracks_stop_record_button_text">Stop recording</string>
     <string name="gpstracker_item_tracks_display_button_text">Display</string>
     <string name="gpstracker_item_tracks_save_button_text">Save</string>
+    <string name="gpstracker_item_tracks_delete_button_text">Delete</string>
     <string name="gpstracker_item_tracks_import_button_text">Import</string>
     <string name="gpstracker_item_tracks_export_button_text">Export</string>
     <string name="GeoModelListSelectionDoneText">Done Selection</string>

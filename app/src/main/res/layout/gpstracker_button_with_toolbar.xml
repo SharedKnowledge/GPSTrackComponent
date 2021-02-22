@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/gpstracker_list_with_toolbar"
+    android:id="@+id/gpstracker_button_with_toolbar"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/gpstracker_list_toolbar"
+        android:id="@+id/gpstracker_reduced_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -16,17 +16,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <include
-        android:id="@+id/gpstracker_spinner"
-        android:layout_below="@id/gpstracker_list_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        layout="@layout/gpstracker_spinner" />
-
-    <include
-        android:layout_below="@id/gpstracker_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        layout="@layout/gpstracker_list_geomodels_recycler_view" />
+        android:id="@+id/import_button"
+        layout="@layout/gpstracker_import_action_layout"/>
 
 </RelativeLayout>

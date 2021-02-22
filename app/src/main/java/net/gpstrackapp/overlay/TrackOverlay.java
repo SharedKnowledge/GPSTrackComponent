@@ -38,15 +38,12 @@ public class TrackOverlay extends GeoModelOverlay<Track> {
         Polyline polyline = new Polyline();
         polyline.setPoints(linePoints);
 
-        polyline.setOnClickListener(new Polyline.OnClickListener() {
-            @Override
-            public boolean onClick(Polyline polyline, MapView mapView, GeoPoint eventPos) {
-                Toast.makeText(mapView.getContext(),
-                        "Track name: " + geoModel.getObjectName() + System.lineSeparator() +
-                                "Creator: " + geoModel.getCreator() + System.lineSeparator() +
-                                "Date of creation: " + geoModel.getDateOfCreationAsFormattedString(), Toast.LENGTH_LONG).show();
-                return false;
-            }
+        polyline.setOnClickListener((polyline1, mapView, eventPos) -> {
+            Toast.makeText(mapView.getContext(),
+                    "Track name: " + geoModel.getObjectName() + System.lineSeparator() +
+                            "Creator: " + geoModel.getCreator() + System.lineSeparator() +
+                            "Date of creation: " + geoModel.getDateOfCreationAsFormattedString(), Toast.LENGTH_LONG).show();
+            return false;
         });
         return polyline;
     }
@@ -65,17 +62,5 @@ public class TrackOverlay extends GeoModelOverlay<Track> {
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setTitle("Track recording ended at: " + endPoint.getDateAsFormattedString());
         return marker;
-    }
-
-    public Polyline getLine() {
-        return line;
-    }
-
-    public Marker getStart() {
-        return start;
-    }
-
-    public Marker getEnd() {
-        return end;
     }
 }

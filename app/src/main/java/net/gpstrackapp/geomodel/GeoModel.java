@@ -1,24 +1,18 @@
 package net.gpstrackapp.geomodel;
 
-import android.os.Parcelable;
-
-import net.gpstrackapp.GPSComponent;
-
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
 public abstract class GeoModel implements Serializable {
     private CharSequence objectId;
     private CharSequence objectName;
-    private final Date dateOfCreation;
+    private final LocalDateTime dateOfCreation;
     private CharSequence creator;
 
-    public GeoModel(CharSequence objectId, CharSequence objectName, CharSequence creator, Date dateOfCreation) {
+    public GeoModel(CharSequence objectId, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation) {
         this.objectId = objectId == null ? UUID.randomUUID().toString() : objectId;
         this.objectName = objectName;
         this.creator = creator;
@@ -33,13 +27,13 @@ public abstract class GeoModel implements Serializable {
         return objectName;
     }
 
-    public Date getDateOfCreation() {
+    public LocalDateTime getDateOfCreation() {
         return dateOfCreation;
     }
 
     public String getDateOfCreationAsFormattedString() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return df.format(getDateOfCreation());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return formatter.format(dateOfCreation);
     }
 
     public CharSequence getCreator() {

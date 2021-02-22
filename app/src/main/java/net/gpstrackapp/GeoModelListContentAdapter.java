@@ -23,17 +23,15 @@ public class GeoModelListContentAdapter extends
     private RequestGeoModelsCommand requestGeoModelsCommand;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView GeoModelName,
-                GeoModelDate,
-                GeoModelCreator,
-                GeoModelSelected;
+        public TextView geoModelName, geoModelID, geoModelDate, geoModelCreator, geoModelSelected;
 
         public MyViewHolder(View view) {
             super(view);
-            GeoModelName = view.findViewById(R.id.gpstracker_list_geomodels_row_name);
-            GeoModelDate = view.findViewById(R.id.gpstracker_list_geomodels_row_date);
-            GeoModelCreator = view.findViewById(R.id.gpstracker_list_geomodels_row_creator);
-            GeoModelSelected = view.findViewById(R.id.gpstracker_list_geomodels_row_selected);
+            geoModelID = view.findViewById(R.id.gpstracker_list_geomodels_row_id);
+            geoModelName = view.findViewById(R.id.gpstracker_list_geomodels_row_name);
+            geoModelDate = view.findViewById(R.id.gpstracker_list_geomodels_row_date);
+            geoModelCreator = view.findViewById(R.id.gpstracker_list_geomodels_row_creator);
+            geoModelSelected = view.findViewById(R.id.gpstracker_list_geomodels_row_selected);
 
             view.setOnClickListener(clickListener);
         }
@@ -64,16 +62,18 @@ public class GeoModelListContentAdapter extends
 
         CharSequence geoModelID = geoModel.getObjectId();
         helper.setSelectedText(Integer.toString(position), geoModelID,
-                holder.itemView, holder.GeoModelSelected);
+                holder.itemView, holder.geoModelSelected);
 
-        CharSequence geoModelName = geoModel.getObjectName();
+        CharSequence id = geoModel.getObjectId();
+        CharSequence name = geoModel.getObjectName();
         String date = geoModel.getDateOfCreationAsFormattedString();
         CharSequence creator = geoModel.getCreator();
 
         holder.itemView.setTag(R.id.geomodel_id_tag, geoModelID);
-        holder.GeoModelName.setText(geoModelName);
-        holder.GeoModelDate.setText(date);
-        holder.GeoModelCreator.setText(creator);
+        holder.geoModelID.setText(id);
+        holder.geoModelName.setText(name);
+        holder.geoModelDate.setText(date);
+        holder.geoModelCreator.setText(creator);
     }
 
     //TODO

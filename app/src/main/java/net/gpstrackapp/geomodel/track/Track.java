@@ -9,6 +9,9 @@ import net.gpstrackapp.geomodel.ILocationConsumer;
 import org.osmdroid.util.GeoPoint;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +19,7 @@ import java.util.List;
 public class Track extends GeoModel implements ILocationConsumer, Serializable {
     private List<TrackPoint> trackPoints = new ArrayList<>();
 
-    public Track(CharSequence objectID, CharSequence objectName, CharSequence creator, Date dateOfCreation, List<TrackPoint> trackPoints) {
+    public Track(CharSequence objectID, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation, List<TrackPoint> trackPoints) {
         super(objectID, objectName, creator, dateOfCreation);
         if (trackPoints != null) {
             this.trackPoints.addAll(trackPoints);
@@ -45,7 +48,7 @@ public class Track extends GeoModel implements ILocationConsumer, Serializable {
                 location.getLatitude(),
                 location.getLongitude(),
                 location.getAltitude());
-        Date date = new Date(location.getTime());
+        LocalDateTime date = Instant.ofEpochMilli(location.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
         TrackPoint trackPoint = new TrackPoint(geoPoint, date);
         addTrackPoint(trackPoint);
     }

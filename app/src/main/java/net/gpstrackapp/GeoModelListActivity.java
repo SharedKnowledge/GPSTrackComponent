@@ -1,11 +1,13 @@
 package net.gpstrackapp;
 
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.sharksystem.asap.android.Util;
@@ -24,7 +26,12 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
         Log.d(getLogStart(), "onCreate");
 
         try {
-            setContentView(R.layout.gpstracker_list_drawer_layout);
+            setContentView(R.layout.gpstracker_drawer_layout);
+
+            // inflate layout in DrawerLayout
+            DrawerLayout drawerLayout = findViewById(R.id.gpstracker_list_drawer_layout);
+            View child = getLayoutInflater().inflate(R.layout.gpstracker_list_with_toolbar, null);
+            drawerLayout.addView(child);
 
             GPSComponent.getGPSComponent().getASAPApplication().setupDrawerLayout(this);
 
@@ -35,10 +42,10 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
             }
 
             // setup toolbar
-            Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_with_toolbar);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_toolbar);
             setSupportActionBar(toolbar);
 
-            recyclerView = (RecyclerView) findViewById(R.id.gpstracker_list_recycler_view);
+            recyclerView = (RecyclerView) findViewById(R.id.gpstracker_list_geomodels_recycler_view);
 
             adapter = new GeoModelListContentAdapter(this, this.selectableContentSource, createRequestGeoModelsCommand());
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
