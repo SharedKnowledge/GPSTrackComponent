@@ -5,6 +5,7 @@
     <string name="gpstracker_item_tracks_start_record_button_text">Start recording</string>
     <string name="gpstracker_item_tracks_stop_record_button_text">Stop recording</string>
     <string name="gpstracker_item_tracks_display_button_text">Display</string>
+    <string name="gpstracker_item_tracks_merge_button_text">Merge</string>
     <string name="gpstracker_item_tracks_save_button_text">Save</string>
     <string name="gpstracker_item_tracks_delete_button_text">Delete</string>
     <string name="gpstracker_item_tracks_import_button_text">Import</string>

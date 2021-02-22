@@ -16,9 +16,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
     private LocationReceiver locationReceiver;
     private Intent serviceIntent;
     private Context ctx;
-
     private Track recordedTrack;
-
     private TrackVisualizer trackVisualizer;
 
     public TrackRecordingPresenter(ConfiguredMapView mapView) {

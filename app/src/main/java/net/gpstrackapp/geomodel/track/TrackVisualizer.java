@@ -17,7 +17,7 @@ public class TrackVisualizer extends GeoModelVisualizer<Track, TrackOverlay> {
     @Override
     protected TrackOverlay createGeoModelOverlay(Track track, ConfiguredMapView mapView) {
         TrackOverlay trackOverlay = new TrackOverlay(track);
-        trackOverlay.addStartEndMarkers(mapView);
+        trackOverlay.initializeComponents(mapView);
         return trackOverlay;
     }
 

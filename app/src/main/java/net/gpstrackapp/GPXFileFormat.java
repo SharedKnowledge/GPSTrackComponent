@@ -1,24 +1,17 @@
 package net.gpstrackapp;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Environment;
 
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackPoint;
+import net.gpstrackapp.geomodel.track.TrackSegment;
 
 import org.osmdroid.util.GeoPoint;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -39,7 +32,6 @@ import io.jenetics.jpx.Latitude;
 import io.jenetics.jpx.Length;
 import io.jenetics.jpx.Longitude;
 import io.jenetics.jpx.Metadata;
-import io.jenetics.jpx.TrackSegment;
 import io.jenetics.jpx.WayPoint;
 
 public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
@@ -79,25 +71,34 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
                 .time(System.currentTimeMillis())
                 .name(trackName)
                 .build();
-        io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(trackName);
-        Iterator<Track> iterator = tracksToExport.iterator();
-        while (iterator.hasNext()) {
-            Track track = iterator.next();
-            List<WayPoint> wayPoints = new ArrayList<>();
-            for (TrackPoint trackPoint : track.getTrackPoints()) {
-                GeoPoint geoPoint = trackPoint.getGeoPoint();
-                wayPoints.add(WayPoint.of(
-                        Latitude.ofDegrees(geoPoint.getLatitude()),
-                        Longitude.ofDegrees(geoPoint.getLongitude()),
-                        Length.of(geoPoint.getAltitude(), Length.Unit.METER),
-                        trackPoint.getDate().atZone(ZoneId.systemDefault())
-                ));
+
+        List<io.jenetics.jpx.Track> gpxTracks = new ArrayList<>();
+        // iterate over Tracks
+        for (Track track : tracksToExport) {
+            io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(trackName);
+            List<TrackSegment> trackSegments = track.getTrackSegments();
+
+            // iterate over TrackSegments
+            for (TrackSegment trackSegment : trackSegments) {
+                List<WayPoint> wayPoints = new ArrayList<>();
+
+                // iterate over TrackPoints / WayPoints
+                for (TrackPoint trackPoint : trackSegment.getTrackPoints()) {
+                    GeoPoint geoPoint = trackPoint.getGeoPoint();
+                    wayPoints.add(WayPoint.of(
+                            Latitude.ofDegrees(geoPoint.getLatitude()),
+                            Longitude.ofDegrees(geoPoint.getLongitude()),
+                            Length.of(geoPoint.getAltitude(), Length.Unit.METER),
+                            trackPoint.getDate().atZone(ZoneId.systemDefault())
+                    ));
+                }
+                io.jenetics.jpx.TrackSegment segment = io.jenetics.jpx.TrackSegment.builder().points(wayPoints).build();
+                trackBuilder = trackBuilder.addSegment(segment);
             }
-            TrackSegment segment = TrackSegment.builder().points(wayPoints).build();
-            trackBuilder = trackBuilder.addSegment(segment);
+            io.jenetics.jpx.Track gpxTrack = trackBuilder.build();
+            gpxTracks.add(gpxTrack);
         }
-        io.jenetics.jpx.Track trackToExport = trackBuilder.build();
-        GPX gpx = GPX.of(appName, metadata, null, null, Arrays.asList(trackToExport));
+        GPX gpx = GPX.of(appName, metadata, null, null, gpxTracks);
         return gpx;
     }
 
@@ -115,28 +116,37 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
 
         // import Tracks
         List<io.jenetics.jpx.Track> gpxTracks = gpx.tracks().collect(Collectors.toList());
-        for (io.jenetics.jpx.Track gpxTrack : gpxTracks) {
-            List<TrackSegment> segments = gpxTrack.getSegments();
-            for (int i = 0; i < segments.size(); i++) {
-                List<WayPoint> wayPoints = segments.get(i).getPoints();
-                List<TrackPoint> trackPoints = new ArrayList<>();
-                for (WayPoint wayPoint : wayPoints) {
-                    Latitude lat = wayPoint.getLatitude();
-                    Longitude lon = wayPoint.getLongitude();
-                    Optional<Length> alt = wayPoint.getElevation();
+        // iterate over Tracks
+        for (int i = 0; i < gpxTracks.size(); i++) {
+            io.jenetics.jpx.Track gpxTrack = gpxTracks.get(i);
+            String trackName = gpxTrack.getName().isPresent() ?
+                    gpxTrack.getName().get() + " - Abschnitt " + (i + 1) :
+                    null;
+
+            List<io.jenetics.jpx.TrackSegment> gpxTrackSegments = gpxTrack.getSegments();
+            List<TrackSegment> trackSegments = new ArrayList<>();
+
+            // iterate over TrackSegments
+            for (io.jenetics.jpx.TrackSegment gpxTrackSegment : gpxTrackSegments) {
+                TrackSegment trackSegment = new TrackSegment(null);
+                List<WayPoint> gpxWayPoints = gpxTrackSegment.getPoints();
+
+                // iterate over TrackPoints / WayPoints
+                for (WayPoint gpxWayPoint : gpxWayPoints) {
+                    Latitude lat = gpxWayPoint.getLatitude();
+                    Longitude lon = gpxWayPoint.getLongitude();
+                    Optional<Length> alt = gpxWayPoint.getElevation();
                     GeoPoint geoPoint = alt.isPresent() ?
                             new GeoPoint(lat.doubleValue(), lon.doubleValue()) :
                             new GeoPoint(lat.doubleValue(), lon.doubleValue(), alt.get().doubleValue());
-                    LocalDateTime pointTime = wayPoint.getTime().orElse(null).toLocalDateTime();
+                    LocalDateTime pointTime = gpxWayPoint.getTime().orElse(null).toLocalDateTime();
                     TrackPoint trackPoint = new TrackPoint(geoPoint, pointTime);
-                    trackPoints.add(trackPoint);
+                    trackSegment.addTrackPoint(trackPoint);
                 }
-                String trackName = gpxTrack.getName().isPresent() ?
-                        gpxTrack.getName().get() + " - Abschnitt " + (i + 1) :
-                        null;
-                Track track = new Track(null, trackName, null, time, trackPoints);
-                trackModelManager.addGeoModel(track);
+                trackSegments.add(trackSegment);
             }
+            Track track = new Track(null, trackName, null, time, trackSegments);
+            trackModelManager.addGeoModel(track);
         }
 
         /*

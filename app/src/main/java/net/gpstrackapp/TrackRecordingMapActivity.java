@@ -21,6 +21,7 @@ import android.widget.EditText;
 
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
+import net.gpstrackapp.geomodel.track.TrackSegment;
 import net.gpstrackapp.overlay.TrackOverlay;
 import net.sharksystem.asap.ASAPException;
 
@@ -189,6 +190,9 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                 case R.id.display_item:
                     startDisplayTracksActivity();
                     return true;
+                case R.id.merge_item:
+                    startMergeTracksActivity();
+                    return true;
                 case R.id.save_item:
                     startSaveTracksActivity(null);
                     return true;
@@ -223,9 +227,10 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         builder.setView(input);
         builder.setPositiveButton("OK", (dialog, which) -> {
             String trackName = input.getText().toString();
+            TrackSegment trackSegment = new TrackSegment(null);
             Track track = new Track(null, trackName,
                     GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
-                    LocalDateTime.now(), null);
+                    LocalDateTime.now(), trackSegment);
             trackModelManager.addGeoModel(track);
             trackRecordingPresenter.registerLocationConsumer(track);
             invalidateOptionsMenu();
@@ -255,6 +260,11 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         Set<CharSequence> selectedItemIDs = trackRecordingPresenter.getTrackVisualizer().getSelectedItemIDs();
         intent.putCharSequenceArrayListExtra("selectedItemIDs", new ArrayList<>(selectedItemIDs));
         startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
+    }
+
+    private void startMergeTracksActivity() {
+        Intent intent = new Intent(this, MergeTracksActivity.class);
+        startActivity(intent);
     }
 
     private void startSaveTracksActivity(Track trackToSave) {

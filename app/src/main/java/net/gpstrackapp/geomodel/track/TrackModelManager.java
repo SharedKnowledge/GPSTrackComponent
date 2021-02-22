@@ -86,6 +86,4 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
     private String getLogStart() {
         return this.getClass().getSimpleName();
     }
-
-
 }

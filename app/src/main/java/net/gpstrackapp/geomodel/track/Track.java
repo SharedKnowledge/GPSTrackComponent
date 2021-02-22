@@ -1,6 +1,7 @@
 package net.gpstrackapp.geomodel.track;
 
 import android.location.Location;
+import android.util.Log;
 
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModel;
@@ -13,33 +14,41 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class Track extends GeoModel implements ILocationConsumer, Serializable {
-    private List<TrackPoint> trackPoints = new ArrayList<>();
+    private List<TrackSegment> trackSegments = new ArrayList<>();
 
-    public Track(CharSequence objectID, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation, List<TrackPoint> trackPoints) {
+    public Track(CharSequence objectID, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation, List<TrackSegment> trackSegments) {
         super(objectID, objectName, creator, dateOfCreation);
-        if (trackPoints != null) {
-            this.trackPoints.addAll(trackPoints);
+        if (trackSegments != null) {
+            this.trackSegments.addAll(trackSegments);
+        } else {
+            this.trackSegments.add(new TrackSegment(null));
         }
     }
 
-    public void addTrackPoint(TrackPoint trackPoint) {
-        this.trackPoints.add(trackPoint);
+    public Track(CharSequence objectID, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation, TrackSegment trackSegment) {
+        this(objectID, objectName, creator, dateOfCreation, Arrays.asList(trackSegment));
     }
 
-    public List<TrackPoint> getTrackPoints() {
-        return trackPoints;
+    public void addTrackSegment(TrackSegment trackSegment) {
+        trackSegments.add(trackSegment);
     }
 
-    public List<GeoPoint> getGeoPoints() {
-        List<GeoPoint> geoPoints = new ArrayList<>();
-        for (int i = 0; i < trackPoints.size(); i++) {
-            geoPoints.add(trackPoints.get(i).getGeoPoint());
+    public List<TrackSegment> getTrackSegments() {
+        return trackSegments;
+    }
+
+    public TrackSegment getLastTrackSegment() {
+        if (trackSegments.size() > 0) {
+            return trackSegments.get(trackSegments.size() - 1);
+        } else {
+            Log.d(getLogStart(), "Track hat keine Segmente");
+            return null;
         }
-        return geoPoints;
     }
 
     @Override
@@ -50,6 +59,10 @@ public class Track extends GeoModel implements ILocationConsumer, Serializable {
                 location.getAltitude());
         LocalDateTime date = Instant.ofEpochMilli(location.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
         TrackPoint trackPoint = new TrackPoint(geoPoint, date);
-        addTrackPoint(trackPoint);
+        getLastTrackSegment().addTrackPoint(trackPoint);
+    }
+
+    private String getLogStart() {
+        return getClass().getSimpleName();
     }
 }

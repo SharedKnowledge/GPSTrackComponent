@@ -27,12 +27,12 @@
         <activity android:name=".InitActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".TrackRecordingMapActivity"/>
         <activity android:name=".DisplayTracksActivity"/>
+        <activity android:name=".MergeTracksActivity"/>
         <activity android:name=".SaveTracksActivity"/>
         <activity android:name=".DeleteTracksActivity"/>
         <activity android:name=".ImportTracksActivity"/>
