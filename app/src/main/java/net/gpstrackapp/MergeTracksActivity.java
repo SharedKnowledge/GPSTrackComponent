@@ -2,6 +2,7 @@ package net.gpstrackapp;
 
 import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
@@ -19,7 +20,11 @@ public class MergeTracksActivity extends GeoModelListSelectionActivity {
 
     @Override
     protected void onSelectionFinished(Set<CharSequence> selectedItemIDs) {
-        showTrackNameDialog(selectedItemIDs);
+        if (selectedItemIDs.size() > 1) {
+            showTrackNameDialog(selectedItemIDs);
+        } else {
+            finish();
+        }
     }
 
     private void showTrackNameDialog(Set<CharSequence> selectedItemIDs) {
@@ -47,17 +52,22 @@ public class MergeTracksActivity extends GeoModelListSelectionActivity {
                 GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
                 LocalDateTime.now(), trackSegments);
         trackModelManager.addGeoModel(track);
-
-        // to remove tracks after merge uncomment this
-        /*
-        for (CharSequence id : selectedItemIDs) {
-            trackModelManager.removeGeoModelByUUID(id);
-        }
-         */
+        Toast.makeText(this, "Merging was successful.", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     @Override
     protected RequestGeoModelsCommand createRequestGeoModelsCommand() {
         return new RequestTracksCommand();
+    }
+
+    @Override
+    public String setActionText() {
+        return "Merge tracks";
+    }
+
+    @Override
+    public String setOptionalAdditionalInfo() {
+        return "A new track with all the segments from the selected tracks will be created. The selected tracks will not be deleted.";
     }
 }

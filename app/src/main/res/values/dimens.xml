@@ -1,16 +1,22 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
+    <!-- Copied from SN2 -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="row_padding_vertical">10dp</dimen>
-    <dimen name="spinner_padding_vertical">20dp</dimen>
     <dimen name="marginUnderToolbar">56dp</dimen>
     <dimen name="recyclerRowEntryTextSize">16dp</dimen>
-    <dimen name="recyclerRowEntryTextSizeSmall">12dp</dimen>
-    <dimen name="spinnerTextSize">16dp</dimen>
     <dimen name="rowPaddingHorizontal">2pt</dimen>
     <dimen name="textSizeHuge">30pt</dimen>
     <dimen name="textSizeGoodReadable">12pt</dimen>
     <dimen name="textSizeGoodReadableSmall">8pt</dimen>
+
+    <!-- Specific to this component -->
+    <dimen name="description_text_size">14dp</dimen>
+    <dimen name="spinner_padding_top">16dp</dimen>
+    <dimen name="spinner_padding_bottom">8dp</dimen>
+    <dimen name="spinner_text_size">16dp</dimen>
+    <dimen name="spinner_line_spacing_multiplier">1.2</dimen>
+    <dimen name="recycler_row_entry_text_size_small">12dp</dimen>
+
 </resources>

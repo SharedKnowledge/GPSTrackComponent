@@ -9,31 +9,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import net.gpstrackapp.geomodel.track.Track;
-
-import org.xml.sax.SAXException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-public class ImportTracksActivity extends AppCompatActivity {
+public class ImportTracksActivity extends AppCompatActivity implements ActivityWithDescription {
     private final int CHOOSE_FILE_CODE = 1;
+    private TextView descriptionView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,12 +35,21 @@ public class ImportTracksActivity extends AppCompatActivity {
 
         // inflate layout in DrawerLayout
         DrawerLayout drawerLayout = findViewById(R.id.gpstracker_list_drawer_layout);
-        View child = getLayoutInflater().inflate(R.layout.gpstracker_button_with_toolbar, null);
+        View child = getLayoutInflater().inflate(R.layout.gpstracker_description_and_button_with_toolbar, null);
         drawerLayout.addView(child);
 
         // setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_reduced_toolbar);
         setSupportActionBar(toolbar);
+
+        descriptionView = (TextView) findViewById(R.id.gpstracker_description);
+        String description = setActionText();
+        String additionalInfo = setOptionalAdditionalInfo();
+        if (additionalInfo != null && !additionalInfo.equals("")) {
+            description += " " + additionalInfo;
+        }
+        descriptionView.setText(description);
+        Log.d(getLogStart(), descriptionView.getText().toString());
     }
 
     @Override
@@ -107,6 +109,8 @@ public class ImportTracksActivity extends AppCompatActivity {
                         } catch (IOException e) {
                             Log.d(getLogStart(), e.getLocalizedMessage());
                         }
+                        Toast.makeText(this, "Import was successful.", Toast.LENGTH_SHORT).show();
+                        finish();
                     } else {
                         Toast.makeText(this, "The file could not be imported because the file type " + mimeType + " is not supported", Toast.LENGTH_SHORT).show();
                     }
@@ -119,5 +123,15 @@ public class ImportTracksActivity extends AppCompatActivity {
 
     private String getLogStart() {
         return getClass().getSimpleName();
+    }
+
+    @Override
+    public String setActionText() {
+        return "Import tracks";
+    }
+
+    @Override
+    public String setOptionalAdditionalInfo() {
+        return null;
     }
 }

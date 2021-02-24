@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/gpstracker_button_with_toolbar"
+    android:id="@+id/gpstracker_description_and_button_with_toolbar"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -16,7 +16,14 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <include
-        android:id="@+id/import_button"
+        android:id="@+id/gpstracker_import_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gpstracker_reduced_toolbar"
+        layout="@layout/gpstracker_list_description" />
+
+    <include
+        android:id="@+id/gpstracker_import_button"
         layout="@layout/gpstracker_import_action_layout"/>
 
 </RelativeLayout>

@@ -11,6 +11,7 @@ public class FormatManager {
     private static Map<String, ExportFileFormat> exportFormats = new HashMap<>();
 
     static {
+        registerFormat(new KMLFileFormat());
         registerFormat(new GPXFileFormat());
     }
 

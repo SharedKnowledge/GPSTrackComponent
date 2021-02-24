@@ -41,13 +41,16 @@ public abstract class GeoModelVisualizer<K extends GeoModel, V extends GeoModelO
         while (iterSelect.hasNext()) {
             CharSequence itemID = iterSelect.next();
             K geoModel = getGeoModelByUUID(itemID);
-            // add every Track that is not yet displayed to the map
-            if (!displayedGeoModels.contains(geoModel)) {
-                addGeoModelToHolder(geoModel);
-                addedGeoModels.add(geoModel);
+            // if geoModel is null then it was deleted since the last map update
+            if (geoModel != null) {
+                // add every Track that is not yet displayed to the map
+                if (!displayedGeoModels.contains(geoModel)) {
+                    addGeoModelToHolder(geoModel);
+                    addedGeoModels.add(geoModel);
+                }
+                // remove all Tracks that have to get displayed again from the Set
+                geoModelsToRemoveFromMap.remove(geoModel);
             }
-            // remove all Tracks that have to get displayed again from the Set
-            geoModelsToRemoveFromMap.remove(geoModel);
         }
 
         Iterator<K> iterRemove = geoModelsToRemoveFromMap.iterator();
@@ -62,6 +65,8 @@ public abstract class GeoModelVisualizer<K extends GeoModel, V extends GeoModelO
             Toast.makeText(mapView.getContext(), toastText, Toast.LENGTH_LONG).show();
         }
         mapView.invalidate();
+
+        Log.d(getLogStart(), "updateGeoModelsOnMapView(): " + mapView.getOverlays().get(mapView.getOverlays().size() - 1));
     }
 
     private void addGeoModelToHolder(K geoModel) {

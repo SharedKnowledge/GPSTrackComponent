@@ -5,9 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--
-    <include layout="@layout/gpstracker_list_with_toolbar" />
-    -->
+    <!-- Toolbar gets inflated during runtime -->
 
     <!-- TODO include sharknet drawer navigation view when integrating -->
 

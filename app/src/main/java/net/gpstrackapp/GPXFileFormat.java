@@ -52,30 +52,20 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
         String appName = ctx.getApplicationInfo().loadLabel(ctx.getPackageManager()).toString();
         GPX gpx = generateGPX(tracksToExport, trackName, appName);
         gpx.write(gpx, outputStream);
-
-        /*
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document document = dBuilder.newDocument();
-
-        Element gpxElement = document.createElement("gpx");
-        document.appendChild(gpxElement);
-        Attr gpxCreator = document.createAttribute(ctx.getApplicationInfo().loadLabel(ctx.getPackageManager()).toString());
-         */
     }
 
-    private GPX generateGPX(Set<Track> tracksToExport, String trackName, String appName) {
+    private GPX generateGPX(Set<Track> tracksToExport, String fileName, String appName) {
         //TODO extension that lets one give more details for track segments, so that id, name, creator, etc. don't get lost when user does import -> export
         Metadata metadata = Metadata.builder()
                 .author(GPSComponent.getGPSComponent().getASAPApplication().getOwnerName().toString())
                 .time(System.currentTimeMillis())
-                .name(trackName)
+                .name(fileName)
                 .build();
 
         List<io.jenetics.jpx.Track> gpxTracks = new ArrayList<>();
         // iterate over Tracks
         for (Track track : tracksToExport) {
-            io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(trackName);
+            io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(track.getObjectName().toString());
             List<TrackSegment> trackSegments = track.getTrackSegments();
 
             // iterate over TrackSegments
@@ -120,7 +110,7 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
         for (int i = 0; i < gpxTracks.size(); i++) {
             io.jenetics.jpx.Track gpxTrack = gpxTracks.get(i);
             String trackName = gpxTrack.getName().isPresent() ?
-                    gpxTrack.getName().get() + " - Abschnitt " + (i + 1) :
+                    gpxTrack.getName().get() :
                     null;
 
             List<io.jenetics.jpx.TrackSegment> gpxTrackSegments = gpxTrack.getSegments();
@@ -148,11 +138,5 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
             Track track = new Track(null, trackName, null, time, trackSegments);
             trackModelManager.addGeoModel(track);
         }
-
-        /*
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(file);
-         */
     }
 }

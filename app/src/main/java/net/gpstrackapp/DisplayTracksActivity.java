@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class DisplayTracksActivity extends GeoModelListSelectionActivity {
-
     @Override
     protected void onSelectionFinished(Set<CharSequence> selectedItemIDs) {
         Intent intent = new Intent();
@@ -21,5 +20,15 @@ public class DisplayTracksActivity extends GeoModelListSelectionActivity {
     @Override
     protected RequestGeoModelsCommand createRequestGeoModelsCommand() {
         return new RequestTracksCommand();
+    }
+
+    @Override
+    public String setActionText() {
+        return "Display tracks";
+    }
+
+    @Override
+    public String setOptionalAdditionalInfo() {
+        return "Already displayed tracks are preselected.";
     }
 }

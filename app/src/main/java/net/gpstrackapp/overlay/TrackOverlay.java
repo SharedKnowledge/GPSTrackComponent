@@ -23,6 +23,7 @@ public class TrackOverlay extends GeoModelOverlay<Track> {
         for (TrackSegment trackSegment : track.getTrackSegments()) {
             TrackSegmentOverlay trackSegmentOverlay = new TrackSegmentOverlay(trackSegment, polylineToastText);
             trackSegmentOverlays.add(trackSegmentOverlay);
+            this.add(trackSegmentOverlay);
         }
     }
 

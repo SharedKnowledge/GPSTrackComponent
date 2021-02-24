@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:textSize="@dimen/recyclerRowEntryTextSizeSmall"
+        android:textSize="@dimen/recycler_row_entry_text_size_small"
         />
 
     <TextView

@@ -32,7 +32,6 @@ import org.osmdroid.views.MapView;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,17 +50,10 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(getLogStart(), "onCreate");
-        /*
-        Log.d("TrackRecordingMapActivity", String.valueOf(android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)));
-        Log.d("TrackRecordingMapActivity", String.valueOf(Environment.isExternalStorageRemovable()));
-        Log.d("TrackRecordingMapActivity", String.valueOf(Configuration.getInstance().getOsmdroidBasePath()));
-        */
         try {
             ctx = GPSComponent.getGPSComponent().getContext();
         } catch (ASAPException e) {
-            //TODO anpassen
-            e.printStackTrace();
+            Log.d(getLogStart(), e.getLocalizedMessage());
         }
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 

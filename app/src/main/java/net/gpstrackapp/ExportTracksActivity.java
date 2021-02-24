@@ -7,13 +7,12 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
@@ -21,12 +20,11 @@ import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 //after selection navigate to new Activity, in which user selects format
 public class ExportTracksActivity extends GeoModelListSelectionActivity implements AdapterView.OnItemSelectedListener {
@@ -43,7 +41,10 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
 
         Set<String> formats = getFormatStrings();
         availableFormats = formats.toArray(new String[formats.size()]);
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, availableFormats);
+        List<String> availableFormatsUpperCase = Arrays.stream(availableFormats)
+                .map(format -> format.toUpperCase())
+                .collect(Collectors.toList());
+        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, availableFormatsUpperCase);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         View spinnerView = findViewById(R.id.gpstracker_spinner);
@@ -64,10 +65,10 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
 
     @Override
     protected void onSelectionFinished(Set<CharSequence> selectedItemIDs) {
-        showTrackNameDialog(selectedItemIDs);
+        showFileNameDialog(selectedItemIDs);
     }
 
-    private void showTrackNameDialog(Set<CharSequence> selectedItemIDs) {
+    private void showFileNameDialog(Set<CharSequence> selectedItemIDs) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose a file name");
 
@@ -76,25 +77,29 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
 
         builder.setView(input);
         builder.setPositiveButton("OK", (dialog, which) -> {
-            String trackName = input.getText().toString();
-            createFile(selectedItemIDs, trackName);
+            //TODO check input for illegal chars
+            String fileName = input.getText().toString();
+            createFile(selectedItemIDs, fileName);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
-    private void createFile(Set<CharSequence> selectedItemIDs, String trackName) {
+    private void createFile(Set<CharSequence> selectedItemIDs, String fileName) {
         if (selectedFormat != null) {
             Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
-            ExportFileFormat format = FormatManager.getExportFormatByFileExtension(selectedFormat);
-            trackName += "." + format.getFileExtensionString();
 
-            exportHelper = new ExportHelper(format, selectedTracks, trackName);
+            Log.d(getLogStart(), selectedFormat);
+            Log.d(getLogStart(), FormatManager.getExportFormats().toString());
+            ExportFileFormat format = FormatManager.getExportFormatByFileExtension(selectedFormat);
+            fileName += "." + format.getFileExtensionString();
+
+            exportHelper = new ExportHelper(format, selectedTracks, fileName);
 
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType(format.getMIMEDataType());
-            intent.putExtra(Intent.EXTRA_TITLE, trackName);
+            intent.putExtra(Intent.EXTRA_TITLE, fileName);
             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.getExternalStorageDirectory().toURI());
 
             startActivityForResult(intent, CREATE_FILE_CODE);
@@ -113,6 +118,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
                 } catch (FileNotFoundException e) {
                     Log.d(getLogStart(), e.getLocalizedMessage());
                 }
+                Toast.makeText(this, "Export was successful.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -127,18 +133,23 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
         return new RequestTracksCommand();
     }
 
+    @Override
+    public String setActionText() {
+        return "Export tracks";
+    }
+
+    @Override
+    public String setOptionalAdditionalInfo() {
+        return "Also choose a format in which you want to export the tracks.";
+    }
+
     protected Set<String> getFormatStrings() {
         Set<String> exportFormats = FormatManager.getExportFormats().keySet();
-        exportFormats = exportFormats.stream()
-                .map(format -> format.toUpperCase())
-                .collect(Collectors.toSet());
         return exportFormats;
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
+    public void onNothingSelected(AdapterView<?> parent) { }
 
     private String getLogStart() {
         return getClass().getSimpleName();
@@ -147,18 +158,18 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
     protected class ExportHelper {
         private ExportFileFormat format;
         private Set<Track> tracksToExport;
-        private String trackName;
+        private String fileName;
 
-        public ExportHelper(ExportFileFormat format, Set<Track> tracksToExport, String trackName) {
+        public ExportHelper(ExportFileFormat format, Set<Track> tracksToExport, String fileName) {
             this.format = format;
             this.tracksToExport = tracksToExport;
-            this.trackName = trackName;
+            this.fileName = fileName;
         }
 
         public void exportToFile(OutputStream outputStream) {
             try {
-                format.exportToFile(ExportTracksActivity.this, tracksToExport, trackName, outputStream);
-            } catch (ParserConfigurationException | IOException e) {
+                format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream);
+            } catch (Exception e) {
                 Log.d(getLogStart(), e.getLocalizedMessage());
             }
         }

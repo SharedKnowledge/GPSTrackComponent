@@ -2,20 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/spinner_padding_bottom"
+    android:paddingBottom="@dimen/row_padding_vertical"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/spinner_padding_top">
+    android:paddingTop="@dimen/row_padding_vertical">
 
-    <Spinner
-        android:id="@+id/format_spinner"
+    <TextView
+        android:id="@+id/gpstracker_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@android:style/Widget.Spinner"
-        android:textSize="@dimen/spinner_text_size"/>
+        android:lineSpacingMultiplier="@dimen/spinner_line_spacing_multiplier"
+        android:textStyle="bold"
+        android:textSize="@dimen/description_text_size"/>
 
 </RelativeLayout>
