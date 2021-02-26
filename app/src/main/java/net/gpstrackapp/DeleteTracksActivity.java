@@ -17,7 +17,6 @@ public class DeleteTracksActivity extends GeoModelListSelectionActivity {
         Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
         trackModelManager.deleteGeoModelsFromFiles(this, selectedTracks);
         trackModelManager.removeGeoModelsByUUIDs(selectedItemIDs);
-        Toast.makeText(this, "Deleting was successful.", Toast.LENGTH_SHORT).show();
         finish();
     }
 

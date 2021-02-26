@@ -21,20 +21,15 @@ public abstract class MapViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(getLogStart(), "onCreate");
 
         mapView = setupMapViewAndGet();
         finishMapSetup();
 
         presenter = setupPresenterAndGet();
-        presenter.onCreate();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // refresh the osmdroid configuration so that overlays can adjust
-        mapView.onPause();
-        presenter.onPause();
+        if (presenter != null) {
+            presenter.onCreate();
+        }
     }
 
     @Override
@@ -42,14 +37,30 @@ public abstract class MapViewActivity extends AppCompatActivity {
         super.onResume();
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onResume();
-        presenter.onResume();
+        if (presenter != null) {
+            presenter.onResume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(getLogStart(), "onPause");
+        // refresh the osmdroid configuration so that overlays can adjust
+        mapView.onPause();
+        if (presenter != null) {
+            presenter.onPause();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(getLogStart(), "onDestroy");
         parentView.removeView(mapView);
-        presenter.onDestroy();
+        if (presenter != null) {
+            presenter.onDestroy();
+        }
     }
 
     @Override

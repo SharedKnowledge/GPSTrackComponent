@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class TrackPoint implements Serializable {
+    private static final long serialVersionUID = 0;
+
     private GeoPoint geoPoint;
     private LocalDateTime date;
 

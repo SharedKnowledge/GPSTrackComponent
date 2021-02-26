@@ -1,10 +1,15 @@
 package net.gpstrackapp;
 
+import net.gpstrackapp.format.ExportFileFormat;
+import net.gpstrackapp.format.FileFormat;
+import net.gpstrackapp.format.GPXFileFormat;
+import net.gpstrackapp.format.ImportFileFormat;
+import net.gpstrackapp.format.KMLFileFormat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class FormatManager {
     private static Map<String, ImportFileFormat> importFormats = new HashMap<>();

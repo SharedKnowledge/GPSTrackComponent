@@ -1,19 +1,14 @@
 package net.gpstrackapp.geomodel.track;
 
-import android.location.Location;
-
-import net.gpstrackapp.geomodel.ILocationConsumer;
-
 import org.osmdroid.util.GeoPoint;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TrackSegment implements Serializable {
+    private static final long serialVersionUID = 0;
+
     List<TrackPoint> trackPoints = new ArrayList<>();
 
     public TrackSegment(List<TrackPoint> trackPoints) {

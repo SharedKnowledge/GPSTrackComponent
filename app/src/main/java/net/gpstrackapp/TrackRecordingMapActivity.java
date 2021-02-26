@@ -18,7 +18,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
@@ -26,6 +28,7 @@ import net.gpstrackapp.overlay.TrackOverlay;
 import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.modules.IArchiveFile;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
@@ -38,7 +41,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//TODO permission handling, maybe in superclass or split up
+import static android.content.DialogInterface.BUTTON_POSITIVE;
+
+/*
+TODO On first run after install SOMETIMES onPause() and onResume() of this activity get called alternately in a never ending
+    loop, from the second run onwards everything works completely fine. The reason for the call to onPause() escapes me.
+    It might have something to do with the LocationService and the missing ACCESS_FINE_LOCATION permission, that the user has
+    to agree to. The service doesn't get started and returns START_STICKY but doesn't get restarted for some reason? This would
+    explain why everything works fine on the second run as all permissions are already granted.
+*/
 public class TrackRecordingMapActivity extends MapViewActivity {
     private static final int DISPLAY_ACTIVITY_REQUEST_CODE = 0;
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
@@ -49,20 +60,22 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         try {
-            ctx = GPSComponent.getGPSComponent().getContext();
+            ctx = GPSComponent.getGPSComponent().getContext().getApplicationContext();
         } catch (ASAPException e) {
             Log.d(getLogStart(), e.getLocalizedMessage());
         }
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        super.onCreate(savedInstanceState);
 
         requestPermissionsIfNecessary(new String[] {
-                // if you need to show the current location, uncomment the line below
+                // needed to show the current location
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 // WRITE_EXTERNAL_STORAGE is required in order to show the map
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
+
+        Log.d(getLogStart(), "onCreate");
     }
 
     @Override
@@ -139,7 +152,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init Toolbar");
+        Log.d(getLogStart(), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_tracker_mapview_action_buttons, menu);
         adjustMenuToRecordingState(menu);
@@ -157,11 +170,11 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         if (trackRecordingPresenter.isRecordingTrack()) {
             recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_stop_record_button_text));
             menu.findItem(R.id.track_item).getSubMenu().setGroupEnabled(R.id.group_track_actions, false);
-            Log.d(getLogStart(), "disable group");
+            menu.findItem(R.id.map_item).getSubMenu().setGroupEnabled(R.id.group_map_actions, false);
         } else {
             recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_start_record_button_text));
             menu.findItem(R.id.track_item).getSubMenu().setGroupEnabled(R.id.group_track_actions, true);
-            Log.d(getLogStart(), "enable group");
+            menu.findItem(R.id.map_item).getSubMenu().setGroupEnabled(R.id.group_map_actions, true);
         }
     }
 
@@ -169,6 +182,9 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
+                case R.id.download_item:
+                    startDownloadTilesActivity();
+                    return true;
                 case R.id.record_item:
                     if (!trackRecordingPresenter.isRecordingTrack()) {
                         showTrackNameDialog();
@@ -201,24 +217,25 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.d(this.getLogStart(), e.getLocalizedMessage());
+            Log.d(getLogStart(), e.getLocalizedMessage());
         }
         return false;
     }
 
     private void showTrackNameDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose a name for the new track");
-
         final EditText input = new EditText(this);
 
         String name = GPSComponent.getGPSComponent().getASAPApplication().getOwnerName() + "\'s track " + (trackModelManager.count() + 1);
         input.setText(name);
         input.setSelectAllOnFocus(true);
 
-        builder.setView(input);
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String trackName = input.getText().toString();
+        DialogInterface.OnClickListener listener = (dialog, which) -> {
+            String trackName = null;
+            switch (which) {
+                case BUTTON_POSITIVE:
+                    trackName = input.getText().toString();
+                    break;
+            }
             TrackSegment trackSegment = new TrackSegment(null);
             Track track = new Track(null, trackName,
                     GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
@@ -226,25 +243,30 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             trackModelManager.addGeoModel(track);
             trackRecordingPresenter.registerLocationConsumer(track);
             invalidateOptionsMenu();
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        };
+
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(input)
+                .setTitle("Choose a name for the new track")
+                .setPositiveButton(android.R.string.ok, listener)
+                .setNegativeButton(android.R.string.cancel, listener)
+                .create();
+        alertDialog.show();
     }
 
     private void showSaveTrackDialog(final Track track) {
-        DialogInterface.OnClickListener clickListener = (dialog, which) -> {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    startSaveTracksActivity(track);
-                    break;
-            }
-        };
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Save recorded track to storage?")
-                .setPositiveButton("Yes" , clickListener)
-                .setNegativeButton("No" , clickListener)
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    startSaveTracksActivity(track);
+                })
+                .setNegativeButton(android.R.string.no, (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private void startDownloadTilesActivity() {
+        Intent intent = new Intent(this, DownloadTilesActivity.class);
+        startActivity(intent);
     }
 
     private void startDisplayTracksActivity() {

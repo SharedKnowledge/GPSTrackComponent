@@ -5,8 +5,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public abstract class GeoModel implements Serializable {
+    private static final long serialVersionUID = 0;
+
     private CharSequence objectId;
     private CharSequence objectName;
     private final LocalDateTime dateOfCreation;
@@ -33,7 +36,7 @@ public abstract class GeoModel implements Serializable {
 
     public String getDateOfCreationAsFormattedString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return formatter.format(dateOfCreation);
+        return dateOfCreation != null ? formatter.format(dateOfCreation) : null;
     }
 
     public CharSequence getCreator() {

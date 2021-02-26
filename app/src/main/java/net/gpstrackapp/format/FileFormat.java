@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.format;
 
 public interface FileFormat {
     String getFileExtensionString();

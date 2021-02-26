@@ -27,6 +27,7 @@ public class ConfiguredMapView extends MapView {
     private ITileSource tileSource = DEFAULT_TILE_SOURCE;
     private static Set<ITileSource> validTileSources = new HashSet<ITileSource>(Arrays.asList(
             TileSourceFactory.MAPNIK,
+            TileSourceFactory.OpenTopo,
             TileSourceFactory.USGS_TOPO,
             TileSourceFactory.USGS_SAT));
     private Context ctx;
@@ -34,7 +35,7 @@ public class ConfiguredMapView extends MapView {
     public ConfiguredMapView(Context ctx) {
         super(ctx);
         this.ctx = ctx;
-        setupOverlays(ctx);
+        setupOverlays();
         getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
         setMultiTouchControls(true);
         Log.d(getLogStart(), "Constructor");
@@ -43,9 +44,16 @@ public class ConfiguredMapView extends MapView {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(getLogStart(), "onResume");
     }
 
-    private void setupOverlays(Context ctx) {
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(getLogStart(), "onPause");
+    }
+
+    private void setupOverlays() {
         Log.d(getLogStart(), "setup Overlays");
         this.getOverlays().clear();
         this.getOverlays().add(new CopyrightOverlay(ctx));

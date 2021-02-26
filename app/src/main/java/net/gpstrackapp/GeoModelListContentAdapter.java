@@ -51,7 +51,7 @@ public class GeoModelListContentAdapter extends
         Log.d(this.getLogStart(), "onCreateViewHolder");
         View itemView = LayoutInflater
                 .from(parent.getContext())
-                .inflate(R.layout.gpstracker_list_geomodel_row, parent, false);
+                .inflate(R.layout.gpstracker_list_geomodels_row, parent, false);
         return new GeoModelListContentAdapter.MyViewHolder(itemView);
     }
 
@@ -66,8 +66,11 @@ public class GeoModelListContentAdapter extends
 
         CharSequence id = geoModel.getObjectId();
         CharSequence name = geoModel.getObjectName();
+        name = name != null ? name : "No name assigned";
         String date = geoModel.getDateOfCreationAsFormattedString();
+        date = date != null ? date : "Unknown date of creation";
         CharSequence creator = geoModel.getCreator();
+        creator = creator != null ? creator : "Unknown creator";
 
         holder.itemView.setTag(R.id.geomodel_id_tag, geoModelID);
         holder.geoModelID.setText(id);

@@ -66,7 +66,7 @@ public abstract class GeoModelVisualizer<K extends GeoModel, V extends GeoModelO
         }
         mapView.invalidate();
 
-        Log.d(getLogStart(), "updateGeoModelsOnMapView(): " + mapView.getOverlays().get(mapView.getOverlays().size() - 1));
+        Log.d(getLogStart(), "updateGeoModelsOnMapView: " + mapView.getOverlays().size());
     }
 
     private void addGeoModelToHolder(K geoModel) {

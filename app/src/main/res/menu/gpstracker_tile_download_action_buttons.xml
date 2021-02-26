@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/confirm_item"
+        android:title="@string/gpstracker_item_map_download_tiles_done_text"
+        app:showAsAction="always|withText"
+        />
+
+    <item
         android:id="@+id/abort_item"
         android:title="@string/abort"
         app:showAsAction="always|withText"

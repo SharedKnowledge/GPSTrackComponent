@@ -17,7 +17,6 @@ public class SaveTracksActivity extends GeoModelListSelectionActivity {
     protected void onSelectionFinished(Set<CharSequence> selectedItemIDs) {
         Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
         trackModelManager.saveGeoModelsToFiles(this, selectedTracks);
-        Toast.makeText(this, "Saving was successful.", Toast.LENGTH_SHORT).show();
         finish();
     }
 

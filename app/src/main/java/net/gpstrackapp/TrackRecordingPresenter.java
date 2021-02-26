@@ -6,7 +6,7 @@ import android.content.IntentFilter;
 import android.util.Log;
 import android.widget.Toast;
 
-import net.gpstrackapp.geomodel.ILocationConsumer;
+import net.gpstrackapp.location.ILocationConsumer;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackVisualizer;
 import net.gpstrackapp.location.LocationService;
@@ -32,6 +32,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
             locationReceiver = new LocationReceiver();
         }
         setTrackLocationReceiver();
+        Log.d(getLogStart(), "onCreate");
     }
 
     @Override

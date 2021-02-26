@@ -1,6 +1,6 @@
 package net.gpstrackapp;
 
-import net.gpstrackapp.geomodel.ILocationConsumer;
+import net.gpstrackapp.location.ILocationConsumer;
 
 public interface Recorder {
     void registerLocationConsumer(ILocationConsumer consumer);

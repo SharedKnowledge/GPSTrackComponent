@@ -4,8 +4,18 @@
 
     <item android:id="@+id/map_item"
         android:title="@string/gpstracker_menu_map_button_text"
-        app:showAsAction="always|withText"
-        />
+        app:showAsAction="always|withText">
+
+        <menu>
+            <group android:id="@+id/group_map_actions">
+                <item android:id="@+id/download_item"
+                    android:title="@string/gpstracker_item_map_download_tiles_button_text"
+                    app:showAsAction="always|withText"
+                    />
+            </group>
+        </menu>
+
+    </item>
     <item android:id="@+id/track_item"
         android:title="@string/gpstracker_menu_tracks_button_text"
         app:showAsAction="always|withText">

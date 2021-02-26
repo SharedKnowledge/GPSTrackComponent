@@ -1,4 +1,4 @@
-package net.gpstrackapp.geomodel;
+package net.gpstrackapp.location;
 
 import android.location.Location;
 

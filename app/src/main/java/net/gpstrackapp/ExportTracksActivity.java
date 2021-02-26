@@ -1,10 +1,12 @@
 package net.gpstrackapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -14,13 +16,16 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import net.gpstrackapp.format.ExportFileFormat;
+import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
+import net.gpstrackapp.geomodel.track.TrackSegment;
 
-import java.io.FileNotFoundException;
 import java.io.OutputStream;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -69,39 +74,39 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
     }
 
     private void showFileNameDialog(Set<CharSequence> selectedItemIDs) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose a file name");
-
         final EditText input = new EditText(this);
         input.setSelectAllOnFocus(true);
 
-        builder.setView(input);
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            //TODO check input for illegal chars
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(input)
+                .setTitle("Choose a file name")
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .create();
+        alertDialog.show();
+
+        alertDialog.setOnShowListener(dialog -> {
             String fileName = input.getText().toString();
-            createFile(selectedItemIDs, fileName);
+            if (FileUtils.isValidFileName(fileName)) {
+                createFile(selectedItemIDs, fileName);
+                dialog.dismiss();
+            } else {
+                input.setError("Don't use any of these characters: " + System.lineSeparator() + new String(FileUtils.getInvalidChars()));
+            }
         });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
     }
 
     private void createFile(Set<CharSequence> selectedItemIDs, String fileName) {
         if (selectedFormat != null) {
             Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
 
-            Log.d(getLogStart(), selectedFormat);
-            Log.d(getLogStart(), FormatManager.getExportFormats().toString());
             ExportFileFormat format = FormatManager.getExportFormatByFileExtension(selectedFormat);
             fileName += "." + format.getFileExtensionString();
 
             exportHelper = new ExportHelper(format, selectedTracks, fileName);
 
-            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType(format.getMIMEDataType());
-            intent.putExtra(Intent.EXTRA_TITLE, fileName);
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.getExternalStorageDirectory().toURI());
-
             startActivityForResult(intent, CREATE_FILE_CODE);
         }
     }
@@ -112,12 +117,8 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
         if (requestCode == CREATE_FILE_CODE) {
             if (resultCode == RESULT_OK) {
                 Uri result = data.getData();
-                try {
-                    OutputStream outputStream = getContentResolver().openOutputStream(result);
-                    exportHelper.exportToFile(outputStream);
-                } catch (FileNotFoundException e) {
-                    Log.d(getLogStart(), e.getLocalizedMessage());
-                }
+                DocumentFile dir = DocumentFile.fromTreeUri(this, result);
+                exportHelper.exportToFile(dir);
                 Toast.makeText(this, "Export was successful.", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -166,8 +167,10 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
             this.fileName = fileName;
         }
 
-        public void exportToFile(OutputStream outputStream) {
+        public void exportToFile(DocumentFile dir) {
             try {
+                DocumentFile newFile = dir.createFile(format.getMIMEDataType(), fileName);
+                OutputStream outputStream = getContentResolver().openOutputStream(newFile.getUri());
                 format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream);
             } catch (Exception e) {
                 Log.d(getLogStart(), e.getLocalizedMessage());

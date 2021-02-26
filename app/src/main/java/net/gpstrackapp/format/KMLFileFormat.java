@@ -1,8 +1,9 @@
-package net.gpstrackapp;
+package net.gpstrackapp.format;
 
 import android.content.Context;
 import android.util.Log;
 
+import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackPoint;
 import net.gpstrackapp.geomodel.track.TrackSegment;
@@ -100,7 +101,7 @@ public class KMLFileFormat implements ExportFileFormat {
 
         Element lineStyle = document.createElement("LineStyle");
         Element color = document.createElement("color");
-        color.appendChild(document.createTextNode("000000ff"));
+        color.appendChild(document.createTextNode("#ff9900ff"));
         lineStyle.appendChild(color);
         Element width = document.createElement("width");
         width.appendChild(document.createTextNode("4"));
@@ -111,7 +112,7 @@ public class KMLFileFormat implements ExportFileFormat {
         Element scale = document.createElement("scale");
         scale.appendChild(document.createTextNode("1.5"));
         iconStyle.appendChild(scale);
-        Element icon = document.createElement("icon");
+        Element icon = document.createElement("Icon");
         Element href = document.createElement("href");
         href.appendChild(document.createTextNode(
                 "http://earth.google.com/images/kml-icons/track-directional/track-0.png"));
@@ -133,16 +134,16 @@ public class KMLFileFormat implements ExportFileFormat {
                 placemarkName.appendChild(document.createTextNode(multiTrackName));
                 placemark.appendChild(placemarkName);
             }
+            Element styleUrl = document.createElement("styleUrl");
+            styleUrl.appendChild(document.createTextNode("#" + trackStyleTag));
+            placemark.appendChild(styleUrl);
+
             Element dateOfCreation = document.createElement("TimeStamp");
             Element whenDateOfCreation = document.createElement("when");
             String formattedDateOfCreation = track.getDateOfCreation().format(formatterWhen);
             whenDateOfCreation.appendChild(document.createTextNode(formattedDateOfCreation));
             dateOfCreation.appendChild(whenDateOfCreation);
             placemark.appendChild(dateOfCreation);
-
-            Element styleUrl = document.createElement("styleUrl");
-            styleUrl.appendChild(document.createTextNode("#" + trackStyleTag));
-            placemark.appendChild(styleUrl);
 
             //multiTrack (what is called Track in this app is called MultiTrack in KML)
             Element multiTrack = document.createElement("gx:MultiTrack");

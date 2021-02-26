@@ -7,9 +7,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
-import net.gpstrackapp.geomodel.ILocationConsumer;
-import net.gpstrackapp.geomodel.track.Track;
-
 import java.util.ArrayList;
 import java.util.List;
 

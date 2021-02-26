@@ -31,8 +31,8 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
             setContentView(R.layout.gpstracker_drawer_layout);
 
             // inflate layout in DrawerLayout
-            DrawerLayout drawerLayout = findViewById(R.id.gpstracker_list_drawer_layout);
-            View child = getLayoutInflater().inflate(R.layout.gpstracker_list_with_toolbar, null);
+            DrawerLayout drawerLayout = findViewById(R.id.gpstracker_drawer_layout);
+            View child = getLayoutInflater().inflate(R.layout.gpstracker_with_toolbar, null);
             drawerLayout.addView(child);
 
             GPSComponent.getGPSComponent().getASAPApplication().setupDrawerLayout(this);

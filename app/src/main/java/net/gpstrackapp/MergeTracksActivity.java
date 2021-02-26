@@ -28,31 +28,24 @@ public class MergeTracksActivity extends GeoModelListSelectionActivity {
     }
 
     private void showTrackNameDialog(Set<CharSequence> selectedItemIDs) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose a file name");
-
         final EditText input = new EditText(this);
         input.setSelectAllOnFocus(true);
 
-        builder.setView(input);
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String trackName = input.getText().toString();
-            mergeTracks(selectedItemIDs, trackName);
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(input)
+                .setTitle("Choose a track name")
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String trackName = input.getText().toString();
+                    mergeTracks(selectedItemIDs, trackName);
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .create();
+       alertDialog.show();
     }
 
     private void mergeTracks(Set<CharSequence> selectedItemIDs, String trackName) {
         Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
-        List<TrackSegment> trackSegments = selectedTracks.stream()
-                .flatMap(track -> track.getTrackSegments().stream())
-                .collect(Collectors.toList());
-        Track track = new Track(null, trackName,
-                GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
-                LocalDateTime.now(), trackSegments);
-        trackModelManager.addGeoModel(track);
-        Toast.makeText(this, "Merging was successful.", Toast.LENGTH_SHORT).show();
+        trackModelManager.mergeTracks(this, selectedTracks, trackName);
         finish();
     }
 

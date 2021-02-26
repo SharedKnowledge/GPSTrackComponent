@@ -1,7 +1,11 @@
-package net.gpstrackapp;
+package net.gpstrackapp.format;
 
 import android.content.Context;
+import android.util.Log;
 
+import net.gpstrackapp.GPSComponent;
+import net.gpstrackapp.format.ExportFileFormat;
+import net.gpstrackapp.format.ImportFileFormat;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackPoint;
@@ -15,17 +19,12 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import io.jenetics.jpx.GPX;
 import io.jenetics.jpx.Latitude;
@@ -36,6 +35,9 @@ import io.jenetics.jpx.WayPoint;
 
 public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
     private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+
+    // semicolon
+    private String delimiter = String.valueOf('\u003B');
 
     @Override
     public String getMIMEDataType() {
@@ -48,14 +50,13 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
     }
 
     @Override
-    public void exportToFile(Context ctx, Set<Track> tracksToExport, String trackName, OutputStream outputStream) throws IOException {
+    public void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream) throws IOException {
         String appName = ctx.getApplicationInfo().loadLabel(ctx.getPackageManager()).toString();
-        GPX gpx = generateGPX(tracksToExport, trackName, appName);
+        GPX gpx = generateGPX(tracksToExport, fileName, appName);
         gpx.write(gpx, outputStream);
     }
 
     private GPX generateGPX(Set<Track> tracksToExport, String fileName, String appName) {
-        //TODO extension that lets one give more details for track segments, so that id, name, creator, etc. don't get lost when user does import -> export
         Metadata metadata = Metadata.builder()
                 .author(GPSComponent.getGPSComponent().getASAPApplication().getOwnerName().toString())
                 .time(System.currentTimeMillis())
@@ -65,7 +66,16 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
         List<io.jenetics.jpx.Track> gpxTracks = new ArrayList<>();
         // iterate over Tracks
         for (Track track : tracksToExport) {
-            io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(track.getObjectName().toString());
+            // TODO can later be done with an extension
+            // use the description property of track to set creator and date of track
+            String desc = "";
+            CharSequence creator = track.getCreator();
+            desc += creator == null ? "" : creator;
+            desc += delimiter;
+            LocalDateTime dateOfCreation = track.getDateOfCreation();
+            desc += dateOfCreation == null ? "" : dateOfCreation.toString();
+
+            io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(track.getObjectName().toString()).desc(desc);
             List<TrackSegment> trackSegments = track.getTrackSegments();
 
             // iterate over TrackSegments
@@ -75,11 +85,13 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
                 // iterate over TrackPoints / WayPoints
                 for (TrackPoint trackPoint : trackSegment.getTrackPoints()) {
                     GeoPoint geoPoint = trackPoint.getGeoPoint();
+                    LocalDateTime date = trackPoint.getDate();
+                    ZonedDateTime dateZoned = date != null ? date.atZone(ZoneId.systemDefault()) : null;
                     wayPoints.add(WayPoint.of(
                             Latitude.ofDegrees(geoPoint.getLatitude()),
                             Longitude.ofDegrees(geoPoint.getLongitude()),
                             Length.of(geoPoint.getAltitude(), Length.Unit.METER),
-                            trackPoint.getDate().atZone(ZoneId.systemDefault())
+                            dateZoned
                     ));
                 }
                 io.jenetics.jpx.TrackSegment segment = io.jenetics.jpx.TrackSegment.builder().points(wayPoints).build();
@@ -93,25 +105,43 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
     }
 
     @Override
-    public void importFromFile(InputStream inputStream) throws IOException {
+    public void importFromFile(Context ctx, InputStream inputStream) throws IOException {
+        String appName = ctx.getApplicationInfo().loadLabel(ctx.getPackageManager()).toString();
         GPX gpx = GPX.read(inputStream);
-
-        Optional<Metadata> metaOpt = gpx.getMetadata();
-        LocalDateTime time = null;
-        if (metaOpt.isPresent()) {
-            Metadata metadata = metaOpt.get();
-            ZonedDateTime zonedDateTime = metadata.getTime().orElse(null);
-            time = zonedDateTime.toLocalDateTime();
-        }
 
         // import Tracks
         List<io.jenetics.jpx.Track> gpxTracks = gpx.tracks().collect(Collectors.toList());
         // iterate over Tracks
         for (int i = 0; i < gpxTracks.size(); i++) {
             io.jenetics.jpx.Track gpxTrack = gpxTracks.get(i);
-            String trackName = gpxTrack.getName().isPresent() ?
-                    gpxTrack.getName().get() :
-                    null;
+            String trackName = gpxTrack.getName().isPresent() ? gpxTrack.getName().get() : null;
+            String creator = null;
+            LocalDateTime dateOfCreation = null;
+            // file was originally exported from this app, use the description property of track to get creator and date of track
+            if (gpx.getCreator().equals(appName)) {
+                String desc = gpxTrack.getDescription().orElse("");
+                if (!desc.isEmpty()) {
+                    String[] descParts = desc.split(delimiter);
+                    if (descParts.length == 2) {
+                        // creator
+                        creator = descParts[0].isEmpty() ? null : descParts[0];
+                        // date
+                        String dateString = descParts[1];
+                        if (!dateString.isEmpty()) {
+                            try {
+                                dateOfCreation = LocalDateTime.parse(dateString);
+                            } catch (DateTimeParseException e) {
+                                Log.d(getLogStart(), "Could not parse date string of a track. " + System.lineSeparator()
+                                        + "String to parse was: " + e.getParsedString() + System.lineSeparator()
+                                        + "Error message: " + e.getLocalizedMessage());
+                            }
+                        }
+                    } else {
+                        Log.d(getLogStart(), "The description parameter was not properly formatted on export from this app. "
+                                + "For this reason some attributes of a track could not be properly imported");
+                    }
+                }
+            }
 
             List<io.jenetics.jpx.TrackSegment> gpxTrackSegments = gpxTrack.getSegments();
             List<TrackSegment> trackSegments = new ArrayList<>();
@@ -135,8 +165,12 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
                 }
                 trackSegments.add(trackSegment);
             }
-            Track track = new Track(null, trackName, null, time, trackSegments);
+            Track track = new Track(null, trackName, creator, dateOfCreation, trackSegments);
             trackModelManager.addGeoModel(track);
         }
+    }
+
+    private String getLogStart() {
+        return getClass().getSimpleName();
     }
 }

@@ -5,14 +5,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import net.gpstrackapp.geomodel.GeoModel;
-
 import java.util.Set;
 
 public abstract class GeoModelListSelectionActivity extends GeoModelListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init Toolbar");
+        Log.d(getLogStart(), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_list_selection_action_buttons, menu);
         return true;
@@ -22,10 +20,10 @@ public abstract class GeoModelListSelectionActivity extends GeoModelListActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch(item.getItemId()) {
-                case R.id.gpstrackerListSelectionDoneButton:
+                case R.id.gpstracker_list_selection_done_button:
                     this.doDone();
                     return true;
-                case R.id.abortButton:
+                case R.id.abort_item:
                     this.finish();
                     return true;
                 default:

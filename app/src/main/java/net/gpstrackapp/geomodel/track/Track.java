@@ -3,9 +3,8 @@ package net.gpstrackapp.geomodel.track;
 import android.location.Location;
 import android.util.Log;
 
-import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModel;
-import net.gpstrackapp.geomodel.ILocationConsumer;
+import net.gpstrackapp.location.ILocationConsumer;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -15,10 +14,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 public class Track extends GeoModel implements ILocationConsumer, Serializable {
+    private static final long serialVersionUID = 0;
     private List<TrackSegment> trackSegments = new ArrayList<>();
 
     public Track(CharSequence objectID, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation, List<TrackSegment> trackSegments) {

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">GPSTrackApp</string>
     <string name="gpstracker_menu_map_button_text">Map</string>
+    <string name="gpstracker_item_map_download_tiles_button_text">Download Tiles</string>
+    <string name="gpstracker_item_map_download_tiles_done_text">Confirm</string>
+
     <string name="gpstracker_menu_tracks_button_text">Tracks</string>
     <string name="gpstracker_item_tracks_start_record_button_text">Start recording</string>
     <string name="gpstracker_item_tracks_stop_record_button_text">Stop recording</string>
@@ -11,5 +14,7 @@
     <string name="gpstracker_item_tracks_import_button_text">Import</string>
     <string name="gpstracker_item_tracks_export_button_text">Export</string>
     <string name="gpstracker_geomodel_list_selection_done_text">Done Selection</string>
+
     <string name="abort">Abort</string>
+
 </resources>

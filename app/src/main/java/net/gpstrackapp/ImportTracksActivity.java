@@ -18,6 +18,8 @@ import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.gpstrackapp.format.ImportFileFormat;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +36,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
         setContentView(R.layout.gpstracker_drawer_layout);
 
         // inflate layout in DrawerLayout
-        DrawerLayout drawerLayout = findViewById(R.id.gpstracker_list_drawer_layout);
+        DrawerLayout drawerLayout = findViewById(R.id.gpstracker_drawer_layout);
         View child = getLayoutInflater().inflate(R.layout.gpstracker_description_and_button_with_toolbar, null);
         drawerLayout.addView(child);
 
@@ -54,7 +56,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init Toolbar");
+        Log.d(getLogStart(), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_reduced_action_buttons, menu);
         return true;
@@ -64,7 +66,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.abortButton:
+                case R.id.abort_item:
                     this.finish();
                     return true;
                 default:
@@ -79,12 +81,17 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
     }
 
     public void onImportButtonClicked(View view) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         Set<String> importFormats = FormatManager.getImportFormats().keySet();
         Set<String> mimeTypes = importFormats.stream()
                 .map(format -> MimeTypeMap.getSingleton().getMimeTypeFromExtension(format))
                 .collect(Collectors.toSet());
 
+        /*
+        TODO When a file is deleted manually the file will sometimes still be shown in the following Activity, most likely because
+         it doesn't get refreshed by the storage access framework for some reason. In the Device File Explorer the files
+         don't exist anymore. After a restart of the device the files won't be shown anymore, but that's not really a solution.
+        */
         String[] mimeTypesArray = mimeTypes.toArray(new String[mimeTypes.size()]);
         intent.setType("*/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypesArray);
@@ -105,7 +112,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                     if (importFileFormat != null) {
                         InputStream inputStream = getContentResolver().openInputStream(result);
                         try {
-                            importFileFormat.importFromFile(inputStream);
+                            importFileFormat.importFromFile(this, inputStream);
                         } catch (IOException e) {
                             Log.d(getLogStart(), e.getLocalizedMessage());
                         }

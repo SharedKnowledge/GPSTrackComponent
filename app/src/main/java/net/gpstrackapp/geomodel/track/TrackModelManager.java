@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModelManager;
 import net.gpstrackapp.geomodel.GeoModelStorage;
 
@@ -13,11 +14,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TrackModelManager extends GeoModelManager<Track> implements GeoModelStorage<Track> {
+    public void mergeTracks(Context ctx, Set<Track> tracksToMerge, String newTrackName) {
+        List<TrackSegment> trackSegments = tracksToMerge.stream()
+                .flatMap(track -> track.getTrackSegments().stream())
+                .collect(Collectors.toList());
+        Track track = new Track(null, newTrackName,
+                GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
+                LocalDateTime.now(), trackSegments);
+        addGeoModel(track);
+        Toast.makeText(ctx, "The Tracks have been successfully merged.", Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void saveGeoModelToFile(Context ctx, Track trackToSave) {
         try {
@@ -39,7 +54,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             Track trackToSave = iterator.next();
             saveGeoModelToFile(ctx, trackToSave);
         }
-        Toast.makeText(ctx, "The Tracks have been successfully saved.", Toast.LENGTH_LONG).show();
+        Toast.makeText(ctx, "The Tracks have been successfully saved.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -56,7 +71,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             Track trackToDelete = iterator.next();
             deleteGeoModelFromFile(ctx, trackToDelete);
         }
-        Toast.makeText(ctx, "The Tracks have been successfully deleted.", Toast.LENGTH_LONG).show();
+        Toast.makeText(ctx, "The Tracks have been successfully deleted.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
