@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,27 +27,21 @@ import java.util.stream.Collectors;
 
 public class ImportTracksActivity extends AppCompatActivity implements ActivityWithDescription {
     private final int CHOOSE_FILE_CODE = 1;
-    private TextView descriptionView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.gpstracker_drawer_layout);
-
-        // inflate layout in DrawerLayout
-        DrawerLayout drawerLayout = findViewById(R.id.gpstracker_drawer_layout);
-        View child = getLayoutInflater().inflate(R.layout.gpstracker_description_and_button_with_toolbar, null);
-        drawerLayout.addView(child);
+        setContentView(R.layout.gpstracker_import_action_drawer_layout);
 
         // setup toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_reduced_toolbar);
         setSupportActionBar(toolbar);
 
-        descriptionView = (TextView) findViewById(R.id.gpstracker_description);
+        TextView descriptionView = (TextView) findViewById(R.id.gpstracker_description);
         String description = setActionText();
-        String additionalInfo = setOptionalAdditionalInfo();
+        String additionalInfo = addOptionalAdditionalInfo();
         if (additionalInfo != null && !additionalInfo.equals("")) {
-            description += " " + additionalInfo;
+            description += ":" + System.lineSeparator() + additionalInfo;
         }
         descriptionView.setText(description);
         Log.d(getLogStart(), descriptionView.getText().toString());
@@ -138,7 +131,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
     }
 
     @Override
-    public String setOptionalAdditionalInfo() {
+    public String addOptionalAdditionalInfo() {
         return null;
     }
 }

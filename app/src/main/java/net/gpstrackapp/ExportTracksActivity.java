@@ -140,7 +140,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
     }
 
     @Override
-    public String setOptionalAdditionalInfo() {
+    public String addUserDescription() {
         return "Also choose a format in which you want to export the tracks.";
     }
 

@@ -31,7 +31,7 @@ public class DeleteTracksActivity extends GeoModelListSelectionActivity {
     }
 
     @Override
-    public String setOptionalAdditionalInfo() {
+    public String addUserDescription() {
         return "This will also delete the tracks from local storage!";
     }
 }

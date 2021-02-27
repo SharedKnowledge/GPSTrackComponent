@@ -20,7 +20,7 @@
         android:layout_below="@id/gpstracker_list_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        layout="@layout/gpstracker_list_description" />
+        layout="@layout/gpstracker_description_layout" />
 
     <include
         android:id="@+id/gpstracker_spinner"
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        layout="@layout/gpstracker_spinner" />
+        layout="@layout/gpstracker_list_geomodels_spinner" />
 
     <include
         android:layout_below="@id/gpstracker_spinner"

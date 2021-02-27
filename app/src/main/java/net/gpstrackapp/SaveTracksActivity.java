@@ -31,7 +31,7 @@ public class SaveTracksActivity extends GeoModelListSelectionActivity {
     }
 
     @Override
-    public String setOptionalAdditionalInfo() {
+    public String addUserDescription() {
         return "All selected tracks will be saved to local storage.";
     }
 }

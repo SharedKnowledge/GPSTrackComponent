@@ -7,11 +7,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
-public class DownloadTilesActivity extends MapViewActivity {
+public class DownloadTilesActivity extends MapViewActivity implements ActivityWithDescription {
 
     @Override
     protected ConfiguredMapView setupMapViewAndGet() {
@@ -22,17 +24,25 @@ public class DownloadTilesActivity extends MapViewActivity {
 
     @Override
     protected ViewGroup setupLayoutAndGet() {
-        setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
-        Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_with_toolbar);
+        setContentView(R.layout.gpstracker_tile_download_drawer_layout);
+        Toolbar toolbar = findViewById(R.id.gpstracker_tile_download_toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawerLayout = findViewById(R.id.gpstracker_tracker_mapview_drawer_layout);
-        DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
+        TextView descriptionView = (TextView) findViewById(R.id.gpstracker_description);
+        String description = setActionText();
+        String additionalInfo = addOptionalAdditionalInfo();
+        if (additionalInfo != null && !additionalInfo.equals("")) {
+            description += ":" + System.lineSeparator() + additionalInfo;
+        }
+        descriptionView.setText(description);
+
+        RelativeLayout relativeLayout = findViewById(R.id.gpstracker_tile_download_layout_with_toolbar);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
                 MapView.LayoutParams.MATCH_PARENT);
-        params.setMargins(0, (int) getResources().getDimension(R.dimen.marginUnderToolbar), 0, 0);
+        params.addRule(RelativeLayout.BELOW, R.id.gpstracker_tile_download_description);
         mapView.setLayoutParams(params);
 
-        return drawerLayout;
+        return relativeLayout;
     }
 
     @Override
@@ -70,5 +80,16 @@ public class DownloadTilesActivity extends MapViewActivity {
 
     private String getLogStart() {
         return getClass().getSimpleName();
+    }
+
+    @Override
+    public String setActionText() {
+        return "Download map tiles";
+    }
+
+    @Override
+    public String addOptionalAdditionalInfo() {
+        return "Adjust the map to show the area you want to download. Press \'"
+                + getResources().getString(R.string.gpstracker_item_map_download_tiles_done_text) + "\' once you've finished.";
     }
 }

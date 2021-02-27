@@ -60,7 +60,7 @@ public class MergeTracksActivity extends GeoModelListSelectionActivity {
     }
 
     @Override
-    public String setOptionalAdditionalInfo() {
+    public String addUserDescription() {
         return "A new track with all the segments from the selected tracks will be created. The selected tracks will not be deleted.";
     }
 }

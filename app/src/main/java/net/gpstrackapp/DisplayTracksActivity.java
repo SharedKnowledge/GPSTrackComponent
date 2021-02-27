@@ -28,7 +28,7 @@ public class DisplayTracksActivity extends GeoModelListSelectionActivity {
     }
 
     @Override
-    public String setOptionalAdditionalInfo() {
+    public String addUserDescription() {
         return "Already displayed tracks are preselected.";
     }
 }

@@ -18,9 +18,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
-import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
@@ -28,7 +27,6 @@ import net.gpstrackapp.overlay.TrackOverlay;
 import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.modules.IArchiveFile;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 
@@ -138,16 +136,16 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     @Override
     protected ViewGroup setupLayoutAndGet() {
         setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
-        Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_with_toolbar);
+        Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawerLayout = findViewById(R.id.gpstracker_tracker_mapview_drawer_layout);
-        DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
+        RelativeLayout relativeLayout = findViewById(R.id.gpstracker_tracker_mapview_layout_with_toolbar);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
                 MapView.LayoutParams.MATCH_PARENT);
-        params.setMargins(0, (int) getResources().getDimension(R.dimen.marginUnderToolbar), 0, 0);
+        params.addRule(RelativeLayout.BELOW);
         mapView.setLayoutParams(params);
 
-        return drawerLayout;
+        return relativeLayout;
     }
 
     @Override

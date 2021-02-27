@@ -1,13 +1,11 @@
 package net.gpstrackapp;
 
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
@@ -28,14 +26,7 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
         Log.d(getLogStart(), "onCreate");
 
         try {
-            setContentView(R.layout.gpstracker_drawer_layout);
-
-            // inflate layout in DrawerLayout
-            DrawerLayout drawerLayout = findViewById(R.id.gpstracker_drawer_layout);
-            View child = getLayoutInflater().inflate(R.layout.gpstracker_with_toolbar, null);
-            drawerLayout.addView(child);
-
-            GPSComponent.getGPSComponent().getASAPApplication().setupDrawerLayout(this);
+            setContentView(R.layout.gpstracker_list_geomodels_drawer_layout);
 
             List<CharSequence> selectedItemIDsList = getIntent().getCharSequenceArrayListExtra("selectedItemIDs");
             if (selectedItemIDsList != null) {
@@ -47,19 +38,14 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
             Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_toolbar);
             setSupportActionBar(toolbar);
 
-
             descriptionView = (TextView) findViewById(R.id.gpstracker_description);
-            String selectionHint = ":" + System.lineSeparator()
-                    + "(Un)Select tracks by clicking on them and press \'"
-                    + getResources().getString(R.string.gpstracker_geomodel_list_selection_done_text)
-                    + "\'.";
-            String description = setActionText() + selectionHint;
-            String additionalInfo = setOptionalAdditionalInfo();
+
+            String description = setActionText();
+            String additionalInfo = addOptionalAdditionalInfo();
             if (additionalInfo != null && !additionalInfo.equals("")) {
-                description += " " + additionalInfo;
+                description += ":" + System.lineSeparator() + additionalInfo;
             }
             descriptionView.setText(description);
-
 
             recyclerView = (RecyclerView) findViewById(R.id.gpstracker_list_geomodels_recycler_view);
 
@@ -89,4 +75,13 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
     private String getLogStart() {
         return this.getClass().getSimpleName();
     }
+
+    @Override
+    public String addOptionalAdditionalInfo() {
+        return "(Un)Select tracks by clicking on them and press \'"
+                + getResources().getString(R.string.gpstracker_geomodel_list_selection_done_text) + "\'. "
+                + addUserDescription();
+    }
+
+    public abstract String addUserDescription();
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/gpstracker_drawer_layout"
+    android:id="@+id/gpstracker_tile_download_drawer_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Toolbar gets inflated during runtime -->
+    <include layout="@layout/gpstracker_tile_download_layout_with_toolbar" />
 
     <!-- TODO include sharknet drawer navigation view when integrating -->
 
