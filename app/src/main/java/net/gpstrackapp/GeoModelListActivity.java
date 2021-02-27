@@ -35,7 +35,7 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
             }
 
             // setup toolbar
-            Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_toolbar);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_geomodels_toolbar);
             setSupportActionBar(toolbar);
 
             descriptionView = (TextView) findViewById(R.id.gpstracker_description);

@@ -1,6 +1,5 @@
 package net.gpstrackapp;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,10 +21,8 @@ import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
-import net.gpstrackapp.geomodel.track.TrackSegment;
 
 import java.io.OutputStream;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +49,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
         ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, availableFormatsUpperCase);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        View spinnerView = findViewById(R.id.gpstracker_spinner);
+        View spinnerView = findViewById(R.id.gpstracker_list_geomodels_spinner);
         spinnerView.setVisibility(View.VISIBLE);
 
         spinner = findViewById(R.id.format_spinner);

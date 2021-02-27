@@ -34,7 +34,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
         setContentView(R.layout.gpstracker_import_action_drawer_layout);
 
         // setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_reduced_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_import_toolbar);
         setSupportActionBar(toolbar);
 
         TextView descriptionView = (TextView) findViewById(R.id.gpstracker_description);
@@ -51,7 +51,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(getLogStart(), "init action buttons");
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.gpstracker_reduced_action_buttons, menu);
+        inflater.inflate(R.menu.gpstracker_abort_action_button, menu);
         return true;
     }
 
