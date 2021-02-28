@@ -24,11 +24,9 @@ import android.util.Log;
 
 import java.util.List;
 
-//TODO onDestroy is called when device enters sleep mode
 public class LocationService extends Service {
     private LocationManager locationManager;
     private LocationListener locationListener;
-    //private NotificationChannel channel;
 
     private long updateMinTime = 0;
     private float updateMinDistance = 0;
@@ -38,33 +36,36 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        /*
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d(getLogStart(), "service will be started in foreground");
             startInForeground();
         }
-        */
+
         Log.d(getLogStart(), "onCreate");
     }
 
-    /*
+
     private void startInForeground() {
-        String NOTIFICATION_CHANNEL_ID = "location_service";
-        String channelName = "Location Service";
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, importance);
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            String NOTIFICATION_CHANNEL_ID = "location_service";
+            String channelName = "Location Service";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, importance);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-        Notification notification = notificationBuilder.setOngoing(true)
-                .setContentTitle("App is running in background")
-                .setPriority(NotificationManager.IMPORTANCE_MIN)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .build();
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+            Notification notification = notificationBuilder.setOngoing(true)
+                    .setContentTitle("App is running in background")
+                    .setPriority(NotificationManager.IMPORTANCE_MIN)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .build();
 
-        startForeground(1, notification);
+            startForeground(1, notification);
+        }
     }
-     */
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
