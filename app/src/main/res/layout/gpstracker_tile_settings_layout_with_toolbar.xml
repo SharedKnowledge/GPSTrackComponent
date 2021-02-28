@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/gpstracker_list_geomodels_layout_with_toolbar"
+    android:id="@+id/gpstracker_tile_settings_layout_with_toolbar"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/gpstracker_list_geomodels_toolbar"
+        android:id="@+id/gpstracker_tile_settings_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -16,24 +16,33 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <include
-        android:id="@+id/gpstracker_list_geomodels_description"
-        android:layout_below="@id/gpstracker_list_geomodels_toolbar"
+        android:id="@+id/gpstracker_tile_settings_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/gpstracker_tile_settings_toolbar"
         layout="@layout/gpstracker_description_layout" />
 
     <include
-        android:id="@+id/gpstracker_list_geomodels_spinner"
-        android:layout_below="@id/gpstracker_list_geomodels_description"
+        android:id="@+id/gpstracker_tile_settings_source_spinner"
+        android:layout_below="@id/gpstracker_tile_settings_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         layout="@layout/gpstracker_spinner_layout" />
 
-    <include
-        android:layout_below="@id/gpstracker_list_geomodels_spinner"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        layout="@layout/gpstracker_list_geomodels_recycler_view_layout" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gpstracker_tile_settings_source_spinner"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
 
+        <Button
+            android:id="@+id/gpstracker_tile_settings_save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gpstracker_tile_settings_save_text"
+            android:onClick="onSaveAsDefaultButtonClicked"
+            />
+    </LinearLayout>
 </RelativeLayout>

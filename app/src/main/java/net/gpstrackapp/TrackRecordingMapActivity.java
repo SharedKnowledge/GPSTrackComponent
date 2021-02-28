@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,7 +26,9 @@ import net.gpstrackapp.overlay.TrackOverlay;
 import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import java.time.LocalDateTime;
@@ -61,7 +62,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         try {
             ctx = GPSComponent.getGPSComponent().getContext().getApplicationContext();
         } catch (ASAPException e) {
-            Log.d(getLogStart(), e.getLocalizedMessage());
+            Log.e(getLogStart(), e.getLocalizedMessage());
         }
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         super.onCreate(savedInstanceState);
@@ -77,9 +78,14 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     }
 
     @Override
-    protected Presenter setupPresenterAndGet() {
+    protected Presenter setupAndGetPresenter() {
         trackRecordingPresenter = new TrackRecordingPresenter(mapView);
         return trackRecordingPresenter;
+    }
+
+    @Override
+    protected ITileSource getMapSpecificTileSource() {
+        return null;
     }
 
     // Always called before onResume, so the overlays can be added/removed in onResume
@@ -98,7 +104,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putCharSequenceArrayList("savedItemIDs", new ArrayList<>(trackRecordingPresenter.getTrackVisualizer().getSelectedItemIDs()));
+        savedInstanceState.putCharSequenceArrayList("itemIDsToRestore", new ArrayList<>(trackRecordingPresenter.getTrackVisualizer().getSelectedItemIDs()));
         if (trackRecordingPresenter.getRecordedTrack() != null) {
             savedInstanceState.putCharSequence("recordedTrack", trackRecordingPresenter.getRecordedTrack().getObjectId());
         }
@@ -107,8 +113,8 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState.containsKey("savedItemIDs")) {
-            Set<CharSequence> selectedItemIDs = new HashSet<>(savedInstanceState.getCharSequenceArrayList("savedItemIDs"));
+        if (savedInstanceState.containsKey("itemIDsToRestore")) {
+            Set<CharSequence> selectedItemIDs = new HashSet<>(savedInstanceState.getCharSequenceArrayList("itemIDsToRestore"));
             trackRecordingPresenter.getTrackVisualizer().setSelectedItemIDs(selectedItemIDs);
         }
         if (savedInstanceState.containsKey("recordedTrack")) {
@@ -118,23 +124,12 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////
-    //                           mapView methods                          //
-    ////////////////////////////////////////////////////////////////////////
-
-    @Override
-    protected ConfiguredMapView setupMapViewAndGet() {
-        mapView = new ConfiguredMapView(this);
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-        return mapView;
-    }
-
     public static Map<Track, TrackOverlay> getTrackWithOverlayHolder() {
         return trackWithOverlayHolder;
     }
 
     @Override
-    protected ViewGroup setupLayoutAndGet() {
+    protected ViewGroup setupAndGetMapViewParentLayout() {
         setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
         Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
         setSupportActionBar(toolbar);
@@ -180,6 +175,9 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
+                case R.id.tile_settings_item:
+                    startMapTileSettingsActivity();
+                    return true;
                 case R.id.download_item:
                     startDownloadTilesActivity();
                     return true;
@@ -215,7 +213,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.d(getLogStart(), e.getLocalizedMessage());
+            Log.e(getLogStart(), e.getLocalizedMessage());
         }
         return false;
     }
@@ -262,8 +260,22 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                 .show();
     }
 
+    private void startMapTileSettingsActivity() {
+        Intent intent = new Intent(this, MapTileSettingsActivity.class);
+        startActivity(intent);
+    }
+
     private void startDownloadTilesActivity() {
         Intent intent = new Intent(this, DownloadTilesActivity.class);
+        GeoPoint lastLocation = mapView.getLastLocation();
+        if (lastLocation != null) {
+            intent.putExtra("lat", lastLocation.getLatitude());
+            intent.putExtra("lon", lastLocation.getLongitude());
+        }
+        double zoomLevel = mapView.getZoomLevelDouble();
+        if (zoomLevel != DEFAULT_ZOOM_LEVEL) {
+            intent.putExtra("zoom", mapView.getZoomLevelDouble());
+        }
         startActivity(intent);
     }
 

@@ -56,7 +56,7 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
             recyclerView.setAdapter(adapter);
             Log.d(getLogStart(), "attached content adapter");
         } catch (Exception e) {
-            Log.d(getLogStart(), "problems while setting up activity and content adapter: " + e.getLocalizedMessage());
+            Log.e(getLogStart(), "problems while setting up activity and content adapter: " + e.getLocalizedMessage());
         }
     }
 
@@ -79,7 +79,7 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
     @Override
     public String addOptionalAdditionalInfo() {
         return "(Un)Select tracks by clicking on them and press \'"
-                + getResources().getString(R.string.gpstracker_geomodel_list_selection_done_text) + "\'. "
+                + getResources().getString(R.string.gpstracker_list_geomodels_selection_done_text) + "\'. "
                 + addUserDescription();
     }
 

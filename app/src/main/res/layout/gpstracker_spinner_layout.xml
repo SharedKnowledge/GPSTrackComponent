@@ -12,7 +12,7 @@
     android:paddingTop="@dimen/spinner_padding_top">
 
     <Spinner
-        android:id="@+id/format_spinner"
+        android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@android:style/Widget.Spinner"

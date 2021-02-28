@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">GPSTrackApp</string>
-    <string name="gpstracker_menu_map_button_text">Map</string>
+    <string name="gpstracker_menu_map_tiles_button_text">Map Tiles</string>
     <string name="gpstracker_item_map_download_tiles_button_text">Download Tiles</string>
+    <string name="gpstracker_item_map_settings_tile_source_button_text">Tile Source Settings</string>
     <string name="gpstracker_item_map_download_tiles_done_text">Confirm</string>
 
     <string name="gpstracker_menu_tracks_button_text">Tracks</string>
@@ -13,8 +14,25 @@
     <string name="gpstracker_item_tracks_delete_button_text">Delete</string>
     <string name="gpstracker_item_tracks_import_button_text">Import</string>
     <string name="gpstracker_item_tracks_export_button_text">Export</string>
-    <string name="gpstracker_geomodel_list_selection_done_text">Done Selection</string>
 
+    <string name="gpstracker_list_geomodels_selection_done_text">Done Selection</string>
+
+    <string name="gpstracker_tile_settings_save_text">Save as default</string>
+    <string name="gpstracker_cache_manager">Cache Manager</string>
+    <string name="gpstracker_cache_current_size">Cache Current Size</string>
+    <string name="gpstracker_cache_download">Start Download</string>
+    <string name="gpstracker_tile_download_file_extension">.sqlite</string>
+    <string name="gpstracker_tile_download_north_lat">Northern most Latitude</string>
+    <string name="gpstracker_tile_download_south_lat">Southern most Latitude</string>
+    <string name="gpstracker_tile_download_west_lon">Western most Longitude</string>
+    <string name="gpstracker_tile_download_east_lon">Eastern most Longitude</string>
+    <string name="gpstracker_tile_download_zoom_level_min">Zoom Level Min</string>
+    <string name="gpstracker_tile_download_zoom_level_max">Zoom Level Max</string>
+    <string name="gpstracker_tile_download_tiles_count_estimate">Tile download estimate:</string>
+    <string name="gpstracker_tile_download_archive_name">Archive File name:</string>
+    <string name="gpstracker_tile_download_start_download_button">Start Download</string>
+
+    <string name="cancel">Cancel</string>
     <string name="abort">Abort</string>
 
 </resources>

@@ -3,11 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/map_item"
-        android:title="@string/gpstracker_menu_map_button_text"
+        android:title="@string/gpstracker_menu_map_tiles_button_text"
         app:showAsAction="always|withText">
 
         <menu>
             <group android:id="@+id/group_map_actions">
+                <item android:id="@+id/tile_settings_item"
+                    android:title="@string/gpstracker_item_map_settings_tile_source_button_text"
+                    app:showAsAction="always|withText"
+                    />
                 <item android:id="@+id/download_item"
                     android:title="@string/gpstracker_item_map_download_tiles_button_text"
                     app:showAsAction="always|withText"

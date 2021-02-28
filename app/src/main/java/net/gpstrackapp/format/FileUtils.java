@@ -8,6 +8,9 @@ public class FileUtils {
     }
 
     public static boolean isValidFileName(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return false;
+        }
         for (char c : invalidFileNameChars) {
             if (fileName.contains(String.valueOf(c))) {
                 return false;

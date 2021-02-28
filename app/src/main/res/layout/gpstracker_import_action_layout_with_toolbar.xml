@@ -22,8 +22,14 @@
         android:layout_below="@id/gpstracker_import_toolbar"
         layout="@layout/gpstracker_description_layout" />
 
-    <include
+    <Button
         android:id="@+id/gpstracker_import_button"
-        layout="@layout/gpstracker_import_action_button_layout"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/gpstracker_item_tracks_import_button_text"
+        android:onClick="onImportButtonClicked"
+        />
 
 </RelativeLayout>

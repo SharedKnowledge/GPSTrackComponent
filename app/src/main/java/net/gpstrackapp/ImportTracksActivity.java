@@ -44,7 +44,6 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
             description += ":" + System.lineSeparator() + additionalInfo;
         }
         descriptionView.setText(description);
-        Log.d(getLogStart(), descriptionView.getText().toString());
     }
 
     @Override
@@ -68,7 +67,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.d(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
+            Log.e(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
         }
         return false;
     }
@@ -107,7 +106,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                         try {
                             importFileFormat.importFromFile(this, inputStream);
                         } catch (IOException e) {
-                            Log.d(getLogStart(), e.getLocalizedMessage());
+                            Log.e(getLogStart(), e.getLocalizedMessage());
                         }
                         Toast.makeText(this, "Import was successful.", Toast.LENGTH_SHORT).show();
                         finish();
@@ -115,7 +114,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                         Toast.makeText(this, "The file could not be imported because the file type " + mimeType + " is not supported", Toast.LENGTH_SHORT).show();
                     }
                 } catch (FileNotFoundException e) {
-                    Log.d(getLogStart(), e.getLocalizedMessage());
+                    Log.e(getLogStart(), e.getLocalizedMessage());
                 }
             }
         }

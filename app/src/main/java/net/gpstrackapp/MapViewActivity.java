@@ -1,32 +1,36 @@
 package net.gpstrackapp;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 
 public abstract class MapViewActivity extends AppCompatActivity {
     protected ConfiguredMapView mapView = null;
     protected ViewGroup parentView = null;
     protected Presenter presenter = null;
-    private final double DEFAULT_ZOOM_LEVEL = 18;
+    protected final double DEFAULT_ZOOM_LEVEL = 18;
+    protected final double DEFAULT_LATITUDE = 0.0;
+    protected final double DEFAULT_LONGITUDE = 0.0;
 
-    protected abstract ConfiguredMapView setupMapViewAndGet();
-    protected abstract ViewGroup setupLayoutAndGet();
-    protected abstract Presenter setupPresenterAndGet();
+    protected abstract ViewGroup setupAndGetMapViewParentLayout();
+    protected abstract Presenter setupAndGetPresenter();
+    protected abstract ITileSource getMapSpecificTileSource();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(getLogStart(), "onCreate");
 
-        mapView = setupMapViewAndGet();
-        finishMapSetup();
+        mapView = new ConfiguredMapView(this);
+        finishMapSetup(getIntent());
 
-        presenter = setupPresenterAndGet();
+        presenter = setupAndGetPresenter();
         if (presenter != null) {
             presenter.onCreate();
         }
@@ -35,6 +39,15 @@ public abstract class MapViewActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(getLogStart(), "onResume");
+
+        ITileSource customTileSource = getMapSpecificTileSource();
+        if (customTileSource != null) {
+            mapView.setTileSource(customTileSource);
+        } else {
+            mapView.setTileSource(ConfiguredMapView.getDefaultTileSource());
+        }
+
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onResume();
         if (presenter != null) {
@@ -97,10 +110,23 @@ public abstract class MapViewActivity extends AppCompatActivity {
         }
     }
 
-    private void finishMapSetup() {
+    private void finishMapSetup(Intent intent) {
         Log.d(getLogStart(), "finish map setup");
-        setZoomLevel(DEFAULT_ZOOM_LEVEL);
-        parentView = this.setupLayoutAndGet();
+        GeoPoint lastLocation = new GeoPoint(
+                intent.getDoubleExtra("lat", DEFAULT_LATITUDE),
+                intent.getDoubleExtra("lon", DEFAULT_LONGITUDE));
+        setCenterCoordinates(lastLocation);
+        setZoomLevel(intent.getDoubleExtra("zoom", DEFAULT_ZOOM_LEVEL));
+
+        //Update location of location overlay
+        if (lastLocation.getLatitude() != DEFAULT_LATITUDE || lastLocation.getLongitude() != DEFAULT_LONGITUDE) {
+            Location location = new Location("");
+            location.setLatitude(lastLocation.getLatitude());
+            location.setLongitude(lastLocation.getLongitude());
+            mapView.getProvider().onLocationChanged(location);
+        }
+
+        parentView = this.setupAndGetMapViewParentLayout();
         parentView.addView(mapView);
     }
 

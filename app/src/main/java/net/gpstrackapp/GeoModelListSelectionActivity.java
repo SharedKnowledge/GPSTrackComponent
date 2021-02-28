@@ -32,7 +32,7 @@ public abstract class GeoModelListSelectionActivity extends GeoModelListActivity
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.d(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
+            Log.e(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
         }
         return false;
     }

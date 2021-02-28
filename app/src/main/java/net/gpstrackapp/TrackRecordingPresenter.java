@@ -31,7 +31,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
         if (locationReceiver == null) {
             locationReceiver = new LocationReceiver();
         }
-        setTrackLocationReceiver();
+        setLocationReceiver();
         Log.d(getLogStart(), "onCreate");
     }
 
@@ -46,7 +46,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
 
     @Override
     public void onDestroy() {
-        unsetTrackLocationReceiver();
+        unsetLocationReceiver();
         stopLocationService();
     }
 
@@ -56,6 +56,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
 
     @Override
     public void registerLocationConsumer(ILocationConsumer consumer) {
+        locationReceiver.addLocationConsumer(consumer);
         if (consumer instanceof Track) {
             if (!isRecordingTrack()) {
                 recordedTrack = (Track) consumer;
@@ -64,19 +65,18 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
                 return;
             }
         }
-        locationReceiver.addLocationConsumer(consumer);
-        Log.d(getLogStart(), "Track recording (re)started");
-        Toast.makeText(ctx, "Track recording (re)started", Toast.LENGTH_SHORT).show();
+        Log.d(getLogStart(), "Recording (re)started");
+        Toast.makeText(ctx, "Recording (re)started", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void unregisterLocationConsumer(ILocationConsumer consumer) {
+        locationReceiver.removeLocationConsumer(consumer);
         if (consumer.equals(recordedTrack)) {
             recordedTrack = null;
         }
-        locationReceiver.removeLocationConsumer(consumer);
-        Log.d(getLogStart(), "Track recording stopped");
-        Toast.makeText(ctx, "Track recording stopped", Toast.LENGTH_SHORT).show();
+        Log.d(getLogStart(), "Recording stopped");
+        Toast.makeText(ctx, "Recording stopped", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -110,14 +110,15 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
         Log.d(getLogStart(), "stop location service");
     }
 
-    //TODO Interface fuer das Registrieren eines Receivers?
-    private void setTrackLocationReceiver() {
+    @Override
+    public void setLocationReceiver() {
         IntentFilter filter = new IntentFilter("LOCATION UPDATE");
         ctx.registerReceiver(locationReceiver, filter);
         Log.d(getLogStart(), "register receiver");
     }
 
-    private void unsetTrackLocationReceiver() {
+    @Override
+    public void unsetLocationReceiver() {
         ctx.unregisterReceiver(locationReceiver);
         Log.d(getLogStart(), "unregister receiver");
     }

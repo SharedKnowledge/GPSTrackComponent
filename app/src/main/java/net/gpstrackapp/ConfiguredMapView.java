@@ -9,7 +9,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -22,12 +21,13 @@ import java.util.Set;
 public class ConfiguredMapView extends MapView {
     private MyLocationNewOverlay locationOverlay;
     private GpsMyLocationProvider provider;
-    //TODO change TileSource (nicht Mapnik) und in validTileSources entfernen, besser ist jedoch validTileSources nur fuer Download und Laden von Offline-Tiles zu verwenden
-    private static final ITileSource DEFAULT_TILE_SOURCE = TileSourceFactory.MAPNIK;
-    private ITileSource tileSource = DEFAULT_TILE_SOURCE;
+    private static ITileSource defaultTileSource = TileSourceFactory.DEFAULT_TILE_SOURCE;
+    private ITileSource selectedTileSource = defaultTileSource;
     private static Set<ITileSource> validTileSources = new HashSet<ITileSource>(Arrays.asList(
             TileSourceFactory.MAPNIK,
             TileSourceFactory.OpenTopo,
+            /* for some reason the USGS TileSources often return a Not Found error for tiles on higher zoom levels
+            while lower zoom levels work perfectly fine */
             TileSourceFactory.USGS_TOPO,
             TileSourceFactory.USGS_SAT));
     private Context ctx;
@@ -35,10 +35,10 @@ public class ConfiguredMapView extends MapView {
     public ConfiguredMapView(Context ctx) {
         super(ctx);
         this.ctx = ctx;
+        this.setTileSource(selectedTileSource);
         setupOverlays();
         getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
         setMultiTouchControls(true);
-        Log.d(getLogStart(), "Constructor");
     }
 
     @Override
@@ -81,16 +81,33 @@ public class ConfiguredMapView extends MapView {
     }
 
     @Override
-    public void setTileSource(ITileSource tileSource) throws IllegalArgumentException {
+    public void setTileSource(ITileSource tileSource) {
         if (validTileSources.contains(tileSource)) {
-            this.tileSource = tileSource;
+            this.selectedTileSource = tileSource;
             super.setTileSource(tileSource);
         } else {
-            throw new IllegalArgumentException("The passed TileSource parameter is invalid." + System.lineSeparator() +
+            Log.e(getLogStart(), "The passed TileSource parameter is invalid." + System.lineSeparator() +
                     "For policy reasons only the following TileSources are valid:" + System.lineSeparator() +
-                    getValidTileSourcesAsString()
-            );
+                    getValidTileSourcesAsString());
         }
+    }
+
+    public static void setDefaultTileSource(ITileSource defaultTileSource) {
+        if (validTileSources.contains(defaultTileSource)) {
+            ConfiguredMapView.defaultTileSource = defaultTileSource;
+        } else {
+            Log.e(getLogStart(), "The passed TileSource parameter is invalid." + System.lineSeparator() +
+                    "For policy reasons only the following TileSources are valid:" + System.lineSeparator() +
+                    getValidTileSourcesAsString());
+        }
+    }
+
+    public static ITileSource getDefaultTileSource() {
+        return defaultTileSource;
+    }
+
+    public static Set<ITileSource> getValidTileSources() {
+        return validTileSources;
     }
 
     public static String getValidTileSourcesAsString() {
@@ -106,7 +123,7 @@ public class ConfiguredMapView extends MapView {
         return tileSourceString;
     }
 
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
+    private static String getLogStart() {
+        return ConfiguredMapView.class.getSimpleName();
     }
 }

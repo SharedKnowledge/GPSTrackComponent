@@ -42,7 +42,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             oos.close();
             Log.d(getLogStart(), "Saved track: " + trackToSave.getObjectName());
         } catch (IOException e) {
-            Log.d(getLogStart(), "A problem occurred while trying to save a track." + System.lineSeparator() + e.getMessage());
+            Log.e(getLogStart(), "A problem occurred while trying to save a track." + System.lineSeparator() + e.getLocalizedMessage());
             Toast.makeText(ctx, "A problem occurred while trying to save a track.", Toast.LENGTH_LONG).show();
         }
     }
@@ -87,7 +87,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
                 tracks.add(loadedTrack);
                 Log.d(getLogStart(), "Loaded track with UUID: " + loadedTrack.getObjectId());
             } catch (IOException | ClassNotFoundException e) {
-                Log.d(getLogStart(), "A problem occurred while trying to load a track." + System.lineSeparator() + e.getLocalizedMessage());
+                Log.e(getLogStart(), "A problem occurred while trying to load a track." + System.lineSeparator() + e.getLocalizedMessage());
             }
         }
 

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/gpstracker_list_geomodels_selection_done_button"
-        android:title="@string/gpstracker_geomodel_list_selection_done_text"
+        android:title="@string/gpstracker_list_geomodels_selection_done_text"
         app:showAsAction="always|withText"
         />
     <item

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -46,13 +47,13 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
         List<String> availableFormatsUpperCase = Arrays.stream(availableFormats)
                 .map(format -> format.toUpperCase())
                 .collect(Collectors.toList());
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, availableFormatsUpperCase);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, availableFormatsUpperCase);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         View spinnerView = findViewById(R.id.gpstracker_list_geomodels_spinner);
         spinnerView.setVisibility(View.VISIBLE);
 
-        spinner = findViewById(R.id.format_spinner);
+        spinner = findViewById(R.id.spinner);
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(this);
         spinner.setPrompt("Select a file format");
@@ -82,11 +83,12 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
                 .create();
         alertDialog.show();
 
-        alertDialog.setOnShowListener(dialog -> {
+        Button buttonPositive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        buttonPositive.setOnClickListener(v -> {
             String fileName = input.getText().toString();
             if (FileUtils.isValidFileName(fileName)) {
                 createFile(selectedItemIDs, fileName);
-                dialog.dismiss();
+                alertDialog.dismiss();
             } else {
                 input.setError("Don't use any of these characters: " + System.lineSeparator() + new String(FileUtils.getInvalidChars()));
             }
@@ -170,7 +172,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
                 OutputStream outputStream = getContentResolver().openOutputStream(newFile.getUri());
                 format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream);
             } catch (Exception e) {
-                Log.d(getLogStart(), e.getLocalizedMessage());
+                Log.e(getLogStart(), e.getLocalizedMessage());
             }
         }
     }

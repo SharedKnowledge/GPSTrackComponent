@@ -24,7 +24,6 @@ public class GPSComponent implements ASAPApplicationComponent {
         Log.d(getLogStart(), "Finished loading tracks from storage.");
     }
 
-    //TODO evtl. add AndroidASAPKeyStorage
     public static GPSComponent initialize(ASAPApplication asapApplication) {
         return GPSComponent.instance = new GPSComponent(asapApplication);
     }

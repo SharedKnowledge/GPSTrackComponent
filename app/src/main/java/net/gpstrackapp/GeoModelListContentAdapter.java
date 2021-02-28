@@ -79,7 +79,6 @@ public class GeoModelListContentAdapter extends
         holder.geoModelCreator.setText(creator);
     }
 
-    //TODO
     @Override
     public int getItemCount() {
         return requestGeoModelsCommand.getNumberOfGeoModels();
