@@ -8,15 +8,18 @@ import java.util.Set;
 
 public abstract class GeoModelManager<T extends GeoModel> {
     protected List<T> geoModels = new ArrayList<>();
+    protected static List<GeoModel> geoModelsGlobal = new ArrayList<>();
 
     public boolean addGeoModel(T geoModel) {
+        geoModelsGlobal.add(geoModel);
         return geoModels.add(geoModel);
     }
 
     public boolean removeGeoModelByUUID(CharSequence UUID) {
-        T track = getGeoModelByUUID(UUID);
-        if (track != null) {
-            return geoModels.remove(track);
+        T geoModel = getGeoModelByUUID(UUID);
+        if (geoModel != null) {
+            geoModelsGlobal.remove(geoModel);
+            return geoModels.remove(geoModel);
         } else {
             return false;
         }
@@ -36,8 +39,16 @@ public abstract class GeoModelManager<T extends GeoModel> {
         return geoModels;
     }
 
+    public static List<GeoModel> getAllFromGlobal() {
+        return geoModelsGlobal;
+    }
+
     public int count() {
         return geoModels.size();
+    }
+
+    public static int countGlobal() {
+        return geoModelsGlobal.size();
     }
 
     public T getGeoModelByUUID(CharSequence UUID) {
@@ -54,6 +65,27 @@ public abstract class GeoModelManager<T extends GeoModel> {
         Set<T> selectedGeoModels = new HashSet<>();
         while (iterator.hasNext()) {
             T geoModel = getGeoModelByUUID(iterator.next());
+            if (geoModel != null) {
+                selectedGeoModels.add(geoModel);
+            }
+        }
+        return selectedGeoModels;
+    }
+
+    public static GeoModel getGeoModelByUUIDFromGlobal(CharSequence UUID) {
+        for (int i = 0; i < geoModelsGlobal.size(); i++) {
+            if (geoModelsGlobal.get(i).getObjectId().equals(UUID)) {
+                return geoModelsGlobal.get(i);
+            }
+        }
+        return null;
+    }
+
+    public static Set<GeoModel> getGeoModelsByUUIDsFromGlobal(Set<CharSequence> UUIDs) {
+        Iterator<CharSequence> iterator = UUIDs.iterator();
+        Set<GeoModel> selectedGeoModels = new HashSet<>();
+        while (iterator.hasNext()) {
+            GeoModel geoModel = getGeoModelByUUIDFromGlobal(iterator.next());
             if (geoModel != null) {
                 selectedGeoModels.add(geoModel);
             }

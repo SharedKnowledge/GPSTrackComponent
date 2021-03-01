@@ -9,10 +9,12 @@ import java.util.stream.Stream;
 
 public abstract class GeoModel implements Serializable {
     private static final long serialVersionUID = 0;
+    private static String formatterPattern = "yyyy-MM-dd HH:mm:ss";
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatterPattern);
 
     private CharSequence objectId;
     private CharSequence objectName;
-    private final LocalDateTime dateOfCreation;
+    private LocalDateTime dateOfCreation;
     private CharSequence creator;
 
     public GeoModel(CharSequence objectId, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation) {
@@ -20,6 +22,18 @@ public abstract class GeoModel implements Serializable {
         this.objectName = objectName;
         this.creator = creator;
         this.dateOfCreation = dateOfCreation;
+    }
+
+    public void setObjectName(CharSequence objectName) {
+        this.objectName = objectName;
+    }
+
+    public void setDateOfCreation(LocalDateTime dateOfCreation) {
+        this.dateOfCreation = dateOfCreation;
+    }
+
+    public void setCreator(CharSequence creator) {
+        this.creator = creator;
     }
 
     public CharSequence getObjectId() {
@@ -35,12 +49,19 @@ public abstract class GeoModel implements Serializable {
     }
 
     public String getDateOfCreationAsFormattedString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return dateOfCreation != null ? formatter.format(dateOfCreation) : null;
     }
 
     public CharSequence getCreator() {
         return creator;
+    }
+
+    public static String getFormatterPattern() {
+        return formatterPattern;
+    }
+
+    public static DateTimeFormatter getFormatter() {
+        return formatter;
     }
 
     @Override

@@ -253,10 +253,10 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     private void showSaveTrackDialog(final Track track) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Save recorded track to storage?")
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setPositiveButton("Yes", (dialog, which) -> {
                     startSaveTracksActivity(track);
                 })
-                .setNegativeButton(android.R.string.no, (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 

@@ -38,6 +38,7 @@
         <activity android:name=".DeleteTracksActivity"/>
         <activity android:name=".ImportTracksActivity"/>
         <activity android:name=".ExportTracksActivity"/>
+        <activity android:name=".EditGeoModelActivity"/>
 
         <service android:name=".location.LocationService"
             android:enabled="true"

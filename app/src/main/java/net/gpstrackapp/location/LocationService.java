@@ -28,6 +28,9 @@ public class LocationService extends Service {
     private LocationManager locationManager;
     private LocationListener locationListener;
 
+    private static boolean askedUserPermission = false;
+    private static boolean startInForeground = true;
+
     private long updateMinTime = 0;
     private float updateMinDistance = 0;
     // accuracy is the radius of 68% confidence
@@ -37,14 +40,27 @@ public class LocationService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.d(getLogStart(), "service will be started in foreground");
+        if (startInForeground && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startInForeground();
         }
-
         Log.d(getLogStart(), "onCreate");
     }
 
+    public static void setAskedUserPermission(boolean askedUserPermission) {
+        LocationService.askedUserPermission = askedUserPermission;
+    }
+
+    public static boolean hasAskedUserPermission() {
+        return askedUserPermission;
+    }
+
+    public static void setStartInForeground(boolean startInForeground) {
+        LocationService.startInForeground = startInForeground;
+    }
+
+    public static boolean shouldStartInForeground() {
+        return startInForeground;
+    }
 
     private void startInForeground() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -65,7 +81,6 @@ public class LocationService extends Service {
             startForeground(1, notification);
         }
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

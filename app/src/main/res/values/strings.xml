@@ -31,8 +31,13 @@
     <string name="gpstracker_tile_download_tiles_count_estimate">Tile download estimate:</string>
     <string name="gpstracker_tile_download_archive_name">Archive File name:</string>
     <string name="gpstracker_tile_download_start_download_button">Start Download</string>
+    
+    <string name="gpstracker_geomodel_edit_id">ID</string>
+    <string name="gpstracker_geomodel_edit_name">Name</string>
+    <string name="gpstracker_geomodel_edit_date">Date of creation</string>
+    <string name="gpstracker_geomodel_edit_creator">Creator</string>
 
+    <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="abort">Abort</string>
-
 </resources>

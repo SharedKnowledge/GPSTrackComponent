@@ -18,6 +18,7 @@
     <dimen name="spinner_text_size">16dp</dimen>
     <dimen name="spinner_line_spacing_multiplier">1.2</dimen>
     <dimen name="recycler_row_entry_text_size_small">12dp</dimen>
+    <dimen name="row_edit_padding_vertical">10dp</dimen>
 
     <dimen name="marginUnderToolbarInc">96dp</dimen>
 

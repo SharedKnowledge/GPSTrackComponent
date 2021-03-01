@@ -1,6 +1,7 @@
 package net.gpstrackapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,11 +15,12 @@ import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 
 public class GeoModelListContentAdapter extends
         RecyclerView.Adapter<GeoModelListContentAdapter.MyViewHolder>
-        implements View.OnClickListener {
+        implements View.OnClickListener, View.OnLongClickListener {
 
     private final Context ctx;
     protected final SelectableGeoModelListContentAdapterHelper helper;
     private View.OnClickListener clickListener;
+    private View.OnLongClickListener longClickListener;
     private boolean firstClick = true;
     private RequestGeoModelsCommand requestGeoModelsCommand;
 
@@ -34,6 +36,7 @@ public class GeoModelListContentAdapter extends
             geoModelSelected = view.findViewById(R.id.gpstracker_list_geomodels_row_selected);
 
             view.setOnClickListener(clickListener);
+            view.setOnLongClickListener(longClickListener);
         }
     }
 
@@ -41,6 +44,7 @@ public class GeoModelListContentAdapter extends
         Log.d(this.getLogStart(), "constructor");
         this.ctx = ctx;
         this.clickListener = this;
+        this.longClickListener = this;
         this.helper = helper;
         this.requestGeoModelsCommand = requestGeoModelsCommand;
     }
@@ -84,7 +88,15 @@ public class GeoModelListContentAdapter extends
         return requestGeoModelsCommand.getNumberOfGeoModels();
     }
 
-    //TODO onLongClick to edit GeoModel?
+    @Override
+    public boolean onLongClick(View view) {
+        Log.d(getLogStart(), "onLongClick");
+        CharSequence geoModelID = (CharSequence) view.getTag(R.id.geomodel_id_tag);
+        Intent intent = new Intent(ctx, EditGeoModelActivity.class);
+        intent.putExtra("geoModelID", geoModelID);
+        ctx.startActivity(intent);
+        return true;
+    }
 
     @Override
     public void onClick(View view) {

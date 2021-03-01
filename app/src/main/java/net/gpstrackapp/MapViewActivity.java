@@ -15,8 +15,9 @@ public abstract class MapViewActivity extends AppCompatActivity {
     protected ViewGroup parentView = null;
     protected Presenter presenter = null;
     protected final double DEFAULT_ZOOM_LEVEL = 18;
-    protected final double DEFAULT_LATITUDE = 0.0;
-    protected final double DEFAULT_LONGITUDE = 0.0;
+    // HTW Campus Wilhelminenhof
+    protected final double DEFAULT_LATITUDE = 52.457563642191246;
+    protected final double DEFAULT_LONGITUDE = 13.526327369714947;
 
     protected abstract ViewGroup setupAndGetMapViewParentLayout();
     protected abstract Presenter setupAndGetPresenter();
@@ -68,12 +69,12 @@ public abstract class MapViewActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         Log.d(getLogStart(), "onDestroy");
-        parentView.removeView(mapView);
         if (presenter != null) {
             presenter.onDestroy();
         }
+        parentView.removeView(mapView);
+        super.onDestroy();
     }
 
     @Override

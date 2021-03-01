@@ -3,6 +3,8 @@ package net.gpstrackapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,8 +28,22 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
 
     @Override
     public void onCreate() {
-        //start service here so that user can navigate to other components in SN2 without ending the service
-        startLocationService();
+        serviceIntent = new Intent(ctx, LocationService.class);
+        /*
+        Start the location service here (and stop it in onDestroy) to enable the user to navigate to other
+        components in SN2 without ending the service. Alternatively move startLocationService to onResume and
+        stopLocationService to onPause to use it only in this component. The disadvantage of that is that a new
+        notification is sent every time the user returns to this Activity if it should be started in foreground.
+        In newer SDK versions this may be different.
+        */
+
+        if (!LocationService.hasAskedUserPermission()) {
+            showStartInForegroundDialog();
+            LocationService.setAskedUserPermission(true);
+        } else {
+            startLocationService();
+        }
+
         if (locationReceiver == null) {
             locationReceiver = new LocationReceiver();
         }
@@ -36,22 +52,52 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
     }
 
     @Override
-    public void onPause() { }
-
-    @Override
     public void onResume() {
+        /* see comment in onCreate
+        if (!LocationService.hasAskedUserPermission()) {
+            showStartInForegroundDialog();
+            LocationService.setAskedUserPermission(true);
+        } else {
+            startLocationService();
+        }
+        */
+
         //add and remove TrackOverlays
         trackVisualizer.updateGeoModelsOnMapView();
     }
 
     @Override
+    public void onPause() {
+        //stopLocationService();
+    }
+
+    @Override
     public void onDestroy() {
-        unsetLocationReceiver();
         stopLocationService();
+        unsetLocationReceiver();
+        Log.d(getLogStart(), "onDestroy");
     }
 
     public TrackVisualizer getTrackVisualizer() {
         return trackVisualizer;
+    }
+
+    private void showStartInForegroundDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setMessage("Start location service in foreground? Recording can only continue in doze mode if you select "
+                    + "\'Yes\', but it will drain the battery more. In case this is not needed select \'No\'.")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    LocationService.setStartInForeground(true);
+                    startLocationService();
+                    dialog.dismiss();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    LocationService.setStartInForeground(false);
+                    startLocationService();
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
     }
 
     @Override
@@ -93,16 +139,13 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
     }
 
     private void startLocationService() {
-        serviceIntent = new Intent(ctx.getApplicationContext(), LocationService.class);
-        /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (LocationService.shouldStartInForeground() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ctx.startForegroundService(serviceIntent);
+            Log.d(getLogStart(), "start location service as foreground service");
         } else {
             ctx.startService(serviceIntent);
+            Log.d(getLogStart(), "start location service as normal service");
         }
-        */
-        ctx.startService(serviceIntent);
-        Log.d(getLogStart(), "start location service");
     }
 
     private void stopLocationService() {
