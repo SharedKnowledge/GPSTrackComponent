@@ -31,10 +31,9 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
         serviceIntent = new Intent(ctx, LocationService.class);
         /*
         Start the location service here (and stop it in onDestroy) to enable the user to navigate to other
-        components in SN2 without ending the service. Alternatively move startLocationService to onResume and
-        stopLocationService to onPause to use it only in this component. The disadvantage of that is that a new
-        notification is sent every time the user returns to this Activity if it should be started in foreground.
-        In newer SDK versions this may be different.
+        components in SN2 while recording as the service isn't ended. Alternatively move this block to onResume
+        and stopLocationService to onPause to record only while using this component.
+        In newer SDK versions the notification channel may not be needed anymore.
         */
 
         if (!LocationService.hasAskedUserPermission()) {
