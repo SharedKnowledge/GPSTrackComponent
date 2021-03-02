@@ -17,9 +17,9 @@ import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.format.FormatManager;
-import net.gpstrackapp.R;
 import net.gpstrackapp.format.ImportFileFormat;
 
 import java.io.FileNotFoundException;

@@ -37,10 +37,10 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
             }
 
             // setup toolbar
-            Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_list_geomodels_toolbar);
+            Toolbar toolbar = findViewById(R.id.gpstracker_list_geomodels_toolbar);
             setSupportActionBar(toolbar);
 
-            descriptionView = (TextView) findViewById(R.id.gpstracker_description);
+            descriptionView = findViewById(R.id.gpstracker_description);
 
             String description = setActionText();
             String additionalInfo = addOptionalAdditionalInfo();
@@ -49,7 +49,7 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
             }
             descriptionView.setText(description);
 
-            recyclerView = (RecyclerView) findViewById(R.id.gpstracker_list_geomodels_recycler_view);
+            recyclerView = findViewById(R.id.gpstracker_list_geomodels_recycler_view);
 
             adapter = new GeoModelListContentAdapter(this, this.selectableContentSource, createRequestGeoModelsCommand());
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());

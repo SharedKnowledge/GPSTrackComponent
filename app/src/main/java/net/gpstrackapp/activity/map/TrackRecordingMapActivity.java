@@ -28,11 +28,11 @@ import net.gpstrackapp.activity.geomodel.track.ExportTracksActivity;
 import net.gpstrackapp.activity.geomodel.track.ImportTracksActivity;
 import net.gpstrackapp.activity.geomodel.track.MergeTracksActivity;
 import net.gpstrackapp.activity.geomodel.track.SaveTracksActivity;
-import net.gpstrackapp.recording.TrackRecordingPresenter;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
 import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.recording.TrackRecordingPresenter;
 import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.config.Configuration;
@@ -97,7 +97,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         return null;
     }
 
-    // Always called before onResume, so the overlays can be added/removed in onResume
+    // Always called before onResume, so the track overlays can be added/removed in onResume
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

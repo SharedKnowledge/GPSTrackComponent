@@ -18,7 +18,7 @@ public abstract class MapViewActivity extends AppCompatActivity {
     protected ViewGroup parentView = null;
     protected Presenter presenter = null;
     protected final double DEFAULT_ZOOM_LEVEL = 18;
-    // HTW Campus Wilhelminenhof
+    // set HTW Campus Wilhelminenhof as default location
     protected final double DEFAULT_LATITUDE = 52.457563642191246;
     protected final double DEFAULT_LONGITUDE = 13.526327369714947;
 
@@ -63,6 +63,7 @@ public abstract class MapViewActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(getLogStart(), "onPause");
+
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onPause();
         if (presenter != null) {

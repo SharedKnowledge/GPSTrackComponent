@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import net.gpstrackapp.geomodel.track.TrackModelManager;
-import net.gpstrackapp.geomodel.track.TrackVisualizer;
 import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.android.apps.ASAPApplication;
 import net.sharksystem.asap.android.apps.ASAPApplicationComponent;

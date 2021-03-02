@@ -1,11 +1,9 @@
 package net.gpstrackapp.location;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -16,17 +14,16 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.util.List;
-
 public class LocationService extends Service {
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private NotificationManager notificationManager;
+    private NotificationChannel locationChannel;
 
     private static boolean askedUserPermission = false;
     private static boolean startInForeground = true;
@@ -67,15 +64,16 @@ public class LocationService extends Service {
             String NOTIFICATION_CHANNEL_ID = "location_service";
             String channelName = "Location Service";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, importance);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            locationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, importance);
+            notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(locationChannel);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
             Notification notification = notificationBuilder.setOngoing(true)
                     .setContentTitle("App is running in background")
                     .setPriority(NotificationManager.IMPORTANCE_MIN)
                     .setCategory(Notification.CATEGORY_SERVICE)
+                    .setSound(null)
                     .build();
 
             startForeground(1, notification);
@@ -132,6 +130,9 @@ public class LocationService extends Service {
         super.onDestroy();
         Log.d(getLogStart(), "onDestroy");
         locationManager.removeUpdates(locationListener);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.deleteNotificationChannel(locationChannel.getId());
+        }
     }
 
     private String getLogStart() {

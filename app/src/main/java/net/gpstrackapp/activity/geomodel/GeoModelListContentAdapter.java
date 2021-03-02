@@ -20,8 +20,8 @@ public class GeoModelListContentAdapter extends
 
     private final Context ctx;
     protected final SelectableGeoModelListContentAdapterHelper helper;
-    private View.OnClickListener clickListener;
-    private View.OnLongClickListener longClickListener;
+    private final View.OnClickListener clickListener;
+    private final View.OnLongClickListener longClickListener;
     private boolean firstClick = true;
     private RequestGeoModelsCommand requestGeoModelsCommand;
 

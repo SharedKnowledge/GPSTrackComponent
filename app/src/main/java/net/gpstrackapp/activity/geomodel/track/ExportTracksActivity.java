@@ -16,12 +16,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
-import net.gpstrackapp.format.FormatManager;
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.R;
+import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
 import net.gpstrackapp.format.ExportFileFormat;
 import net.gpstrackapp.format.FileUtils;
+import net.gpstrackapp.format.FormatManager;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 import net.gpstrackapp.geomodel.track.Track;

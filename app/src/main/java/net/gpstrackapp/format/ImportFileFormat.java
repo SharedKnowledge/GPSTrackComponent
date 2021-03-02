@@ -2,8 +2,6 @@ package net.gpstrackapp.format;
 
 import android.content.Context;
 
-import net.gpstrackapp.format.FileFormat;
-
 import java.io.IOException;
 import java.io.InputStream;
 

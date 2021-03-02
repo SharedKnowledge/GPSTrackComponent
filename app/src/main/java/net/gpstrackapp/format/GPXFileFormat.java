@@ -4,8 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import net.gpstrackapp.GPSComponent;
-import net.gpstrackapp.format.ExportFileFormat;
-import net.gpstrackapp.format.ImportFileFormat;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackPoint;
@@ -66,7 +64,7 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
         List<io.jenetics.jpx.Track> gpxTracks = new ArrayList<>();
         // iterate over Tracks
         for (Track track : tracksToExport) {
-            // TODO can later be done with an extension
+            // TODO can later be done with an extension to gpx that declares additional fields instead of writing it into the description
             // use the description property of track to set creator and date of track
             String desc = "";
             CharSequence creator = track.getCreator();

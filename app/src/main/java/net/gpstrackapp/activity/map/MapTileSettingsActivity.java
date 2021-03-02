@@ -12,9 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.overlay.ConfiguredMapView;
-import net.gpstrackapp.R;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 
@@ -33,10 +33,10 @@ public class MapTileSettingsActivity extends AppCompatActivity implements Activi
         setContentView(R.layout.gpstracker_tile_settings_drawer_layout);
 
         // setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.gpstracker_tile_settings_toolbar);
+        Toolbar toolbar = findViewById(R.id.gpstracker_tile_settings_toolbar);
         setSupportActionBar(toolbar);
 
-        TextView descriptionView = (TextView) findViewById(R.id.gpstracker_description);
+        TextView descriptionView = findViewById(R.id.gpstracker_description);
         String description = setActionText();
         String additionalInfo = addOptionalAdditionalInfo();
         if (additionalInfo != null && !additionalInfo.equals("")) {

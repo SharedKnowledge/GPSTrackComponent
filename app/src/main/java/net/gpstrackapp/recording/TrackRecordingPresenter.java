@@ -9,11 +9,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import net.gpstrackapp.Presenter;
-import net.gpstrackapp.location.ILocationConsumer;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackVisualizer;
-import net.gpstrackapp.location.LocationService;
+import net.gpstrackapp.location.ILocationConsumer;
 import net.gpstrackapp.location.LocationReceiver;
+import net.gpstrackapp.location.LocationService;
 import net.gpstrackapp.overlay.ConfiguredMapView;
 
 public class TrackRecordingPresenter implements Presenter, Recorder {

@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public abstract class GeoModel implements Serializable {
     private static final long serialVersionUID = 0;
