@@ -140,7 +140,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
 
     @Override
     public String addUserDescription() {
-        return "Also choose a format in which you want to export the tracks.";
+        return "Also choose a format in which you want to export the tracks. All selected tracks will be exported together in one file.";
     }
 
     protected Set<String> getFormatStrings() {

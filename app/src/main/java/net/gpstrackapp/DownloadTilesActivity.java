@@ -190,15 +190,15 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
                 .setView(view)
                 .setCancelable(true)
                 .setOnCancelListener(dialog -> {
+                    cache_north = null;
                     cache_east = null;
                     cache_south = null;
-                    cache_estimate = null;
-                    cache_north = null;
                     cache_west = null;
-                    executeJob = null;
+                    cache_estimate = null;
+                    cache_output = null;
                     zoom_min = null;
                     zoom_max = null;
-                    cache_output = null;
+                    executeJob = null;
                 })
                 .create();
         alertDialog.show();
@@ -208,16 +208,16 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
     private void updateEstimate(boolean startJob) {
         String chooseDifferentTileSourceMessage = "Please choose a different tile source in the tile source settings and try again.";
         String downloadNotAllowedMessage = "Osmdroid does not allow downloads from this tile source. " + chooseDifferentTileSourceMessage;
-        if (cache_east != null &&
-                cache_west != null &&
-                cache_north != null &&
+        if (cache_north != null &&
+                cache_east != null &&
                 cache_south != null &&
+                cache_west != null &&
                 zoom_max != null &&
                 zoom_min != null &&
                 cache_output != null) {
             double n = Double.parseDouble(cache_north.getText().toString());
-            double s = Double.parseDouble(cache_south.getText().toString());
             double e = Double.parseDouble(cache_east.getText().toString());
+            double s = Double.parseDouble(cache_south.getText().toString());
             double w = Double.parseDouble(cache_west.getText().toString());
 
             if (startJob) {
