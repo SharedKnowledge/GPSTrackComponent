@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel.track;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -17,6 +17,9 @@ import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.gpstrackapp.activity.ActivityWithDescription;
+import net.gpstrackapp.format.FormatManager;
+import net.gpstrackapp.R;
 import net.gpstrackapp.format.ImportFileFormat;
 
 import java.io.FileNotFoundException;

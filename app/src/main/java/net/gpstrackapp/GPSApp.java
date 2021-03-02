@@ -23,7 +23,7 @@ public class GPSApp extends ASAPApplication {
 
     public static boolean isStarted() { return GPSApp.singleton != null; }
 
-    static GPSApp initializeGPSApp(Activity initialActivity) {
+    public static GPSApp initializeGPSApp(Activity initialActivity) {
         if(GPSApp.singleton == null) {
             Collection<CharSequence> formats = new ArrayList<>();
             formats.add(GPS_APPNAME);

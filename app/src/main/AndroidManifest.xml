@@ -23,22 +23,22 @@
         android:theme= "@style/NoActionBar"
         tools:replace="android:theme"
         >
-        <activity android:name=".InitActivity">
+        <activity android:name=".activity.InitActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TrackRecordingMapActivity"/>
-        <activity android:name=".DownloadTilesActivity"/>
-        <activity android:name=".MapTileSettingsActivity"/>
-        <activity android:name=".DisplayTracksActivity"/>
-        <activity android:name=".MergeTracksActivity"/>
-        <activity android:name=".SaveTracksActivity"/>
-        <activity android:name=".DeleteTracksActivity"/>
-        <activity android:name=".ImportTracksActivity"/>
-        <activity android:name=".ExportTracksActivity"/>
-        <activity android:name=".EditGeoModelActivity"/>
+        <activity android:name=".activity.map.TrackRecordingMapActivity"/>
+        <activity android:name=".activity.map.DownloadTilesActivity"/>
+        <activity android:name=".activity.map.MapTileSettingsActivity"/>
+        <activity android:name=".activity.geomodel.track.DisplayTracksActivity"/>
+        <activity android:name=".activity.geomodel.track.MergeTracksActivity"/>
+        <activity android:name=".activity.geomodel.track.SaveTracksActivity"/>
+        <activity android:name=".activity.geomodel.track.DeleteTracksActivity"/>
+        <activity android:name=".activity.geomodel.track.ImportTracksActivity"/>
+        <activity android:name=".activity.geomodel.track.ExportTracksActivity"/>
+        <activity android:name=".activity.geomodel.EditGeoModelActivity"/>
 
         <service android:name=".location.LocationService"
             android:enabled="true"

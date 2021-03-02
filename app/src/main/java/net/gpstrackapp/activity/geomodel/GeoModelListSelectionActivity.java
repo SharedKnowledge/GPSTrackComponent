@@ -1,9 +1,11 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel;
 
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import net.gpstrackapp.R;
 
 import java.util.Set;
 

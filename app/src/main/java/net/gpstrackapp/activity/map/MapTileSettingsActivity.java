@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.map;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +11,10 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import net.gpstrackapp.activity.ActivityWithDescription;
+import net.gpstrackapp.overlay.ConfiguredMapView;
+import net.gpstrackapp.R;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 

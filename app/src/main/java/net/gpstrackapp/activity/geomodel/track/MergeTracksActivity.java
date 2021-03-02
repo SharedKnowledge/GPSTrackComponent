@@ -1,19 +1,16 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel.track;
 
 import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
-import android.widget.Toast;
 
+import net.gpstrackapp.GPSComponent;
+import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
-import net.gpstrackapp.geomodel.track.TrackSegment;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class MergeTracksActivity extends GeoModelListSelectionActivity {
     private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();

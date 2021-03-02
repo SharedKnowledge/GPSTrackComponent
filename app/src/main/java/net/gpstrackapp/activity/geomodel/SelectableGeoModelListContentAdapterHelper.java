@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;

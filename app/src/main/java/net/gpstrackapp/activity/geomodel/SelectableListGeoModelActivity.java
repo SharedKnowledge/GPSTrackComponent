@@ -1,8 +1,6 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel;
 
 import android.support.v7.app.AppCompatActivity;
-
-import net.sharksystem.asap.android.apps.ASAPActivity;
 
 import java.util.Set;
 

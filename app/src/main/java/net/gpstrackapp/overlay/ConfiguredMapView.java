@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.overlay;
 
 import android.content.Context;
 import android.util.Log;

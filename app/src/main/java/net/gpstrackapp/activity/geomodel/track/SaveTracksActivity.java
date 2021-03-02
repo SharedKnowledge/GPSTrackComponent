@@ -1,7 +1,7 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel.track;
 
-import android.widget.Toast;
-
+import net.gpstrackapp.GPSComponent;
+import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 import net.gpstrackapp.geomodel.track.Track;
@@ -9,14 +9,13 @@ import net.gpstrackapp.geomodel.track.TrackModelManager;
 
 import java.util.Set;
 
-public class DeleteTracksActivity extends GeoModelListSelectionActivity {
+public class SaveTracksActivity extends GeoModelListSelectionActivity {
     private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
 
     @Override
     protected void onSelectionFinished(Set<CharSequence> selectedItemIDs) {
         Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
-        trackModelManager.deleteGeoModelsFromFiles(this, selectedTracks);
-        trackModelManager.removeGeoModelsByUUIDs(selectedItemIDs);
+        trackModelManager.saveGeoModelsToFiles(this, selectedTracks);
         finish();
     }
 
@@ -27,11 +26,11 @@ public class DeleteTracksActivity extends GeoModelListSelectionActivity {
 
     @Override
     public String setActionText() {
-        return "Delete tracks";
+        return "Save tracks";
     }
 
     @Override
     public String addUserDescription() {
-        return "This will also delete the tracks from local storage!";
+        return "All selected tracks will be saved to local storage.";
     }
 }

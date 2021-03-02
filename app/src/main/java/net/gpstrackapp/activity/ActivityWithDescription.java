@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity;
 
 public interface ActivityWithDescription {
     String setActionText();

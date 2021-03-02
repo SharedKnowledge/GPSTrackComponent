@@ -1,30 +1,23 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import net.gpstrackapp.R;
 import net.gpstrackapp.geomodel.GeoModel;
 import net.gpstrackapp.geomodel.GeoModelManager;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 
 public class EditGeoModelActivity extends AppCompatActivity {
     private GeoModel geoModel;

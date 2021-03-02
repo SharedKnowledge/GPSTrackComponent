@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.map;
 
 import android.content.Intent;
 import android.location.Location;
@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ViewGroup;
+
+import net.gpstrackapp.Presenter;
+import net.gpstrackapp.overlay.ConfiguredMapView;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;

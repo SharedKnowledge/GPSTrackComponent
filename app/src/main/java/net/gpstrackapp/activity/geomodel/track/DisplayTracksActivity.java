@@ -1,7 +1,8 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel.track;
 
 import android.content.Intent;
 
+import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 

@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/row_padding_vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".GeoModelListSelectionActivity">
+    tools:context=".activity.geomodel.GeoModelListSelectionActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/gpstracker_list_geomodels_recycler_view"

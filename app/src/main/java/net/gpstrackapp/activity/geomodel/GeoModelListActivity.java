@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel;
 
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.TextView;
 
+import net.gpstrackapp.R;
+import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.sharksystem.asap.android.Util;
 

@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.format;
 
 import net.gpstrackapp.format.ExportFileFormat;
 import net.gpstrackapp.format.FileFormat;

@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.recording;
 
 import net.gpstrackapp.location.ILocationConsumer;
 

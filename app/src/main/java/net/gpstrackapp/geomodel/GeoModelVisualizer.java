@@ -3,7 +3,7 @@ package net.gpstrackapp.geomodel;
 import android.util.Log;
 import android.widget.Toast;
 
-import net.gpstrackapp.ConfiguredMapView;
+import net.gpstrackapp.overlay.ConfiguredMapView;
 import net.gpstrackapp.overlay.GeoModelOverlay;
 
 import java.util.ArrayList;

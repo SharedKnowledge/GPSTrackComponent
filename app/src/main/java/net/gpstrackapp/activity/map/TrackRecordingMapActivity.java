@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.map;
 
 import android.Manifest;
 import android.content.Context;
@@ -19,6 +19,16 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import net.gpstrackapp.GPSComponent;
+import net.gpstrackapp.Presenter;
+import net.gpstrackapp.R;
+import net.gpstrackapp.activity.geomodel.track.DeleteTracksActivity;
+import net.gpstrackapp.activity.geomodel.track.DisplayTracksActivity;
+import net.gpstrackapp.activity.geomodel.track.ExportTracksActivity;
+import net.gpstrackapp.activity.geomodel.track.ImportTracksActivity;
+import net.gpstrackapp.activity.geomodel.track.MergeTracksActivity;
+import net.gpstrackapp.activity.geomodel.track.SaveTracksActivity;
+import net.gpstrackapp.recording.TrackRecordingPresenter;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
@@ -27,7 +37,6 @@ import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 

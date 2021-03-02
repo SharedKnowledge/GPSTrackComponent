@@ -1,4 +1,4 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity.geomodel;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import net.gpstrackapp.R;
 import net.gpstrackapp.geomodel.GeoModel;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 
