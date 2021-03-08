@@ -21,9 +21,9 @@ import java.util.Set;
 public class ConfiguredMapView extends MapView {
     private MyLocationNewOverlay locationOverlay;
     private GpsMyLocationProvider provider;
-    private static ITileSource defaultTileSource = TileSourceFactory.DEFAULT_TILE_SOURCE;
+    private static ITileSource defaultTileSource = TileSourceFactory.MAPNIK;
     private ITileSource selectedTileSource = defaultTileSource;
-    private static Set<ITileSource> validTileSources = new HashSet<ITileSource>(Arrays.asList(
+    private static Set<ITileSource> validTileSources = new HashSet<>(Arrays.asList(
             TileSourceFactory.MAPNIK,
             TileSourceFactory.OpenTopo,
             /* for some reason the USGS TileSources often return a Not Found error for tiles on higher zoom levels

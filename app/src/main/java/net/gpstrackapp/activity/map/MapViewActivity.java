@@ -45,6 +45,8 @@ public abstract class MapViewActivity extends AppCompatActivity {
         super.onResume();
         Log.d(getLogStart(), "onResume");
 
+        /* if the user changes the default tilesource in the settings then set the new tilesource here
+         if the subclass does not specify a specific tilesource to be used in getMapSpecificTileSource() */
         ITileSource customTileSource = getMapSpecificTileSource();
         if (customTileSource != null) {
             mapView.setTileSource(customTileSource);
