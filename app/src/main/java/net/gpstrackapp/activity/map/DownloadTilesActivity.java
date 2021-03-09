@@ -271,7 +271,6 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
                     downloadPrompt.dismiss();
                     downloadPrompt = null;
                 }
-
                 // has to be checked here because handling error in async task is very difficult
                 ITileSource currentTileSource = mapView.getTileProvider().getTileSource();
                 if (!(currentTileSource instanceof OnlineTileSourceBase)) {

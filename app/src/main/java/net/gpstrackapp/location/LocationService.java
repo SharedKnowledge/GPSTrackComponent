@@ -130,9 +130,6 @@ public class LocationService extends Service {
         super.onDestroy();
         Log.d(getLogStart(), "onDestroy");
         locationManager.removeUpdates(locationListener);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.deleteNotificationChannel(locationChannel.getId());
-        }
     }
 
     private String getLogStart() {

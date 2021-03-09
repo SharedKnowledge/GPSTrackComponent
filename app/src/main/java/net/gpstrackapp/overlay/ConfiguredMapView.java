@@ -21,15 +21,21 @@ import java.util.Set;
 public class ConfiguredMapView extends MapView {
     private MyLocationNewOverlay locationOverlay;
     private GpsMyLocationProvider provider;
-    private static ITileSource defaultTileSource = TileSourceFactory.MAPNIK;
+    private static ITileSource defaultTileSource = TileSourceFactory.OpenTopo;
     private ITileSource selectedTileSource = defaultTileSource;
+    // add Tile Sources to use for the maps here, make sure to read the terms of service before adding them
     private static Set<ITileSource> validTileSources = new HashSet<>(Arrays.asList(
+            // MAPNIK and WIKIMEDIA not usable for downloads
             TileSourceFactory.MAPNIK,
-            TileSourceFactory.OpenTopo,
-            /* for some reason the USGS TileSources often return a Not Found error for tiles on higher zoom levels
-            while lower zoom levels work perfectly fine */
-            TileSourceFactory.USGS_TOPO,
-            TileSourceFactory.USGS_SAT));
+            TileSourceFactory.WIKIMEDIA,
+            TileSourceFactory.OpenTopo
+            /*
+            At the moment the USGS TileSources return a Not Found error for tiles on zoom levels 9 or
+            higher, as can be checked on these sites by trying to load the Start Tile of Level ID 9 or higher:
+            TileSourceFactory.USGS_TOPO: https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer
+            TileSourceFactory.USGS_SAT: https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer
+             */
+    ));
     private Context ctx;
 
     public ConfiguredMapView(Context ctx) {
