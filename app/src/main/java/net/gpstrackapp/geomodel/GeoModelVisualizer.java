@@ -107,6 +107,6 @@ public abstract class GeoModelVisualizer<K extends GeoModel, V extends GeoModelO
     protected abstract K getGeoModelByUUID(CharSequence uuid);
 
     private String getLogStart() {
-        return this.getClass().getSimpleName();
+        return GeoModelVisualizer.class.getSimpleName();
     }
 }

@@ -1,7 +1,6 @@
 package net.gpstrackapp.activity.map;
 
 import android.app.AlertDialog;
-import android.os.Environment;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,7 +20,9 @@ import android.widget.Toast;
 import net.gpstrackapp.Presenter;
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
+import net.gpstrackapp.format.FileUtils;
 
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
 import org.osmdroid.tileprovider.modules.SqliteArchiveTileWriter;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -34,10 +35,12 @@ import java.io.File;
 
 public class DownloadTilesActivity extends MapViewActivity implements ActivityWithDescription, View.OnClickListener, SeekBar.OnSeekBarChangeListener, TextWatcher {
     private static final int TILE_COUNT_DOWNLOAD_LIMIT = 250;
-    private SeekBar zoom_min, zoom_max;
-    private EditText cache_north, cache_south, cache_east, cache_west, cache_output;
-    private TextView cache_estimate, zoom_min_current, zoom_max_current;
-    private Button executeJob;
+    private int zoomMinTileSource, zoomMaxTileSource;
+
+    private SeekBar zoomMinSeekBar, zoomMaxSeekBar;
+    private EditText cacheNorth, cacheSouth, cacheEast, cacheWest, cacheOutput;
+    private TextView cacheEstimate, zoomMinCurrent, zoomMaxCurrent;
+    private Button executeJob, cancelAlert;
 
     private AlertDialog alertDialog = null;
     private AlertDialog downloadPrompt = null;
@@ -148,88 +151,115 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
     private void downloadJobAlert() {
         View view = View.inflate(this, R.layout.gpstracker_tile_download_alert_dialog_layout, null);
 
+        zoomMinTileSource = mapView.getTileProvider().getTileSource().getMinimumZoomLevel();
+        zoomMaxTileSource = mapView.getTileProvider().getTileSource().getMaximumZoomLevel();
+
         int zoom = (int) mapView.getZoomLevelDouble();
+        if (zoom < zoomMinTileSource) {
+            zoom = zoomMinTileSource;
+        } else if (zoom > zoomMaxTileSource) {
+            zoom = zoomMaxTileSource;
+        }
+        mapView.getController().setZoom((double) zoom);
 
         BoundingBox boundingBox = mapView.getBoundingBox();
-        zoom_max = view.findViewById(R.id.slider_zoom_max);
-        zoom_max.setMax((int) mapView.getMaxZoomLevel());
-        zoom_max.setProgress(zoom);
-        zoom_max.setOnSeekBarChangeListener(this);
-        zoom_max_current = view.findViewById(R.id.zoom_max_current);
-        zoom_max_current.setText(String.valueOf(zoom_max.getProgress()));
+        zoomMaxSeekBar = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_slider_zoom_max);
+        zoomMaxSeekBar.setMax(zoomMaxTileSource - zoomMinTileSource);
+        zoomMaxSeekBar.setProgress(zoom - zoomMinTileSource);
+        zoomMaxSeekBar.setOnSeekBarChangeListener(this);
+        zoomMaxCurrent = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_zoom_max_current);
+        zoomMaxCurrent.setText(String.valueOf(zoomMaxSeekBar.getProgress()));
 
-        zoom_min = view.findViewById(R.id.slider_zoom_min);
-        zoom_max.setMax((int) mapView.getMaxZoomLevel());
-        zoom_min.setProgress(zoom);
-        zoom_min.setOnSeekBarChangeListener(this);
-        zoom_min_current = view.findViewById(R.id.zoom_min_current);
-        zoom_min_current.setText(String.valueOf(zoom_min.getProgress()));
+        zoomMinSeekBar = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_slider_zoom_min);
+        zoomMinSeekBar.setMax(zoomMaxTileSource - zoomMinTileSource);
+        zoomMinSeekBar.setProgress(zoom - zoomMinTileSource);
+        zoomMinSeekBar.setOnSeekBarChangeListener(this);
+        zoomMinCurrent = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_zoom_min_current);
+        zoomMinCurrent.setText(String.valueOf(zoomMinSeekBar.getProgress()));
 
-        cache_east = view.findViewById(R.id.cache_east);
-        cache_east.setText(boundingBox.getLonEast() + "");
-        cache_north = view.findViewById(R.id.cache_north);
-        cache_north.setText(boundingBox.getLatNorth() + "");
-        cache_south = view.findViewById(R.id.cache_south);
-        cache_south.setText(boundingBox.getLatSouth() + "");
-        cache_west = view.findViewById(R.id.cache_west);
-        cache_west.setText(boundingBox.getLonWest() + "");
-        cache_estimate = view.findViewById(R.id.cache_estimate);
-        cache_output = view.findViewById(R.id.cache_output);
+        cacheEast = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_cache_east);
+        cacheEast.setText(boundingBox.getLonEast() + "");
+        cacheNorth = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_cache_north);
+        cacheNorth.setText(boundingBox.getLatNorth() + "");
+        cacheSouth = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_cache_south);
+        cacheSouth.setText(boundingBox.getLatSouth() + "");
+        cacheWest = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_cache_west);
+        cacheWest.setText(boundingBox.getLonWest() + "");
+        cacheEstimate = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_cache_estimate);
+        cacheOutput = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_cache_output);
 
         //change listeners for both validation and to trigger the download estimation
-        cache_east.addTextChangedListener(this);
-        cache_north.addTextChangedListener(this);
-        cache_south.addTextChangedListener(this);
-        cache_west.addTextChangedListener(this);
-        executeJob = view.findViewById(R.id.executeJob);
+        cacheEast.addTextChangedListener(this);
+        cacheNorth.addTextChangedListener(this);
+        cacheSouth.addTextChangedListener(this);
+        cacheWest.addTextChangedListener(this);
+        executeJob = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_execute_job);
         executeJob.setOnClickListener(this);
+        cancelAlert = view.findViewById(R.id.gpstracker_tile_download_alert_dialog_cancel_alert);
+        cancelAlert.setOnClickListener(this);
 
         //prompt for input params
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        downloadPrompt = new AlertDialog.Builder(this)
                 .setView(view)
                 .setCancelable(true)
                 .setOnCancelListener(dialog -> {
-                    cache_north = null;
-                    cache_east = null;
-                    cache_south = null;
-                    cache_west = null;
-                    cache_estimate = null;
-                    cache_output = null;
-                    zoom_min = null;
-                    zoom_max = null;
+                    cacheNorth = null;
+                    cacheEast = null;
+                    cacheSouth = null;
+                    cacheWest = null;
+                    cacheEstimate = null;
+                    cacheOutput = null;
+                    zoomMinSeekBar = null;
+                    zoomMaxSeekBar = null;
                     executeJob = null;
                 })
                 .create();
-        alertDialog.show();
+        downloadPrompt.show();
         updateEstimate(false);
     }
 
     private void updateEstimate(boolean startJob) {
         String chooseDifferentTileSourceMessage = "Please choose a different tile source in the tile source settings and try again.";
         String downloadNotAllowedMessage = "Osmdroid does not allow downloads from this tile source. " + chooseDifferentTileSourceMessage;
-        if (cache_north != null &&
-                cache_east != null &&
-                cache_south != null &&
-                cache_west != null &&
-                zoom_max != null &&
-                zoom_min != null &&
-                cache_output != null) {
-            double n = Double.parseDouble(cache_north.getText().toString());
-            double e = Double.parseDouble(cache_east.getText().toString());
-            double s = Double.parseDouble(cache_south.getText().toString());
-            double w = Double.parseDouble(cache_west.getText().toString());
+        if (cacheNorth != null &&
+                cacheEast != null &&
+                cacheSouth != null &&
+                cacheWest != null &&
+                zoomMaxSeekBar != null &&
+                zoomMinSeekBar != null &&
+                cacheOutput != null) {
+            double n, e, s, w;
+            try {
+                n = Double.parseDouble(cacheNorth.getText().toString());
+                e = Double.parseDouble(cacheEast.getText().toString());
+                s = Double.parseDouble(cacheSouth.getText().toString());
+                w = Double.parseDouble(cacheWest.getText().toString());
+            } catch (Exception ex) {
+                Toast.makeText(this, "Input cannot be parsed", Toast.LENGTH_SHORT).show();
+                Log.e(getLogStart(), ex.getLocalizedMessage());
+                return;
+            }
 
             if (startJob) {
-                String outputName = Environment.getExternalStorageDirectory().getAbsolutePath()
-                        + File.separator + "osmdroid" + File.separator + cache_output.getText().toString()
-                        + R.string.gpstracker_tile_download_file_extension;
+                String cacheOutputName = cacheOutput.getText().toString();
+                Log.d(getLogStart(), "outputName: " + cacheOutputName);
+                if (!FileUtils.isValidFileName(cacheOutputName)) {
+                    Toast.makeText(this, "File name contains illegal character(s)", Toast.LENGTH_SHORT).show();
+                    Log.e(getLogStart(), "File name contains illegal character(s)");
+                    return;
+                }
+                String outputName = Configuration.getInstance().getOsmdroidBasePath()
+                        + File.separator + cacheOutputName
+                        + getResources().getString(R.string.gpstracker_tile_download_file_extension);
                 try {
                     writer = new SqliteArchiveTileWriter(outputName);
                 } catch (Exception ex) {
                     Toast.makeText(this, "Could not create database at " + outputName, Toast.LENGTH_LONG).show();
                     Log.e(getLogStart(), "Could not create database at " + outputName
                             + System.lineSeparator() + "Error was: " + ex.getLocalizedMessage());
+                    return;
                 }
+
                 try {
                     mgr = new CacheManager(mapView, writer);
                 } catch (TileSourcePolicyException ex) {
@@ -248,21 +278,21 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
                     }
                 }
             }
-            int zoomMin = zoom_min.getProgress();
-            int zoomMax = zoom_max.getProgress();
-            zoom_min_current.setText(String.valueOf(zoomMin));
-            zoom_max_current.setText(String.valueOf(zoomMax));
+            int zoomMin = zoomMinSeekBar.getProgress() + zoomMinTileSource;
+            int zoomMax = zoomMaxSeekBar.getProgress() + zoomMinTileSource;
+            zoomMinCurrent.setText(String.valueOf(zoomMin));
+            zoomMaxCurrent.setText(String.valueOf(zoomMax));
             //nesw
             BoundingBox bb = new BoundingBox(n, e, s, w);
             int tilecount = mgr.possibleTilesInArea(bb, zoomMin, zoomMax);
-            cache_estimate.setText(tilecount + " tiles");
+            cacheEstimate.setText(tilecount + " tiles");
             if (tilecount > TILE_COUNT_DOWNLOAD_LIMIT) {
-                cache_estimate.setError("The tile count exceeds the allowed download limit of " + TILE_COUNT_DOWNLOAD_LIMIT + " Tiles per Download!");
-                cache_estimate.requestFocus();
+                cacheEstimate.setError("The tile count exceeds the allowed download limit of " + TILE_COUNT_DOWNLOAD_LIMIT + " Tiles per Download!");
+                cacheEstimate.requestFocus();
                 executeJob.setEnabled(false);
                 return;
             } else if (!executeJob.isEnabled()) {
-                cache_estimate.setError(null);
+                cacheEstimate.setError(null);
                 executeJob.setEnabled(true);
             }
 
@@ -289,15 +319,19 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
                             @Override
                             public void onTaskComplete() {
                                 Toast.makeText(DownloadTilesActivity.this, "Download complete!", Toast.LENGTH_LONG).show();
-                                if (writer != null)
+                                Log.d(getLogStart(), "Download complete");
+                                if (writer != null) {
                                     writer.onDetach();
+                                }
                             }
 
                             @Override
                             public void onTaskFailed(int errors) {
                                 Toast.makeText(DownloadTilesActivity.this, "Download complete with " + errors + " errors", Toast.LENGTH_LONG).show();
-                                if (writer != null)
+                                Log.d(getLogStart(), "Download complete with " + errors + " errors");
+                                if (writer != null) {
                                     writer.onDetach();
+                                }
                             }
 
                             @Override
@@ -401,8 +435,15 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.executeJob:
+            case R.id.gpstracker_tile_download_alert_dialog_execute_job:
                 updateEstimate(true);
+                break;
+            case R.id.gpstracker_tile_download_alert_dialog_cancel_alert:
+                if (downloadPrompt != null) {
+                    if (downloadPrompt.isShowing()) {
+                        downloadPrompt.dismiss();
+                    }
+                }
                 break;
         }
     }

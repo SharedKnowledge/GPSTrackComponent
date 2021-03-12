@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.Presenter;
@@ -36,10 +38,12 @@ import net.gpstrackapp.recording.TrackRecordingPresenter;
 import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.config.IConfigurationProvider;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,22 +53,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 
-/*
-TODO On first run after install SOMETIMES onPause() and onResume() of this activity get called alternately in a never ending
-    loop, from the second run onwards everything works completely fine. The reason for the call to onPause() escapes me.
-    It might have something to do with the LocationService and the missing ACCESS_FINE_LOCATION permission, that the user has
-    to agree to. The service doesn't get started and returns START_STICKY but doesn't get restarted for some reason? This would
-    explain why everything works fine on the second run as all permissions are already granted.
-*/
 public class TrackRecordingMapActivity extends MapViewActivity {
     private static final int DISPLAY_ACTIVITY_REQUEST_CODE = 0;
+    private static final String WRITE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+    private static final String ACCESS_FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private Context ctx;
     private static Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
     private TrackRecordingPresenter trackRecordingPresenter;
     private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private boolean askedForPermissions = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,17 +74,45 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         } catch (ASAPException e) {
             Log.e(getLogStart(), e.getLocalizedMessage());
         }
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        IConfigurationProvider conf = Configuration.getInstance();
+        conf.load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        conf.setUserAgentValue(getPackageName());
+
+        // Debug options
+        //conf.setDebugMode(true);
+        //conf.setDebugTileProviders(true);
+        //conf.setDebugMapTileDownloader(true);
+        //conf.setDebugMapView(true);
+
+        // use external storage directory if permission is granted
+        if (ContextCompat.checkSelfPermission(ctx, WRITE_EXTERNAL_STORAGE_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
+            // archives are placed here
+            conf.setOsmdroidBasePath(new File(Environment.getExternalStorageDirectory()
+                    + File.separator + "osmdroid"));
+            // tile cache db
+            conf.setOsmdroidTileCache(new File(Environment.getExternalStorageDirectory()
+                    + File.separator + "osmdroid" + File.separator + "tiles"));
+        }
+
         super.onCreate(savedInstanceState);
 
-        requestPermissionsIfNecessary(new String[] {
-                // needed to show the current location
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                // WRITE_EXTERNAL_STORAGE is required in order to show the map
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        });
+        if (!askedForPermissions) {
+            requestPermissionsIfNecessary(new String[] {
+                    // needed to show the current location (location provider)
+                    ACCESS_FINE_LOCATION_PERMISSION,
+                    // WRITE_EXTERNAL_STORAGE is required for offline tile provider and storing files (e.g. track export)
+                    WRITE_EXTERNAL_STORAGE_PERMISSION
+            });
+        }
+        askedForPermissions = true;
 
         Log.d(getLogStart(), "onCreate");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(getLogStart(), "onDestroy");
     }
 
     @Override
@@ -184,20 +213,28 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
+                // --- map tiles ---
                 case R.id.tile_settings_item:
                     startMapTileSettingsActivity();
                     return true;
                 case R.id.download_item:
                     startDownloadTilesActivity();
                     return true;
+
+                // --- tracks ---
                 case R.id.record_item:
-                    if (!trackRecordingPresenter.isRecordingTrack()) {
-                        showTrackNameDialog();
+                    if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION_PERMISSION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        if (!trackRecordingPresenter.isRecordingTrack()) {
+                            showTrackNameDialog();
+                        } else {
+                            Track recordedTrack = trackRecordingPresenter.getRecordedTrack();
+                            trackRecordingPresenter.unregisterLocationConsumer(recordedTrack);
+                            invalidateOptionsMenu();
+                            showSaveTrackDialog(recordedTrack);
+                        }
                     } else {
-                        Track recordedTrack = trackRecordingPresenter.getRecordedTrack();
-                        trackRecordingPresenter.unregisterLocationConsumer(recordedTrack);
-                        invalidateOptionsMenu();
-                        showSaveTrackDialog(recordedTrack);
+                        Toast.makeText(this, "You cannot record tracks without granting location permission", Toast.LENGTH_LONG).show();
                     }
                     return true;
                 case R.id.display_item:
@@ -240,6 +277,9 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                 case BUTTON_POSITIVE:
                     trackName = input.getText().toString();
                     break;
+                case BUTTON_NEGATIVE:
+                    dialog.dismiss();
+                    return;
             }
             TrackSegment trackSegment = new TrackSegment(null);
             Track track = new Track(null, trackName,
@@ -326,24 +366,24 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        Log.d(getLogStart(), "onRequestPermissionsResult");
         for (int i = 0; i < grantResults.length; i++) {
-            permissionsToRequest.add(permissions[i]);
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    permissionsToRequest.toArray(new String[0]),
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                // recreate this activity if any permissions were granted
+                recreate();
+                break;
+            }
         }
     }
 
     private void requestPermissionsIfNecessary(String[] permissions) {
+        Log.d(getLogStart(), "requestPermissionsIfNecessary");
         ArrayList<String> permissionsToRequest = new ArrayList<>();
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission)
                     != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
+                // TODO shouldShowRequestPermissionRationale can be added to explain to the used how permissions are used
+                // Permission is not yet granted
                 permissionsToRequest.add(permission);
             }
         }

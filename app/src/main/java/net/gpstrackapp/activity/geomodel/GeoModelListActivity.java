@@ -74,10 +74,6 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
         }
     }
 
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
-    }
-
     @Override
     public String addOptionalAdditionalInfo() {
         return "(Un)Select tracks by clicking on them and press \'"
@@ -86,4 +82,8 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
     }
 
     public abstract String addUserDescription();
+
+    private String getLogStart() {
+        return GeoModelListActivity.class.getSimpleName();
+    }
 }

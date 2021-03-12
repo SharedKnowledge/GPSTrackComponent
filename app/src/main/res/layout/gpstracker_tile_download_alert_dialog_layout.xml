@@ -10,9 +10,9 @@
     >
     
     <ScrollView
+        android:id="@+id/gpstracker_tile_download_alert_dialog_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/gpstracker_tile_download_alert_dialog_scrollview"
         android:layout_gravity="center_horizontal">
 
         <LinearLayout
@@ -28,9 +28,9 @@
                 android:text="@string/gpstracker_tile_download_north_lat"
                 />
             <EditText
+                android:id="@+id/gpstracker_tile_download_alert_dialog_cache_north"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/cache_north"
                 android:inputType="number|numberDecimal|numberSigned"
                 android:digits="1234567890.-"
                 android:gravity="center"
@@ -43,9 +43,10 @@
                 android:text="@string/gpstracker_tile_download_south_lat"
                 />
             <EditText
+                android:id="@+id/gpstracker_tile_download_alert_dialog_cache_south"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/cache_south"  android:inputType="number|numberDecimal|numberSigned"
+                android:inputType="number|numberDecimal|numberSigned"
                 android:digits="1234567890.-"
                 android:gravity="center"
                 />
@@ -57,9 +58,10 @@
                 android:text="@string/gpstracker_tile_download_east_lon"
                 />
             <EditText
+                android:id="@+id/gpstracker_tile_download_alert_dialog_cache_east"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/cache_east"  android:inputType="number|numberDecimal|numberSigned"
+                android:inputType="number|numberDecimal|numberSigned"
                 android:digits="1234567890.-"
                 android:gravity="center"
                 />
@@ -71,9 +73,10 @@
                 android:text="@string/gpstracker_tile_download_west_lon"
                 />
             <EditText
+                android:id="@+id/gpstracker_tile_download_alert_dialog_cache_west"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/cache_west"  android:inputType="number|numberDecimal|numberSigned"
+                android:inputType="number|numberDecimal|numberSigned"
                 android:digits="1234567890.-"
                 android:gravity="center"
                 />
@@ -85,12 +88,12 @@
                 android:text="@string/gpstracker_tile_download_zoom_level_min"
                 />
             <SeekBar
+                android:id="@+id/gpstracker_tile_download_alert_dialog_slider_zoom_min"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/slider_zoom_min"
                 />
             <TextView
-                android:id="@+id/zoom_min_current"
+                android:id="@+id/gpstracker_tile_download_alert_dialog_zoom_min_current"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
@@ -102,12 +105,12 @@
                 android:text="@string/gpstracker_tile_download_zoom_level_max"
                 />
             <SeekBar
+                android:id="@+id/gpstracker_tile_download_alert_dialog_slider_zoom_max"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/slider_zoom_max"
                 />
             <TextView
-                android:id="@+id/zoom_max_current"
+                android:id="@+id/gpstracker_tile_download_alert_dialog_zoom_max_current"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
@@ -119,7 +122,7 @@
                 android:text="@string/gpstracker_tile_download_tiles_count_estimate"
                 />
             <TextView
-                android:id="@+id/cache_estimate"
+                android:id="@+id/gpstracker_tile_download_alert_dialog_cache_estimate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:focusable="true"
@@ -141,7 +144,7 @@
                 >
 
                 <EditText
-                    android:id="@+id/cache_output"
+                    android:id="@+id/gpstracker_tile_download_alert_dialog_cache_output"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="archive"
@@ -156,11 +159,24 @@
                     />
             </LinearLayout>
 
-            <Button
-                android:id="@+id/executeJob"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/gpstracker_tile_download_start_download_button"/>
+                android:orientation="horizontal"
+                android:gravity="center"
+                >
+
+                <Button
+                    android:id="@+id/gpstracker_tile_download_alert_dialog_execute_job"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gpstracker_tile_download_start_download_button"/>
+                <Button
+                    android:id="@+id/gpstracker_tile_download_alert_dialog_cancel_alert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cancel"/>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

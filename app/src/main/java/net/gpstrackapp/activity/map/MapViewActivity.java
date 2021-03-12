@@ -52,6 +52,7 @@ public abstract class MapViewActivity extends AppCompatActivity {
             mapView.setTileSource(customTileSource);
         } else {
             mapView.setTileSource(ConfiguredMapView.getDefaultTileSource());
+            Log.d(getLogStart(), mapView.getTileProvider().toString());
         }
 
         // refresh the osmdroid configuration so that overlays can adjust
@@ -147,6 +148,6 @@ public abstract class MapViewActivity extends AppCompatActivity {
     }
 
     private String getLogStart() {
-        return this.getClass().getSimpleName();
+        return MapViewActivity.class.getSimpleName();
     }
 }

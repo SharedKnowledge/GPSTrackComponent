@@ -30,7 +30,7 @@ android {
 }
 
 dependencies {
-    // desugaring is used to support Java 8 features, this can be removed if minSdkVersion is set to 26 or higher
+    // desugaring is used to support some Java 8 features, this can be removed if minSdkVersion is set to 26 or higher
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -46,5 +46,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'org.osmdroid:osmdroid-android:6.1.10'
+    // encountered problems with newer 6.1.10 on tile download (https://github.com/osmdroid/osmdroid/issues/1313)
+    implementation 'org.osmdroid:osmdroid-android:6.1.8'
 }

@@ -1,6 +1,9 @@
 package net.gpstrackapp.overlay;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -19,15 +22,18 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ConfiguredMapView extends MapView {
+    private CopyrightOverlay copyrightOverlay;
     private MyLocationNewOverlay locationOverlay;
+    private RotationGestureOverlay rotationGestureOverlay;
     private GpsMyLocationProvider provider;
     private static ITileSource defaultTileSource = TileSourceFactory.OpenTopo;
     private ITileSource selectedTileSource = defaultTileSource;
     // add Tile Sources to use for the maps here, make sure to read the terms of service before adding them
     private static Set<ITileSource> validTileSources = new HashSet<>(Arrays.asList(
-            // MAPNIK and WIKIMEDIA not usable for downloads
+            // MAPNIK and WIKIMEDIA are not available for downloads
             TileSourceFactory.MAPNIK,
             TileSourceFactory.WIKIMEDIA,
+
             TileSourceFactory.OpenTopo
             /*
             At the moment the USGS TileSources return a Not Found error for tiles on zoom levels 9 or
@@ -62,16 +68,30 @@ public class ConfiguredMapView extends MapView {
     private void setupOverlays() {
         Log.d(getLogStart(), "setup Overlays");
         this.getOverlays().clear();
-        this.getOverlays().add(new CopyrightOverlay(ctx));
+        if (copyrightOverlay == null) {
+            copyrightOverlay = new CopyrightOverlay(ctx);
+        }
+        this.getOverlays().add(copyrightOverlay);
 
-        provider = new GpsMyLocationProvider(ctx);
-        locationOverlay = new MyLocationNewOverlay(provider, this);
-        locationOverlay.enableMyLocation();
-        locationOverlay.enableFollowLocation();
-        this.getOverlays().add(locationOverlay);
+        // check location permission
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (provider == null) {
+                provider = new GpsMyLocationProvider(ctx);
+            }
 
-        RotationGestureOverlay rotationGestureOverlay = new RotationGestureOverlay(this);
-        rotationGestureOverlay.setEnabled(true);
+            if (locationOverlay == null) {
+                locationOverlay = new MyLocationNewOverlay(provider, this);
+                locationOverlay.enableMyLocation();
+                locationOverlay.enableFollowLocation();
+                this.getOverlays().add(locationOverlay);
+            }
+        }
+
+        if (rotationGestureOverlay == null) {
+            rotationGestureOverlay = new RotationGestureOverlay(this);
+            rotationGestureOverlay.setEnabled(true);
+        }
         this.getOverlays().add(rotationGestureOverlay);
     }
 
@@ -91,6 +111,15 @@ public class ConfiguredMapView extends MapView {
         if (validTileSources.contains(tileSource)) {
             this.selectedTileSource = tileSource;
             super.setTileSource(tileSource);
+
+            double minZoom = tileSource.getMinimumZoomLevel();
+            double maxZoom = tileSource.getMaximumZoomLevel();
+            // correct zoom level, otherwise tiles won't render because they don't exist for these zoom levels
+            if (getZoomLevelDouble() < minZoom) {
+                getController().setZoom(minZoom);
+            } else if (getZoomLevelDouble() > maxZoom) {
+                getController().setZoom(maxZoom);
+            }
         } else {
             Log.e(getLogStart(), "The passed TileSource parameter is invalid." + System.lineSeparator() +
                     "For policy reasons only the following TileSources are valid:" + System.lineSeparator() +

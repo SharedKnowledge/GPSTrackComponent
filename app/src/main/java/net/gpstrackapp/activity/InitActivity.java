@@ -18,6 +18,7 @@ public class InitActivity extends AppCompatActivity {
             GPSApp.initializeGPSApp(this);
         }
 
+        Log.d(getLogStart(), "start TrackRecordingMapActivity");
         Intent intent = new Intent(this, TrackRecordingMapActivity.class);
         startActivity(intent);
     }

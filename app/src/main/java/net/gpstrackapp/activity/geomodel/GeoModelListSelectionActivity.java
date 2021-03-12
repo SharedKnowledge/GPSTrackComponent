@@ -47,6 +47,6 @@ public abstract class GeoModelListSelectionActivity extends GeoModelListActivity
     protected abstract void onSelectionFinished(Set<CharSequence> selectedItemIDs);
 
     private String getLogStart() {
-        return this.getClass().getSimpleName();
+        return GeoModelListSelectionActivity.class.getSimpleName();
     }
 }

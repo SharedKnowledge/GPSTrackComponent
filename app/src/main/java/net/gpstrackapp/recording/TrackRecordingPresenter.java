@@ -1,9 +1,12 @@
 package net.gpstrackapp.recording;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
@@ -38,11 +41,13 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
         In newer SDK versions the notification channel may not be needed anymore.
         */
 
-        if (!LocationService.hasAskedUserPermission()) {
-            showStartInForegroundDialog();
-            LocationService.setAskedUserPermission(true);
-        } else {
-            startLocationService();
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (!LocationService.hasAskedUserPermission()) {
+                showStartInForegroundDialog();
+                LocationService.setAskedUserPermission(true);
+            } else {
+                startLocationService();
+            }
         }
 
         if (locationReceiver == null) {
@@ -55,11 +60,13 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
     @Override
     public void onResume() {
         /* see comment in onCreate
-        if (!LocationService.hasAskedUserPermission()) {
-            showStartInForegroundDialog();
-            LocationService.setAskedUserPermission(true);
-        } else {
-            startLocationService();
+        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (!LocationService.hasAskedUserPermission()) {
+                showStartInForegroundDialog();
+                LocationService.setAskedUserPermission(true);
+            } else {
+                startLocationService();
+            }
         }
         */
 

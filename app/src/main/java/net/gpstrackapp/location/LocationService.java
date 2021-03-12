@@ -38,8 +38,11 @@ public class LocationService extends Service {
         super.onCreate();
 
         if (startInForeground && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // this is necessary because startForeground() has to be called within 5 seconds of startForegroundService()
+            // see https://developer.android.com/about/versions/oreo/android-8.0-changes.html for more infos
             startInForeground();
         }
+
         Log.d(getLogStart(), "onCreate");
     }
 
@@ -85,6 +88,7 @@ public class LocationService extends Service {
         Log.d(getLogStart(), "onStartCommand");
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new GpsLocationListener();
+        // check location permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(getLogStart(), "Start sticky");
             return START_STICKY;
@@ -130,6 +134,11 @@ public class LocationService extends Service {
         super.onDestroy();
         Log.d(getLogStart(), "onDestroy");
         locationManager.removeUpdates(locationListener);
+        if (locationChannel != null && notificationManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationManager.deleteNotificationChannel(locationChannel.getId());
+            }
+        }
     }
 
     private String getLogStart() {
