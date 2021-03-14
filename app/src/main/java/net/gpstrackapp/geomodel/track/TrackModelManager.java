@@ -9,6 +9,7 @@ import net.gpstrackapp.geomodel.GeoModelManager;
 import net.gpstrackapp.geomodel.GeoModelStorage;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TrackModelManager extends GeoModelManager<Track> implements GeoModelStorage<Track> {
+    private static final String SUBDIR_NAME = "tracks";
     public void mergeTracks(Context ctx, Set<Track> tracksToMerge, String newTrackName) {
         List<TrackSegment> trackSegments = tracksToMerge.stream()
                 .flatMap(track -> track.getTrackSegments().stream())
@@ -36,7 +38,11 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
     @Override
     public void saveGeoModelToFile(Context ctx, Track trackToSave) {
         try {
-            FileOutputStream fos = ctx.openFileOutput(trackToSave.getObjectId().toString(), Context.MODE_PRIVATE);
+            File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
+            dir.mkdirs();
+            File fileToSave = new File(dir, trackToSave.getObjectId().toString());
+            Log.d(getLogStart(), fileToSave.getAbsolutePath());
+            FileOutputStream fos = new FileOutputStream(fileToSave);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(trackToSave);
             oos.close();
@@ -59,9 +65,12 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
 
     @Override
     public void deleteGeoModelFromFile(Context ctx, Track trackToDelete) {
-        File fileToDelete = ctx.getFileStreamPath(trackToDelete.getObjectId().toString());
-        // returns false if file does not exist
+        File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
+        dir.mkdirs();
+        File fileToDelete = new File(dir, trackToDelete.getObjectId().toString());
+        // just returns false if file does not exist
         fileToDelete.delete();
+        Log.d(getLogStart(), "Deleted track: " + trackToDelete.getObjectName());
     }
 
     @Override
@@ -76,12 +85,15 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
 
     @Override
     public void loadAllGeoModelsFromFiles(Context ctx) {
-        File[] files = ctx.getFilesDir().listFiles();
+        File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
+        Log.d(getLogStart(), dir.getAbsolutePath());
+        dir.mkdirs();
+        File[] files = dir.listFiles(pathname -> pathname.isFile());
         Log.d(getLogStart(), "Attempt to load " + files.length + " tracks from storage");
         Set<Track> tracks = new HashSet<>();
         for (int i = 0; i < files.length; i++) {
             try {
-                FileInputStream fis = ctx.openFileInput(files[i].getName());
+                FileInputStream fis = new FileInputStream(files[i]);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 Track loadedTrack = (Track) ois.readObject();
                 tracks.add(loadedTrack);

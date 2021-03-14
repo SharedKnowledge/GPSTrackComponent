@@ -46,6 +46,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    // encountered problems with newer 6.1.10 on tile download (https://github.com/osmdroid/osmdroid/issues/1313)
-    implementation 'org.osmdroid:osmdroid-android:6.1.8'
+    // encountered problems with 6.1.10 on tile download (https://github.com/osmdroid/osmdroid/issues/1313) and
+    // encountered problems with 6.1.7 and 6.1.8 on restart after not granting write external storage permission (https://github.com/osmdroid/osmdroid/issues/1621)
+    implementation 'org.osmdroid:osmdroid-android:6.1.6'
 }

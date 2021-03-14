@@ -61,7 +61,6 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     private static final String WRITE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String ACCESS_FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-    private Context ctx;
     private static Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
     private TrackRecordingPresenter trackRecordingPresenter;
     private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
@@ -69,31 +68,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            ctx = GPSComponent.getGPSComponent().getContext().getApplicationContext();
-        } catch (ASAPException e) {
-            Log.e(getLogStart(), e.getLocalizedMessage());
-        }
-        IConfigurationProvider conf = Configuration.getInstance();
-        conf.load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        conf.setUserAgentValue(getPackageName());
-
-        // Debug options
-        //conf.setDebugMode(true);
-        //conf.setDebugTileProviders(true);
-        //conf.setDebugMapTileDownloader(true);
-        //conf.setDebugMapView(true);
-
-        // use external storage directory if permission is granted
-        if (ContextCompat.checkSelfPermission(ctx, WRITE_EXTERNAL_STORAGE_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
-            // archives are placed here
-            conf.setOsmdroidBasePath(new File(Environment.getExternalStorageDirectory()
-                    + File.separator + "osmdroid"));
-            // tile cache db
-            conf.setOsmdroidTileCache(new File(Environment.getExternalStorageDirectory()
-                    + File.separator + "osmdroid" + File.separator + "tiles"));
-        }
-
+        Log.d(getLogStart(), "onCreate");
         super.onCreate(savedInstanceState);
 
         if (!askedForPermissions) {
@@ -105,14 +80,12 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             });
         }
         askedForPermissions = true;
-
-        Log.d(getLogStart(), "onCreate");
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         Log.d(getLogStart(), "onDestroy");
+        super.onDestroy();
     }
 
     @Override

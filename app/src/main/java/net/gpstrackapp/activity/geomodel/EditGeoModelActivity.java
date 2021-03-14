@@ -112,7 +112,7 @@ public class EditGeoModelActivity extends AppCompatActivity {
         }
         geoModel.setCreator(creator);
 
-        String changed = "Changed were applied to geomodel";
+        String changed = "Changes were applied to geomodel";
         Toast.makeText(this, changed, Toast.LENGTH_SHORT).show();
         Log.d(getLogStart(), changed);
         finish();

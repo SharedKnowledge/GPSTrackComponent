@@ -32,7 +32,8 @@ public class ConfiguredMapView extends MapView {
     private static Set<ITileSource> validTileSources = new HashSet<>(Arrays.asList(
             // MAPNIK and WIKIMEDIA are not available for downloads
             TileSourceFactory.MAPNIK,
-            TileSourceFactory.WIKIMEDIA,
+            // not included in this version of osmdroid yet, problems with osmdroid versions are explained in build.gradle above osmdroid dependency
+            //TileSourceFactory.WIKIMEDIA,
 
             TileSourceFactory.OpenTopo
             /*

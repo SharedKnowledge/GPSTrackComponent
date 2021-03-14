@@ -76,9 +76,9 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
 
     @Override
     public String addOptionalAdditionalInfo() {
-        return "(Un)Select tracks by clicking on them and press \'"
+        return "(Un)Select items by clicking on them and press \'"
                 + getResources().getString(R.string.gpstracker_list_geomodels_selection_done_text) + "\'. "
-                + addUserDescription();
+                + addUserDescription() + " You can also edit items by clicking on them longer.";
     }
 
     public abstract String addUserDescription();
