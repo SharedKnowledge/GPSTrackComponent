@@ -41,7 +41,7 @@ public class GPSComponent implements ASAPApplicationComponent {
 
             IConfigurationProvider conf = Configuration.getInstance();
             conf.load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-            conf.setUserAgentValue(ctx.getPackageName());
+            conf.setUserAgentValue(BuildConfig.APPLICATION_ID);
 
             // Debug options
             //conf.setDebugMode(true);

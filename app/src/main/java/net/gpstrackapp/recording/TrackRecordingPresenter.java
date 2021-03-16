@@ -36,11 +36,10 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
         serviceIntent = new Intent(ctx, LocationService.class);
         /*
         Start the location service here (and stop it in onDestroy) to enable the user to navigate to other
-        components in SN2 while recording as the service isn't ended. Alternatively move this block to onResume
-        and stopLocationService to onPause to record only while using this component.
+        components in SN2 while recording as the service isn't ended. Alternatively move this block to onStart
+        and stopLocationService to onStop to record only while using this component.
         In newer SDK versions the notification channel may not be needed anymore.
         */
-
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (!LocationService.hasAskedUserPermission()) {
                 showStartInForegroundDialog();
@@ -58,8 +57,9 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
     }
 
     @Override
-    public void onResume() {
-        /* see comment in onCreate
+    public void onStart() {
+        /*
+        // see comment in onCreate
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (!LocationService.hasAskedUserPermission()) {
                 showStartInForegroundDialog();
@@ -69,14 +69,25 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
             }
         }
         */
+    }
 
+    @Override
+    public void onResume() {
         //add and remove TrackOverlays
         trackVisualizer.updateGeoModelsOnMapView();
     }
 
     @Override
     public void onPause() {
-        //stopLocationService();
+
+    }
+
+    @Override
+    public void onStop() {
+        /*
+        // see comment in onCreate
+        stopLocationService();
+         */
     }
 
     @Override
@@ -92,7 +103,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
 
     private void showStartInForegroundDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-        builder.setMessage("Start location service in foreground? Recording can only continue in doze mode if you select "
+        builder.setMessage("Run location service in foreground? Recording can only continue in doze mode if you select "
                     + "\'Yes\', but it will drain the battery more. In case this is not needed select \'No\'.")
                 .setPositiveButton("Yes", (dialog, which) -> {
                     LocationService.setStartInForeground(true);

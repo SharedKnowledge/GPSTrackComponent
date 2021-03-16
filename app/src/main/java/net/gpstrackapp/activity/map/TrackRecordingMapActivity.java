@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +43,7 @@ import org.osmdroid.config.IConfigurationProvider;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -60,16 +62,22 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     private static final int DISPLAY_ACTIVITY_REQUEST_CODE = 0;
     private static final String WRITE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String ACCESS_FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private static Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
     private TrackRecordingPresenter trackRecordingPresenter;
-    private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
     private boolean askedForPermissions = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(getLogStart(), "onCreate");
         super.onCreate(savedInstanceState);
+
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(mapView);
+        scaleBarOverlay.setCentred(true);
+        scaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, (int) getResources().getDimension(R.dimen.marginUnderToolbar) + 20);
+        mapView.getOverlays().add(scaleBarOverlay);
 
         if (!askedForPermissions) {
             requestPermissionsIfNecessary(new String[] {
@@ -86,6 +94,36 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     protected void onDestroy() {
         Log.d(getLogStart(), "onDestroy");
         super.onDestroy();
+    }
+
+    @Override
+    protected ViewGroup setupAndGetMapViewParentLayout() {
+        setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
+        Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
+        setSupportActionBar(toolbar);
+
+        RelativeLayout relativeLayout = findViewById(R.id.gpstracker_tracker_mapview_layout_with_toolbar);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
+                MapView.LayoutParams.MATCH_PARENT);
+        params.addRule(RelativeLayout.BELOW);
+        mapView.setLayoutParams(params);
+
+        return relativeLayout;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(getLogStart(), "init action buttons");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.gpstracker_tracker_mapview_action_buttons, menu);
+        adjustMenuToRecordingState(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        adjustMenuToRecordingState(menu);
+        return true;
     }
 
     @Override
@@ -133,40 +171,6 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             Track track = trackModelManager.getGeoModelByUUID(trackID);
             trackRecordingPresenter.registerLocationConsumer(track);
         }
-    }
-
-    public static Map<Track, TrackOverlay> getTrackWithOverlayHolder() {
-        return trackWithOverlayHolder;
-    }
-
-    @Override
-    protected ViewGroup setupAndGetMapViewParentLayout() {
-        setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
-        Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
-        setSupportActionBar(toolbar);
-
-        RelativeLayout relativeLayout = findViewById(R.id.gpstracker_tracker_mapview_layout_with_toolbar);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
-                MapView.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.BELOW);
-        mapView.setLayoutParams(params);
-
-        return relativeLayout;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init action buttons");
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.gpstracker_tracker_mapview_action_buttons, menu);
-        adjustMenuToRecordingState(menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        adjustMenuToRecordingState(menu);
-        return true;
     }
 
     private void adjustMenuToRecordingState(Menu menu) {

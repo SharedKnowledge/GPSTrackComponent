@@ -32,7 +32,7 @@ public class ConfiguredMapView extends MapView {
     private static Set<ITileSource> validTileSources = new HashSet<>(Arrays.asList(
             // MAPNIK and WIKIMEDIA are not available for downloads
             TileSourceFactory.MAPNIK,
-            // not included in this version of osmdroid yet, problems with osmdroid versions are explained in build.gradle above osmdroid dependency
+            // not included in this version of osmdroid yet, problems with newer osmdroid versions are explained in build.gradle above osmdroid dependency
             //TileSourceFactory.WIKIMEDIA,
 
             TileSourceFactory.OpenTopo
@@ -115,7 +115,7 @@ public class ConfiguredMapView extends MapView {
 
             double minZoom = tileSource.getMinimumZoomLevel();
             double maxZoom = tileSource.getMaximumZoomLevel();
-            // correct zoom level, otherwise tiles won't render because they don't exist for these zoom levels
+            // adjust zoom level, otherwise tiles won't render because they don't exist for these zoom levels
             if (getZoomLevelDouble() < minZoom) {
                 getController().setZoom(minZoom);
             } else if (getZoomLevelDouble() > maxZoom) {

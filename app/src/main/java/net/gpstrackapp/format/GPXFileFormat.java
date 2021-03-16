@@ -32,7 +32,7 @@ import io.jenetics.jpx.Metadata;
 import io.jenetics.jpx.WayPoint;
 
 public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
-    private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
 
     // semicolon
     private String delimiter = String.valueOf('\u003B');

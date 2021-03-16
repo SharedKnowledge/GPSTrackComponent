@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class ExportTracksActivity extends GeoModelListSelectionActivity implements AdapterView.OnItemSelectedListener {
     private final int CREATE_FILE_CODE = 1;
     private Spinner spinner;
-    private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
     private String selectedFormat;
     private String[] availableFormats;
     private ExportTracksActivity.ExportHelper exportHelper;

@@ -17,7 +17,7 @@ public abstract class MapViewActivity extends AppCompatActivity {
     protected ConfiguredMapView mapView = null;
     protected ViewGroup parentView = null;
     protected Presenter presenter = null;
-    protected final double DEFAULT_ZOOM_LEVEL = 18;
+    protected final double DEFAULT_ZOOM_LEVEL = 17;
     // set HTW Campus Wilhelminenhof as default location
     protected final double DEFAULT_LATITUDE = 52.457563642191246;
     protected final double DEFAULT_LONGITUDE = 13.526327369714947;
@@ -28,8 +28,8 @@ public abstract class MapViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         Log.d(getLogStart(), "onCreate");
+        super.onCreate(savedInstanceState);
 
         mapView = new ConfiguredMapView(this);
         finishMapSetup(getIntent());
@@ -41,9 +41,17 @@ public abstract class MapViewActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (presenter != null) {
+            presenter.onStart();
+        }
+    }
+
+    @Override
     protected void onResume() {
-        super.onResume();
         Log.d(getLogStart(), "onResume");
+        super.onResume();
 
         /* if the user changes the default tilesource in the settings then set the new tilesource here
          if the subclass does not specify a specific tilesource to be used in getMapSpecificTileSource() */
@@ -64,13 +72,21 @@ public abstract class MapViewActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         Log.d(getLogStart(), "onPause");
+        super.onPause();
 
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onPause();
         if (presenter != null) {
             presenter.onPause();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (presenter != null) {
+            presenter.onStop();
         }
     }
 

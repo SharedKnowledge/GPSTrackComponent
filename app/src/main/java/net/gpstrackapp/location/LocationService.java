@@ -28,10 +28,12 @@ public class LocationService extends Service {
     private static boolean askedUserPermission = false;
     private static boolean startInForeground = true;
 
-    private long updateMinTime = 0;
-    private float updateMinDistance = 0;
+    // in milliseconds
+    private long updateMinTime = 3000;
+    // in meters
+    private float updateMinDistance = 5;
     // accuracy is the radius of 68% confidence
-    private float maxHorizontalAccuracy = 100;
+    private float maxHorizontalAccuracy = 30;
 
     @Override
     public void onCreate() {
@@ -73,7 +75,7 @@ public class LocationService extends Service {
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
             Notification notification = notificationBuilder.setOngoing(true)
-                    .setContentTitle("App is running in background")
+                    .setContentTitle("Location service is running")
                     .setPriority(NotificationManager.IMPORTANCE_MIN)
                     .setCategory(Notification.CATEGORY_SERVICE)
                     .setSound(null)

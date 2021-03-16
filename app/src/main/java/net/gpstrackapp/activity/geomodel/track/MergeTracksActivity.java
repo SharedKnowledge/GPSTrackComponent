@@ -13,7 +13,7 @@ import net.gpstrackapp.geomodel.track.TrackModelManager;
 import java.util.Set;
 
 public class MergeTracksActivity extends GeoModelListSelectionActivity {
-    private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
 
     @Override
     protected void onSelectionFinished(Set<CharSequence> selectedItemIDs) {

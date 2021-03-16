@@ -1,6 +1,7 @@
 package net.gpstrackapp.activity.map;
 
 import android.app.AlertDialog;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,6 +31,7 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourcePolicyException;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay2;
 
 import java.io.File;
 
@@ -46,6 +48,13 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
     private AlertDialog downloadPrompt = null;
     private SqliteArchiveTileWriter writer = null;
     private CacheManager mgr = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mapView.getOverlays().add(new LatLonGridlineOverlay2());
+    }
 
     @Override
     protected ViewGroup setupAndGetMapViewParentLayout() {
