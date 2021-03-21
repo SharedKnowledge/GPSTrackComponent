@@ -24,20 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ConfiguredMapView extends MapView {
-    public static final float DEFAULT_ZOOM_LEVEL = 17;
-    // set HTW Campus Wilhelminenhof as default location
-    public static final String DEFAULT_LATITUDE = "52.457563642191246";
-    public static final String DEFAULT_LONGITUDE = "13.526327369714947";
-
-    public static final String PREFS_NAME = "net.gpstrackapp.osm.prefs";
-    public static final String PREFS_LATITUDE = "prefsLat";
-    public static final String PREFS_LONGITUDE = "prefsLon";
-    public static final String PREFS_ZOOM = "prefsZoom";
-
-    private CopyrightOverlay copyrightOverlay;
-    private MyLocationNewOverlay locationOverlay;
-    private RotationGestureOverlay rotationGestureOverlay;
-    private GpsMyLocationProvider provider;
     private static ITileSource defaultTileSource = TileSourceFactory.OpenTopo;
     private ITileSource selectedTileSource = defaultTileSource;
     // add Tile Sources to use for the maps here, make sure to read the terms of service before adding them
@@ -61,9 +47,6 @@ public class ConfiguredMapView extends MapView {
         super(ctx);
         this.ctx = ctx;
         this.setTileSource(selectedTileSource);
-        setupOverlays();
-        getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
-        setMultiTouchControls(true);
     }
 
     @Override
@@ -76,47 +59,6 @@ public class ConfiguredMapView extends MapView {
     public void onPause() {
         super.onPause();
         Log.d(getLogStart(), "onPause");
-    }
-
-    private void setupOverlays() {
-        Log.d(getLogStart(), "setup Overlays");
-        this.getOverlays().clear();
-        if (copyrightOverlay == null) {
-            copyrightOverlay = new CopyrightOverlay(ctx);
-        }
-        this.getOverlays().add(copyrightOverlay);
-
-        // check location permission
-        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            if (provider == null) {
-                provider = new GpsMyLocationProvider(ctx);
-            }
-
-            if (locationOverlay == null) {
-                locationOverlay = new MyLocationNewOverlay(provider, this);
-                locationOverlay.enableMyLocation();
-                locationOverlay.enableFollowLocation();
-                this.getOverlays().add(locationOverlay);
-            }
-        }
-
-        if (rotationGestureOverlay == null) {
-            rotationGestureOverlay = new RotationGestureOverlay(this);
-            rotationGestureOverlay.setEnabled(true);
-        }
-        this.getOverlays().add(rotationGestureOverlay);
-    }
-
-    public GpsMyLocationProvider getProvider() {
-        return provider;
-    }
-
-    public GeoPoint getLastLocation() {
-        if (locationOverlay != null) {
-            return locationOverlay.getMyLocation();
-        }
-        return null;
     }
 
     @Override

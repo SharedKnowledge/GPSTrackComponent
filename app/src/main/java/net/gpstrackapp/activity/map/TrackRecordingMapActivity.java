@@ -1,23 +1,27 @@
 package net.gpstrackapp.activity.map;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import net.gpstrackapp.GPSComponent;
@@ -31,12 +35,12 @@ import net.gpstrackapp.activity.geomodel.track.SaveTracksActivity;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
-import net.gpstrackapp.overlay.ConfiguredMapView;
+import net.gpstrackapp.geomodel.track.TrackVisualizationManager;
+import net.gpstrackapp.overlay.TrackOverlay;
 import net.gpstrackapp.recording.TrackRecordingPresenter;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.config.IConfigurationProvider;
-import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
@@ -47,23 +51,39 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 
-public class TrackRecordingMapActivity extends MapViewActivity {
+public class TrackRecordingMapActivity extends AppCompatActivity implements ActivityWithAdditionalMapOverlays {
     private static final int DISPLAY_ACTIVITY_REQUEST_CODE = 0;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private static final String WRITE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String ACCESS_FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
 
+    private ConfiguredMapFragment configuredMapFragment;
     private TrackRecordingPresenter trackRecordingPresenter;
     private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
     private boolean askedForPermissions = false;
 
+    // invalidate map when going online
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                configuredMapFragment.invalidateMapView();
+            } catch (NullPointerException e) {
+                Log.e(getLogStart(), "mapView is null");
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         Log.d(getLogStart(), "onCreate");
         if (!askedForPermissions) {
             askedForPermissions = true;
@@ -86,15 +106,19 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                     + File.separator + "osmdroid" + File.separator + "tiles"));
         }
 
-        super.onCreate(savedInstanceState);
+        setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
+        Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
+        setSupportActionBar(toolbar);
 
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-        ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(mapView);
-        scaleBarOverlay.setCentred(true);
-        scaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, (int) getResources().getDimension(R.dimen.marginUnderToolbar) + 20);
-        mapView.getOverlays().add(scaleBarOverlay);
+        configuredMapFragment = new ConfiguredMapFragment();
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.gpstracker_mapfragment_container, configuredMapFragment)
+                .commit();
 
-        trackRecordingPresenter = new TrackRecordingPresenter(mapView);
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        trackRecordingPresenter = new TrackRecordingPresenter(this);
         trackRecordingPresenter.onCreate();
     }
 
@@ -109,8 +133,28 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         super.onResume();
         trackRecordingPresenter.onResume();
 
-        Log.d(getLogStart(), "base path: " + Configuration.getInstance().getOsmdroidBasePath());
-        Log.d(getLogStart(), "tile cache: " + Configuration.getInstance().getOsmdroidTileCache());
+        TrackVisualizationManager trackVisualizer = trackRecordingPresenter.getTrackVisualizer();
+        Map<Track, TrackOverlay> addToMap = trackVisualizer.getGeoModelOverlaysToAddToMap();
+        Map<Track, TrackOverlay> removeFromMap = trackVisualizer.getGeoModelOverlaysToRemoveFromMap();
+
+        Log.d(getLogStart(), "add Overlays: " + addToMap.size());
+        Log.d(getLogStart(), "remove Overlays: " + removeFromMap.size());
+
+        for (Map.Entry<Track, TrackOverlay> entry : addToMap.entrySet()) {
+            TrackOverlay trackOverlay = entry.getValue();
+            configuredMapFragment.addTrackOverlay(trackOverlay);
+        }
+        for (Map.Entry<Track, TrackOverlay> entry : removeFromMap.entrySet()) {
+            TrackOverlay trackOverlay = entry.getValue();
+            configuredMapFragment.removeTrackOverlay(trackOverlay);
+        }
+        String toastText = trackVisualizer.createToastText(
+                addToMap.keySet().stream().collect(Collectors.toList()),
+                removeFromMap.keySet().stream().collect(Collectors.toList()));
+        if (!toastText.isEmpty()) {
+            Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
+        }
+        configuredMapFragment.invalidateMapView();
     }
 
     @Override
@@ -130,21 +174,16 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         Log.d(getLogStart(), "onDestroy");
         super.onDestroy();
         trackRecordingPresenter.onDestroy();
+        unregisterReceiver(networkReceiver);
     }
 
     @Override
-    protected ViewGroup setupLayoutAndGetMapViewParentView() {
-        setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
-        Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
-        setSupportActionBar(toolbar);
-
-        RelativeLayout relativeLayout = findViewById(R.id.gpstracker_tracker_mapview_layout_with_toolbar);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
-                MapView.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.BELOW);
-        mapView.setLayoutParams(params);
-
-        return relativeLayout;
+    public void setupAdditionalOverlays(MapView mapView) {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(mapView);
+        scaleBarOverlay.setCentred(true);
+        scaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, (int) getResources().getDimension(R.dimen.margin_top_scale_bar));
+        mapView.getOverlays().add(scaleBarOverlay);
     }
 
     @Override
@@ -159,11 +198,6 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         adjustMenuToRecordingState(menu);
         return true;
-    }
-
-    @Override
-    protected ITileSource getMapSpecificTileSource() {
-        return null;
     }
 
     // Always called before onResume, so the track overlays can be added/removed in onResume
@@ -324,14 +358,14 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
     private void startDownloadTilesActivity() {
         Intent intent = new Intent(this, DownloadTilesActivity.class);
-        GeoPoint lastLocation = mapView.getLastLocation();
+        GeoPoint lastLocation = configuredMapFragment.getLastLocation();
         if (lastLocation != null) {
             intent.putExtra("lat", lastLocation.getLatitude());
             intent.putExtra("lon", lastLocation.getLongitude());
         }
-        double zoomLevel = mapView.getZoomLevelDouble();
-        if (zoomLevel != ConfiguredMapView.DEFAULT_ZOOM_LEVEL) {
-            intent.putExtra("zoom", mapView.getZoomLevelDouble());
+        double zoomLevel = configuredMapFragment.getZoomLevel();
+        if (zoomLevel != ConfiguredMapFragment.DEFAULT_ZOOM_LEVEL) {
+            intent.putExtra("zoom", zoomLevel);
         }
         startActivity(intent);
     }
