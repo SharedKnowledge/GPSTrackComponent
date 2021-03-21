@@ -12,6 +12,8 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -22,6 +24,16 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ConfiguredMapView extends MapView {
+    public static final float DEFAULT_ZOOM_LEVEL = 17;
+    // set HTW Campus Wilhelminenhof as default location
+    public static final String DEFAULT_LATITUDE = "52.457563642191246";
+    public static final String DEFAULT_LONGITUDE = "13.526327369714947";
+
+    public static final String PREFS_NAME = "net.gpstrackapp.osm.prefs";
+    public static final String PREFS_LATITUDE = "prefsLat";
+    public static final String PREFS_LONGITUDE = "prefsLon";
+    public static final String PREFS_ZOOM = "prefsZoom";
+
     private CopyrightOverlay copyrightOverlay;
     private MyLocationNewOverlay locationOverlay;
     private RotationGestureOverlay rotationGestureOverlay;

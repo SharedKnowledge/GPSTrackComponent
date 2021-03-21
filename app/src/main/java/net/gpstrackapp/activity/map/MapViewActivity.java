@@ -1,30 +1,45 @@
 package net.gpstrackapp.activity.map;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import net.gpstrackapp.Presenter;
 import net.gpstrackapp.overlay.ConfiguredMapView;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 
 public abstract class MapViewActivity extends AppCompatActivity {
     protected ConfiguredMapView mapView = null;
     protected ViewGroup parentView = null;
-    protected Presenter presenter = null;
-    protected final double DEFAULT_ZOOM_LEVEL = 17;
-    // set HTW Campus Wilhelminenhof as default location
-    protected final double DEFAULT_LATITUDE = 52.457563642191246;
-    protected final double DEFAULT_LONGITUDE = 13.526327369714947;
+    protected SharedPreferences prefs;
 
-    protected abstract ViewGroup setupAndGetMapViewParentLayout();
-    protected abstract Presenter setupAndGetPresenter();
+    protected abstract ViewGroup setupLayoutAndGetMapViewParentView();
     protected abstract ITileSource getMapSpecificTileSource();
+
+    // invalidate map when going online
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                mapView.invalidate();
+            } catch (NullPointerException e) {
+                Log.e(getLogStart(), "mapView is null");
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,27 +47,25 @@ public abstract class MapViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mapView = new ConfiguredMapView(this);
-        finishMapSetup(getIntent());
-
-        presenter = setupAndGetPresenter();
-        if (presenter != null) {
-            presenter.onCreate();
+        parentView = this.setupLayoutAndGetMapViewParentView();
+        if (parentView != null) {
+            parentView.addView(mapView);
+        } else {
+            Log.e(getLogStart(), "Parent view for map view was null");
         }
+
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override
     protected void onStart() {
+        loadMapPreferences();
         super.onStart();
-        if (presenter != null) {
-            presenter.onStart();
-        }
     }
 
     @Override
     protected void onResume() {
         Log.d(getLogStart(), "onResume");
-        super.onResume();
-
         /* if the user changes the default tilesource in the settings then set the new tilesource here
          if the subclass does not specify a specific tilesource to be used in getMapSpecificTileSource() */
         ITileSource customTileSource = getMapSpecificTileSource();
@@ -62,104 +75,87 @@ public abstract class MapViewActivity extends AppCompatActivity {
             mapView.setTileSource(ConfiguredMapView.getDefaultTileSource());
             Log.d(getLogStart(), mapView.getTileProvider().toString());
         }
+        super.onResume();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
 
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onResume();
-        if (presenter != null) {
-            presenter.onResume();
-        }
     }
 
     @Override
     protected void onPause() {
         Log.d(getLogStart(), "onPause");
+        saveMapPreferences();
         super.onPause();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Configuration.getInstance().save(this, prefs);
 
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onPause();
-        if (presenter != null) {
-            presenter.onPause();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (presenter != null) {
-            presenter.onStop();
-        }
     }
 
     @Override
     protected void onDestroy() {
         Log.d(getLogStart(), "onDestroy");
-        if (presenter != null) {
-            presenter.onDestroy();
-        }
+        mapView.onDetach();
         parentView.removeView(mapView);
+        unregisterReceiver(networkReceiver);
         super.onDestroy();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        GeoPoint lastLocation = mapView.getLastLocation();
-        if (lastLocation != null) {
-            savedInstanceState.putDouble("lat", lastLocation.getLatitude());
-            savedInstanceState.putDouble("lon", lastLocation.getLongitude());
-        }
-        double zoomLevel = mapView.getZoomLevelDouble();
-        if (zoomLevel != DEFAULT_ZOOM_LEVEL) {
-            savedInstanceState.putDouble("zoom", mapView.getZoomLevelDouble());
-        }
-    }
+    private void loadMapPreferences() {
+        Log.d(getLogStart(), "loadMapPreferences");
+        prefs = getSharedPreferences(ConfiguredMapView.PREFS_NAME, Context.MODE_PRIVATE);
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState.containsKey("lat") && savedInstanceState.containsKey("lon")) {
-            double lat = savedInstanceState.getDouble("lat");
-            double lon = savedInstanceState.getDouble("lon");
-            GeoPoint lastLocation = new GeoPoint(lat, lon);
-            setCenterCoordinates(lastLocation);
-
-            //Update location of location overlay
-            Location location = new Location("");
-            location.setLatitude(lastLocation.getLatitude());
-            location.setLongitude(lastLocation.getLongitude());
-            mapView.getProvider().onLocationChanged(location);
-        }
-        if (savedInstanceState.containsKey("zoom")) {
-            setZoomLevel(savedInstanceState.getDouble("zoom"));
-        }
-    }
-
-    private void finishMapSetup(Intent intent) {
-        Log.d(getLogStart(), "finish map setup");
-        GeoPoint lastLocation = new GeoPoint(
-                intent.getDoubleExtra("lat", DEFAULT_LATITUDE),
-                intent.getDoubleExtra("lon", DEFAULT_LONGITUDE));
+        String latString = prefs.getString(ConfiguredMapView.PREFS_LATITUDE, ConfiguredMapView.DEFAULT_LATITUDE);
+        float lat = Float.valueOf(latString);
+        String lonString = prefs.getString(ConfiguredMapView.PREFS_LONGITUDE, ConfiguredMapView.DEFAULT_LONGITUDE);
+        float lon = Float.valueOf(lonString);
+        GeoPoint lastLocation = new GeoPoint(lat, lon);
         setCenterCoordinates(lastLocation);
-        setZoomLevel(intent.getDoubleExtra("zoom", DEFAULT_ZOOM_LEVEL));
 
-        //Update location of location overlay
-        if (lastLocation.getLatitude() != DEFAULT_LATITUDE || lastLocation.getLongitude() != DEFAULT_LONGITUDE) {
+        Log.d(getLogStart(), "lat: " + lat);
+        Log.d(getLogStart(), "lon: " + lon);
+
+        float zoom = prefs.getFloat(ConfiguredMapView.PREFS_ZOOM, ConfiguredMapView.DEFAULT_ZOOM_LEVEL);
+        setZoomLevel(zoom);
+
+        GpsMyLocationProvider provider = mapView.getProvider();
+        // Update location of location overlay
+        if (provider != null) {
             Location location = new Location("");
             location.setLatitude(lastLocation.getLatitude());
             location.setLongitude(lastLocation.getLongitude());
-            mapView.getProvider().onLocationChanged(location);
+            provider.onLocationChanged(location);
         }
+    }
 
-        parentView = this.setupAndGetMapViewParentLayout();
-        parentView.addView(mapView);
+    private void saveMapPreferences() {
+        Log.d(getLogStart(), "saveMapPreferences");
+        SharedPreferences.Editor editor = prefs.edit();
+        IGeoPoint lastLocation = mapView.getMapCenter();
+        //IGeoPoint lastLocation = mapView.getLastLocation();
+        if (lastLocation != null) {
+            editor.putString(ConfiguredMapView.PREFS_LATITUDE, String.valueOf(lastLocation.getLatitude()));
+            editor.putString(ConfiguredMapView.PREFS_LONGITUDE, String.valueOf(lastLocation.getLongitude()));
+
+            Log.d(getLogStart(), "lat: " + lastLocation.getLatitude());
+            Log.d(getLogStart(), "lon: " + lastLocation.getLongitude());
+        }
+        float zoomLevel = (float) mapView.getZoomLevelDouble();
+        if (zoomLevel != ConfiguredMapView.DEFAULT_ZOOM_LEVEL) {
+            editor.putFloat(ConfiguredMapView.PREFS_ZOOM, zoomLevel);
+        }
+        editor.commit();
     }
 
     private void setZoomLevel(double zoom) {
         mapView.getController().setZoom(zoom);
     }
 
-    protected void setCenterCoordinates(GeoPoint locaction) {
-        GeoPoint centerPoint = new GeoPoint(locaction.getLatitude(), locaction.getLongitude());
+    protected void setCenterCoordinates(GeoPoint location) {
+        GeoPoint centerPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
         mapView.getController().setCenter(centerPoint);
     }
 

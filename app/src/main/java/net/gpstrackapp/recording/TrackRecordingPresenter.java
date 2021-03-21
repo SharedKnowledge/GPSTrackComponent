@@ -33,6 +33,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
 
     @Override
     public void onCreate() {
+        Log.d(getLogStart(), "onCreate");
         serviceIntent = new Intent(ctx, LocationService.class);
         /*
         Start the location service here (and stop it in onDestroy) to enable the user to navigate to other
@@ -53,7 +54,6 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
             locationReceiver = new LocationReceiver();
         }
         setLocationReceiver();
-        Log.d(getLogStart(), "onCreate");
     }
 
     @Override
@@ -92,9 +92,9 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
 
     @Override
     public void onDestroy() {
+        Log.d(getLogStart(), "onDestroy");
         stopLocationService();
         unsetLocationReceiver();
-        Log.d(getLogStart(), "onDestroy");
     }
 
     public TrackVisualizer getTrackVisualizer() {
@@ -121,6 +121,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
 
     @Override
     public void registerLocationConsumer(ILocationConsumer consumer) {
+        Log.d(getLogStart(), "register track");
         locationReceiver.addLocationConsumer(consumer);
         if (consumer instanceof Track) {
             if (!isRecordingTrack()) {

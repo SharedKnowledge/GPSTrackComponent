@@ -2,7 +2,6 @@ package net.gpstrackapp.activity.map;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,7 +17,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.gpstrackapp.Presenter;
+import android.support.v7.widget.Toolbar;
+
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.format.FileUtils;
@@ -36,7 +36,7 @@ import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay2;
 import java.io.File;
 
 public class DownloadTilesActivity extends MapViewActivity implements ActivityWithDescription, View.OnClickListener, SeekBar.OnSeekBarChangeListener, TextWatcher {
-    private static final int TILE_COUNT_DOWNLOAD_LIMIT = 250;
+    private static final int TILE_DOWNLOAD_LIMIT_COUNT = 250;
     private int zoomMinTileSource, zoomMaxTileSource;
 
     private SeekBar zoomMinSeekBar, zoomMaxSeekBar;
@@ -57,7 +57,7 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
     }
 
     @Override
-    protected ViewGroup setupAndGetMapViewParentLayout() {
+    protected ViewGroup setupLayoutAndGetMapViewParentView() {
         setContentView(R.layout.gpstracker_tile_download_drawer_layout);
         Toolbar toolbar = findViewById(R.id.gpstracker_tile_download_toolbar);
         setSupportActionBar(toolbar);
@@ -77,11 +77,6 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
         mapView.setLayoutParams(params);
 
         return relativeLayout;
-    }
-
-    @Override
-    protected Presenter setupAndGetPresenter() {
-        return null;
     }
 
     @Override
@@ -295,8 +290,8 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
             BoundingBox bb = new BoundingBox(n, e, s, w);
             int tilecount = mgr.possibleTilesInArea(bb, zoomMin, zoomMax);
             cacheEstimate.setText(tilecount + " tiles");
-            if (tilecount > TILE_COUNT_DOWNLOAD_LIMIT) {
-                cacheEstimate.setError("The tile count exceeds the allowed download limit of " + TILE_COUNT_DOWNLOAD_LIMIT + " Tiles per Download!");
+            if (tilecount > TILE_DOWNLOAD_LIMIT_COUNT) {
+                cacheEstimate.setError("The tile count exceeds the allowed download limit of " + TILE_DOWNLOAD_LIMIT_COUNT + " Tiles per Download!");
                 cacheEstimate.requestFocus();
                 executeJob.setEnabled(false);
                 return;

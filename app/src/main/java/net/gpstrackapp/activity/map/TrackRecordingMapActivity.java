@@ -1,13 +1,11 @@
 package net.gpstrackapp.activity.map;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -23,7 +21,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import net.gpstrackapp.GPSComponent;
-import net.gpstrackapp.Presenter;
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.geomodel.track.DeleteTracksActivity;
 import net.gpstrackapp.activity.geomodel.track.DisplayTracksActivity;
@@ -34,9 +31,8 @@ import net.gpstrackapp.activity.geomodel.track.SaveTracksActivity;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
-import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.overlay.ConfiguredMapView;
 import net.gpstrackapp.recording.TrackRecordingPresenter;
-import net.sharksystem.asap.ASAPException;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.config.IConfigurationProvider;
@@ -49,10 +45,8 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static android.content.DialogInterface.BUTTON_NEGATIVE;
@@ -60,10 +54,10 @@ import static android.content.DialogInterface.BUTTON_POSITIVE;
 
 public class TrackRecordingMapActivity extends MapViewActivity {
     private static final int DISPLAY_ACTIVITY_REQUEST_CODE = 0;
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private static final String WRITE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String ACCESS_FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-    private static Map<Track, TrackOverlay> trackWithOverlayHolder = new HashMap<>();
+
     private TrackRecordingPresenter trackRecordingPresenter;
     private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
     private boolean askedForPermissions = false;
@@ -71,6 +65,27 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(getLogStart(), "onCreate");
+        if (!askedForPermissions) {
+            askedForPermissions = true;
+            requestPermissionsIfNecessary(new String[] {
+                    // needed to show the current location (location provider)
+                    ACCESS_FINE_LOCATION_PERMISSION,
+                    // WRITE_EXTERNAL_STORAGE is required for offline tile provider and storing files (e.g. track export)
+                    WRITE_EXTERNAL_STORAGE_PERMISSION
+            });
+        }
+
+        IConfigurationProvider conf = Configuration.getInstance();
+        // use external storage directory if permission is granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            // archives are placed here
+            conf.setOsmdroidBasePath(new File(Environment.getExternalStorageDirectory()
+                    + File.separator + "osmdroid"));
+            // tile cache db
+            conf.setOsmdroidTileCache(new File(Environment.getExternalStorageDirectory()
+                    + File.separator + "osmdroid" + File.separator + "tiles"));
+        }
+
         super.onCreate(savedInstanceState);
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
@@ -79,25 +94,46 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         scaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, (int) getResources().getDimension(R.dimen.marginUnderToolbar) + 20);
         mapView.getOverlays().add(scaleBarOverlay);
 
-        if (!askedForPermissions) {
-            requestPermissionsIfNecessary(new String[] {
-                    // needed to show the current location (location provider)
-                    ACCESS_FINE_LOCATION_PERMISSION,
-                    // WRITE_EXTERNAL_STORAGE is required for offline tile provider and storing files (e.g. track export)
-                    WRITE_EXTERNAL_STORAGE_PERMISSION
-            });
-        }
-        askedForPermissions = true;
+        trackRecordingPresenter = new TrackRecordingPresenter(mapView);
+        trackRecordingPresenter.onCreate();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        trackRecordingPresenter.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        trackRecordingPresenter.onResume();
+
+        Log.d(getLogStart(), "base path: " + Configuration.getInstance().getOsmdroidBasePath());
+        Log.d(getLogStart(), "tile cache: " + Configuration.getInstance().getOsmdroidTileCache());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        trackRecordingPresenter.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        trackRecordingPresenter.onStop();
     }
 
     @Override
     protected void onDestroy() {
         Log.d(getLogStart(), "onDestroy");
         super.onDestroy();
+        trackRecordingPresenter.onDestroy();
     }
 
     @Override
-    protected ViewGroup setupAndGetMapViewParentLayout() {
+    protected ViewGroup setupLayoutAndGetMapViewParentView() {
         setContentView(R.layout.gpstracker_tracker_mapview_drawer_layout);
         Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
         setSupportActionBar(toolbar);
@@ -116,7 +152,6 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         Log.d(getLogStart(), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_tracker_mapview_action_buttons, menu);
-        adjustMenuToRecordingState(menu);
         return true;
     }
 
@@ -124,12 +159,6 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         adjustMenuToRecordingState(menu);
         return true;
-    }
-
-    @Override
-    protected Presenter setupAndGetPresenter() {
-        trackRecordingPresenter = new TrackRecordingPresenter(mapView);
-        return trackRecordingPresenter;
     }
 
     @Override
@@ -174,6 +203,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
     }
 
     private void adjustMenuToRecordingState(Menu menu) {
+        Log.d(getLogStart(), "Adjust menu");
         MenuItem recordingItem = menu.findItem(R.id.record_item);
         if (trackRecordingPresenter.isRecordingTrack()) {
             recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_stop_record_button_text));
@@ -258,6 +288,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
                     dialog.dismiss();
                     return;
             }
+
             TrackSegment trackSegment = new TrackSegment(null);
             Track track = new Track(null, trackName,
                     GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
@@ -299,11 +330,12 @@ public class TrackRecordingMapActivity extends MapViewActivity {
             intent.putExtra("lon", lastLocation.getLongitude());
         }
         double zoomLevel = mapView.getZoomLevelDouble();
-        if (zoomLevel != DEFAULT_ZOOM_LEVEL) {
+        if (zoomLevel != ConfiguredMapView.DEFAULT_ZOOM_LEVEL) {
             intent.putExtra("zoom", mapView.getZoomLevelDouble());
         }
         startActivity(intent);
     }
+
 
     private void startDisplayTracksActivity() {
         Intent intent = new Intent(this, DisplayTracksActivity.class);
@@ -311,6 +343,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         intent.putCharSequenceArrayListExtra("selectedItemIDs", new ArrayList<>(selectedItemIDs));
         startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
     }
+
 
     private void startMergeTracksActivity() {
         Intent intent = new Intent(this, MergeTracksActivity.class);
@@ -343,6 +376,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Log.d(getLogStart(), "onRequestPermissionsResult");
         for (int i = 0; i < grantResults.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
@@ -359,7 +393,7 @@ public class TrackRecordingMapActivity extends MapViewActivity {
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission)
                     != PackageManager.PERMISSION_GRANTED) {
-                // TODO shouldShowRequestPermissionRationale can be added to explain to the used how permissions are used
+                // TODO shouldShowRequestPermissionRationale can be added to explain to the user why permissions are required
                 // Permission is not yet granted
                 permissionsToRequest.add(permission);
             }

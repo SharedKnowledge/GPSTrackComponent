@@ -30,7 +30,7 @@ public class MergeTracksActivity extends GeoModelListSelectionActivity {
 
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setView(input)
-                .setTitle("Choose a track name")
+                .setTitle("Choose a name for the merged track")
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     String trackName = input.getText().toString();
                     mergeTracks(selectedItemIDs, trackName);

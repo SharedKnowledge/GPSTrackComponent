@@ -6,11 +6,10 @@ import net.gpstrackapp.overlay.ConfiguredMapView;
 import net.gpstrackapp.overlay.TrackOverlay;
 
 public class TrackVisualizer extends GeoModelVisualizer<Track, TrackOverlay> {
-    private TrackModelManager trackModelManager;
+    private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
 
     public TrackVisualizer(ConfiguredMapView mapView) {
         super(mapView);
-        this.trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
     }
 
     @Override

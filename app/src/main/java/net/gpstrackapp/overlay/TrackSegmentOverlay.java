@@ -26,7 +26,7 @@ public class TrackSegmentOverlay extends FolderOverlay {
 
     public void addStartEndMarkers(MapView mapView) {
         if (!trackSegment.getTrackPoints().isEmpty()) {
-            List<GeoPoint> geoPoints = line.getPoints();
+            List<GeoPoint> geoPoints = line.getActualPoints();
             start = createStart(trackSegment.getTrackPoints().get(0), mapView);
             end = createEnd(trackSegment.getTrackPoints().get(geoPoints.size() - 1), mapView);
             add(start);
