@@ -23,4 +23,11 @@
         android:layout_below="@id/gpstracker_tile_download_toolbar"
         layout="@layout/gpstracker_description_layout" />
 
+    <FrameLayout
+        android:id="@+id/gpstracker_mapfragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/gpstracker_tile_download_description"
+        />
+
 </RelativeLayout>

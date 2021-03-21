@@ -16,4 +16,11 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
 
+    <FrameLayout
+        android:id="@+id/gpstracker_mapfragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/gpstracker_tracker_mapview_toolbar"
+        />
+
 </RelativeLayout>

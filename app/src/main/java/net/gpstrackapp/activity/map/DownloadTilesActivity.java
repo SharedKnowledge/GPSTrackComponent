@@ -2,17 +2,18 @@ package net.gpstrackapp.activity.map;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.format.FileUtils;
+import net.gpstrackapp.overlay.ConfiguredMapView;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
@@ -31,11 +33,12 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourcePolicyException;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay2;
 
 import java.io.File;
 
-public class DownloadTilesActivity extends MapViewActivity implements ActivityWithDescription, View.OnClickListener, SeekBar.OnSeekBarChangeListener, TextWatcher {
+public class DownloadTilesActivity extends AppCompatActivity implements ActivityWithDescription, ActivityWithAdditionalMapOverlays, View.OnClickListener, SeekBar.OnSeekBarChangeListener, TextWatcher {
     private static final int TILE_DOWNLOAD_LIMIT_COUNT = 250;
     private int zoomMinTileSource, zoomMaxTileSource;
 
@@ -49,15 +52,13 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
     private SqliteArchiveTileWriter writer = null;
     private CacheManager mgr = null;
 
+    private ConfiguredMapFragment configuredMapFragment;
+    private MapView mapView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mapView.getOverlays().add(new LatLonGridlineOverlay2());
-    }
-
-    @Override
-    protected ViewGroup setupLayoutAndGetMapViewParentView() {
         setContentView(R.layout.gpstracker_tile_download_drawer_layout);
         Toolbar toolbar = findViewById(R.id.gpstracker_tile_download_toolbar);
         setSupportActionBar(toolbar);
@@ -70,18 +71,22 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
         }
         descriptionView.setText(description);
 
-        RelativeLayout relativeLayout = findViewById(R.id.gpstracker_tile_download_layout_with_toolbar);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MapView.LayoutParams.MATCH_PARENT,
-                MapView.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.BELOW, R.id.gpstracker_tile_download_description);
-        mapView.setLayoutParams(params);
-
-        return relativeLayout;
+        configuredMapFragment = new ConfiguredMapFragment();
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.gpstracker_mapfragment_container, configuredMapFragment)
+                .commit();
     }
 
     @Override
-    protected ITileSource getMapSpecificTileSource() {
-        return null;
+    protected void onStart() {
+        super.onStart();
+        mapView = configuredMapFragment.getMapView();
+    }
+
+    @Override
+    public void setupAdditionalOverlays(MapView mapView) {
+        mapView.getOverlays().add(new LatLonGridlineOverlay2());
     }
 
     @Override
@@ -114,6 +119,7 @@ public class DownloadTilesActivity extends MapViewActivity implements ActivityWi
     }
 
     private void showCacheManagerDialog() {
+        ConfiguredMapView mapView = configuredMapFragment.getMapView();
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
 

@@ -13,22 +13,21 @@ import android.widget.Toast;
 
 import net.gpstrackapp.Presenter;
 import net.gpstrackapp.geomodel.track.Track;
-import net.gpstrackapp.geomodel.track.TrackVisualizer;
+import net.gpstrackapp.geomodel.track.TrackVisualizationManager;
 import net.gpstrackapp.location.ILocationConsumer;
 import net.gpstrackapp.location.LocationReceiver;
 import net.gpstrackapp.location.LocationService;
-import net.gpstrackapp.overlay.ConfiguredMapView;
 
 public class TrackRecordingPresenter implements Presenter, Recorder {
     private LocationReceiver locationReceiver;
     private Intent serviceIntent;
     private Context ctx;
     private Track recordedTrack;
-    private TrackVisualizer trackVisualizer;
+    private TrackVisualizationManager trackVisualizer;
 
-    public TrackRecordingPresenter(ConfiguredMapView mapView) {
-        this.trackVisualizer = new TrackVisualizer(mapView);
-        this.ctx = mapView.getContext();
+    public TrackRecordingPresenter(Context ctx) {
+        this.ctx = ctx;
+        this.trackVisualizer = new TrackVisualizationManager();
     }
 
     @Override
@@ -74,7 +73,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
     @Override
     public void onResume() {
         //add and remove TrackOverlays
-        trackVisualizer.updateGeoModelsOnMapView();
+        trackVisualizer.updateGeoModelHolder();
     }
 
     @Override
@@ -97,7 +96,7 @@ public class TrackRecordingPresenter implements Presenter, Recorder {
         unsetLocationReceiver();
     }
 
-    public TrackVisualizer getTrackVisualizer() {
+    public TrackVisualizationManager getTrackVisualizer() {
         return trackVisualizer;
     }
 
