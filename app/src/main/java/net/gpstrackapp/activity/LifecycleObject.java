@@ -1,6 +1,6 @@
-package net.gpstrackapp;
+package net.gpstrackapp.activity;
 
-public interface Presenter {
+public interface LifecycleObject {
     void onCreate();
     void onStart();
     void onPause();

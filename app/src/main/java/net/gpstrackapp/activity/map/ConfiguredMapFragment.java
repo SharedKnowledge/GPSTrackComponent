@@ -24,13 +24,12 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.overlay.CopyrightOverlay;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
-import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay2;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 public class ConfiguredMapFragment extends Fragment {
-    private Context ctx;
     public static final float DEFAULT_ZOOM_LEVEL = 17;
     // set HTW Campus Wilhelminenhof as default location
     public static final String DEFAULT_LATITUDE = "52.457563642191246";
@@ -41,14 +40,14 @@ public class ConfiguredMapFragment extends Fragment {
     public static final String PREFS_LONGITUDE = "prefsLon";
     public static final String PREFS_ZOOM = "prefsZoom";
 
+    private Context ctx;
+    private boolean mapViewReady = false;
+    protected ConfiguredMapView mapView = null;
+    protected SharedPreferences prefs;
     private CopyrightOverlay copyrightOverlay;
     private MyLocationNewOverlay locationOverlay;
     private RotationGestureOverlay rotationGestureOverlay;
     private GpsMyLocationProvider provider;
-
-    protected ConfiguredMapView mapView = null;
-    protected SharedPreferences prefs;
-
     private ITileSource mapSpecificTileSource = null;
 
     @Nullable
@@ -65,6 +64,7 @@ public class ConfiguredMapFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         this.ctx = this.getActivity();
+        this.mapViewReady = true;
 
         setupOverlays(ctx);
         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
@@ -108,13 +108,24 @@ public class ConfiguredMapFragment extends Fragment {
         }
     }
 
-    public void addTrackOverlay(TrackOverlay trackOverlay) {
-        mapView.getOverlays().add(trackOverlay);
-        trackOverlay.initializeComponents(mapView);
+    public void addOverlay(Overlay overlay) {
+        if (mapViewReady) {
+            mapView.getOverlays().add(overlay);
+            if (overlay instanceof TrackOverlay) {
+                TrackOverlay trackOverlay = (TrackOverlay) overlay;
+                trackOverlay.initializeComponents(mapView);
+            }
+        } else {
+            Log.e(getLogStart(), "Could not add Overlay because the activity is not yet created");
+        }
     }
 
-    public void removeTrackOverlay(TrackOverlay trackOverlay) {
-        mapView.getOverlays().remove(trackOverlay);
+    public void removeOverlay(Overlay overlay) {
+        if (mapViewReady) {
+            mapView.getOverlays().remove(overlay);
+        } else {
+            Log.e(getLogStart(), "Could not add Overlay because the activity is not yet created");
+        }
     }
 
     public GpsMyLocationProvider getProvider() {
@@ -165,6 +176,7 @@ public class ConfiguredMapFragment extends Fragment {
         Log.d(getLogStart(), "onDestroyView");
         super.onDestroyView();
         mapView.onDetach();
+        mapViewReady = false;
     }
 
     private void loadMapPreferences() {
@@ -226,6 +238,7 @@ public class ConfiguredMapFragment extends Fragment {
         mapView.getController().setCenter(centerPoint);
     }
 
+    // use this method to let the mapView only use one specific tile source
     public void setMapSpecificTileSource(ITileSource mapSpecificTileSource) {
         this.mapSpecificTileSource = mapSpecificTileSource;
     }

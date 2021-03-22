@@ -37,12 +37,13 @@ import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
 import net.gpstrackapp.geomodel.track.TrackVisualizationManager;
 import net.gpstrackapp.overlay.TrackOverlay;
-import net.gpstrackapp.recording.TrackRecordingPresenter;
+import net.gpstrackapp.recording.TrackRecorder;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.config.IConfigurationProvider;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import java.io.File;
@@ -65,6 +66,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     private static final String ACCESS_FINE_LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION;
 
     private ConfiguredMapFragment configuredMapFragment;
+    private TrackRecorder trackRecorder;
     private TrackRecordingPresenter trackRecordingPresenter;
     private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
     private boolean askedForPermissions = false;
@@ -118,63 +120,63 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
 
         registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        trackRecordingPresenter = new TrackRecordingPresenter(this);
+        trackRecorder = new TrackRecorder(this);
+        trackRecorder.onCreate();
+
+        trackRecordingPresenter = new TrackRecordingPresenter(new ViewWithOverlays() {
+            @Override
+            public void addOverlay(Overlay overlay) {
+                configuredMapFragment.addOverlay(overlay);
+            }
+
+            @Override
+            public void removeOverlay(Overlay overlay) {
+                configuredMapFragment.removeOverlay(overlay);
+            }
+        });
         trackRecordingPresenter.onCreate();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        trackRecorder.onStart();
         trackRecordingPresenter.onStart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        trackRecorder.onResume();
         trackRecordingPresenter.onResume();
 
-        TrackVisualizationManager trackVisualizer = trackRecordingPresenter.getTrackVisualizer();
-        Map<Track, TrackOverlay> addToMap = trackVisualizer.getGeoModelOverlaysToAddToMap();
-        Map<Track, TrackOverlay> removeFromMap = trackVisualizer.getGeoModelOverlaysToRemoveFromMap();
-
-        Log.d(getLogStart(), "add Overlays: " + addToMap.size());
-        Log.d(getLogStart(), "remove Overlays: " + removeFromMap.size());
-
-        for (Map.Entry<Track, TrackOverlay> entry : addToMap.entrySet()) {
-            TrackOverlay trackOverlay = entry.getValue();
-            configuredMapFragment.addTrackOverlay(trackOverlay);
-        }
-        for (Map.Entry<Track, TrackOverlay> entry : removeFromMap.entrySet()) {
-            TrackOverlay trackOverlay = entry.getValue();
-            configuredMapFragment.removeTrackOverlay(trackOverlay);
-        }
-        String toastText = trackVisualizer.createToastText(
-                addToMap.keySet().stream().collect(Collectors.toList()),
-                removeFromMap.keySet().stream().collect(Collectors.toList()));
+        String toastText = trackRecordingPresenter.getToastText();
         if (!toastText.isEmpty()) {
             Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
         }
-        configuredMapFragment.invalidateMapView();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        trackRecorder.onPause();
         trackRecordingPresenter.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        trackRecorder.onStop();
         trackRecordingPresenter.onStop();
     }
 
     @Override
     protected void onDestroy() {
         Log.d(getLogStart(), "onDestroy");
-        super.onDestroy();
+        trackRecorder.onDestroy();
         trackRecordingPresenter.onDestroy();
         unregisterReceiver(networkReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -208,7 +210,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
             if (resultCode == RESULT_OK) {
                 List<CharSequence> selectedItemIDsList = data.getCharSequenceArrayListExtra("selectedItemIDs");
                 Set<CharSequence> selectedItemIDs = new HashSet<>(selectedItemIDsList);
-                trackRecordingPresenter.getTrackVisualizer().setSelectedItemIDs(selectedItemIDs);
+                trackRecordingPresenter.setSelectedItemIDs(selectedItemIDs);
             }
         }
     }
@@ -216,9 +218,9 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putCharSequenceArrayList("itemIDsToRestore", new ArrayList<>(trackRecordingPresenter.getTrackVisualizer().getSelectedItemIDs()));
-        if (trackRecordingPresenter.getRecordedTrack() != null) {
-            savedInstanceState.putCharSequence("recordedTrack", trackRecordingPresenter.getRecordedTrack().getObjectId());
+        savedInstanceState.putCharSequenceArrayList("itemIDsToRestore", new ArrayList<>(trackRecordingPresenter.getSelectedItemIDs()));
+        if (trackRecorder.getRecordedTrack() != null) {
+            savedInstanceState.putCharSequence("recordedTrack", trackRecorder.getRecordedTrack().getObjectId());
         }
     }
 
@@ -227,19 +229,19 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState.containsKey("itemIDsToRestore")) {
             Set<CharSequence> selectedItemIDs = new HashSet<>(savedInstanceState.getCharSequenceArrayList("itemIDsToRestore"));
-            trackRecordingPresenter.getTrackVisualizer().setSelectedItemIDs(selectedItemIDs);
+            trackRecordingPresenter.setSelectedItemIDs(selectedItemIDs);
         }
         if (savedInstanceState.containsKey("recordedTrack")) {
             CharSequence trackID = savedInstanceState.getCharSequence("recordedTrack");
             Track track = trackModelManager.getGeoModelByUUID(trackID);
-            trackRecordingPresenter.registerLocationConsumer(track);
+            trackRecorder.registerLocationConsumer(track);
         }
     }
 
     private void adjustMenuToRecordingState(Menu menu) {
         Log.d(getLogStart(), "Adjust menu");
         MenuItem recordingItem = menu.findItem(R.id.record_item);
-        if (trackRecordingPresenter.isRecordingTrack()) {
+        if (trackRecorder.isRecordingTrack()) {
             recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_stop_record_button_text));
             menu.findItem(R.id.track_item).getSubMenu().setGroupEnabled(R.id.group_track_actions, false);
             menu.findItem(R.id.map_item).getSubMenu().setGroupEnabled(R.id.group_map_actions, false);
@@ -266,11 +268,11 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
                 case R.id.record_item:
                     if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION_PERMISSION)
                             == PackageManager.PERMISSION_GRANTED) {
-                        if (!trackRecordingPresenter.isRecordingTrack()) {
+                        if (!trackRecorder.isRecordingTrack()) {
                             showTrackNameDialog();
                         } else {
-                            Track recordedTrack = trackRecordingPresenter.getRecordedTrack();
-                            trackRecordingPresenter.unregisterLocationConsumer(recordedTrack);
+                            Track recordedTrack = trackRecorder.getRecordedTrack();
+                            trackRecorder.unregisterLocationConsumer(recordedTrack);
                             invalidateOptionsMenu();
                             showSaveTrackDialog(recordedTrack);
                         }
@@ -328,7 +330,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
                     GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
                     LocalDateTime.now(), trackSegment);
             trackModelManager.addGeoModel(track);
-            trackRecordingPresenter.registerLocationConsumer(track);
+            trackRecorder.registerLocationConsumer(track);
             invalidateOptionsMenu();
         };
 
@@ -373,7 +375,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
 
     private void startDisplayTracksActivity() {
         Intent intent = new Intent(this, DisplayTracksActivity.class);
-        Set<CharSequence> selectedItemIDs = trackRecordingPresenter.getTrackVisualizer().getSelectedItemIDs();
+        Set<CharSequence> selectedItemIDs = trackRecordingPresenter.getSelectedItemIDs();
         intent.putCharSequenceArrayListExtra("selectedItemIDs", new ArrayList<>(selectedItemIDs));
         startActivityForResult(intent, DISPLAY_ACTIVITY_REQUEST_CODE);
     }
