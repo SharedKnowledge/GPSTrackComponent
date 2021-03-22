@@ -2,7 +2,7 @@ package net.gpstrackapp.geomodel.track;
 
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModelVisualizationManager;
-import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.mapview.TrackOverlay;
 
 public class TrackVisualizationManager extends GeoModelVisualizationManager<Track, TrackOverlay> {
     private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();

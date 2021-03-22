@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +22,8 @@ import android.support.v7.widget.Toolbar;
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.format.FileUtils;
-import net.gpstrackapp.overlay.ConfiguredMapView;
+import net.gpstrackapp.mapview.ConfiguredMapFragment;
+import net.gpstrackapp.mapview.ConfiguredMapView;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
@@ -33,7 +33,6 @@ import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourcePolicyException;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gridlines.LatLonGridlineOverlay2;
 
 import java.io.File;

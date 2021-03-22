@@ -35,8 +35,7 @@ import net.gpstrackapp.activity.geomodel.track.SaveTracksActivity;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
-import net.gpstrackapp.geomodel.track.TrackVisualizationManager;
-import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.mapview.ConfiguredMapFragment;
 import net.gpstrackapp.recording.TrackRecorder;
 
 import org.osmdroid.config.Configuration;
@@ -52,9 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_POSITIVE;

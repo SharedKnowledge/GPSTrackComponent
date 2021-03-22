@@ -1,4 +1,4 @@
-package net.gpstrackapp.activity.map;
+package net.gpstrackapp.mapview;
 
 import android.Manifest;
 import android.app.Activity;
@@ -16,8 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.gpstrackapp.overlay.ConfiguredMapView;
-import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.activity.map.ActivityWithAdditionalMapOverlays;
+import net.gpstrackapp.mapview.ConfiguredMapView;
+import net.gpstrackapp.mapview.TrackOverlay;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.ITileSource;

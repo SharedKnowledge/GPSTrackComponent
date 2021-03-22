@@ -14,7 +14,7 @@ import android.support.v7.widget.Toolbar;
 
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
-import net.gpstrackapp.overlay.ConfiguredMapView;
+import net.gpstrackapp.mapview.ConfiguredMapView;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 

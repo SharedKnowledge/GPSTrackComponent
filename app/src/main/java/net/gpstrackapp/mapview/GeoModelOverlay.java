@@ -1,4 +1,4 @@
-package net.gpstrackapp.overlay;
+package net.gpstrackapp.mapview;
 
 import net.gpstrackapp.geomodel.GeoModel;
 

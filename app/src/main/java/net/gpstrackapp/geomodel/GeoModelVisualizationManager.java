@@ -2,7 +2,7 @@ package net.gpstrackapp.geomodel;
 
 import android.util.Log;
 
-import net.gpstrackapp.overlay.GeoModelOverlay;
+import net.gpstrackapp.mapview.GeoModelOverlay;
 
 import java.util.HashMap;
 import java.util.HashSet;

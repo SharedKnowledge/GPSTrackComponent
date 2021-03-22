@@ -1,11 +1,9 @@
 package net.gpstrackapp.activity.map;
 
-import android.widget.Toast;
-
 import net.gpstrackapp.activity.LifecycleObject;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackVisualizationManager;
-import net.gpstrackapp.overlay.TrackOverlay;
+import net.gpstrackapp.mapview.TrackOverlay;
 
 import java.util.Map;
 import java.util.Set;

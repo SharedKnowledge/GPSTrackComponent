@@ -1,22 +1,11 @@
-package net.gpstrackapp.overlay;
+package net.gpstrackapp.mapview;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.CopyrightOverlay;
-import org.osmdroid.views.overlay.compass.CompassOverlay;
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.Arrays;
 import java.util.HashSet;
