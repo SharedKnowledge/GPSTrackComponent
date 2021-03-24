@@ -23,7 +23,7 @@ import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.mapview.ConfiguredMapFragment;
-import net.gpstrackapp.mapview.ConfiguredMapView;
+import net.gpstrackapp.mapview.DownloadableTilesMapView;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
@@ -70,7 +70,10 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
         }
         descriptionView.setText(description);
 
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("downloadable", true);
         configuredMapFragment = new ConfiguredMapFragment();
+        configuredMapFragment.setArguments(bundle);
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.gpstracker_mapfragment_container, configuredMapFragment)
@@ -118,7 +121,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
     }
 
     private void showCacheManagerDialog() {
-        ConfiguredMapView mapView = configuredMapFragment.getMapView();
+        DownloadableTilesMapView mapView = (DownloadableTilesMapView) configuredMapFragment.getMapView();
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
 

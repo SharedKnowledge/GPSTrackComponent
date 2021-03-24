@@ -17,13 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.gpstrackapp.activity.map.ActivityWithAdditionalMapOverlays;
-import net.gpstrackapp.mapview.ConfiguredMapView;
-import net.gpstrackapp.mapview.TrackOverlay;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.CopyrightOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
@@ -44,7 +44,8 @@ public class ConfiguredMapFragment extends Fragment {
 
     private Context ctx;
     private boolean mapViewReady = false;
-    protected ConfiguredMapView mapView = null;
+    private boolean downloadable = false;
+    protected MapView mapView = null;
     protected SharedPreferences prefs;
     private CopyrightOverlay copyrightOverlay;
     private MyLocationNewOverlay locationOverlay;
@@ -56,7 +57,14 @@ public class ConfiguredMapFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(getLogStart(), "onCreateView");
-        mapView = new ConfiguredMapView(inflater.getContext());
+
+        Bundle bundle = getArguments();
+        this.downloadable = bundle != null ? bundle.getBoolean("downloadable") : false;
+        if (downloadable) {
+            mapView = new DownloadableTilesMapView(inflater.getContext());
+        } else {
+            mapView = new MapView(inflater.getContext());
+        }
         mapView.setDestroyMode(false);
         return mapView;
     }
@@ -153,11 +161,15 @@ public class ConfiguredMapFragment extends Fragment {
         Log.d(getLogStart(), "onResume");
         /* if the user changes the default tilesource in the settings then set the new tilesource here
          if the subclass does not specify a specific tilesource to be used in getMapSpecificTileSource() */
+
+        /*
         if (mapSpecificTileSource != null) {
             mapView.setTileSource(mapSpecificTileSource);
         } else {
-            mapView.setTileSource(ConfiguredMapView.getDefaultTileSource());
+            mapView.setTileSource(DownloadableTilesMapView.getDefaultTileSource());
         }
+
+         */
 
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onResume();
@@ -192,13 +204,20 @@ public class ConfiguredMapFragment extends Fragment {
         GeoPoint lastLocation = new GeoPoint(lat, lon);
         setCenterCoordinates(lastLocation);
 
-        float zoom = prefs.getFloat(PREFS_ZOOM, DEFAULT_ZOOM_LEVEL);
-        setZoomLevel(zoom);
-
-        String tileSourceString = prefs.getString(PREFS_TILE_SOURCE, null);
-        if (tileSourceString != null) {
-            ConfiguredMapView.setDefaultTileSourceByName(tileSourceString);
+        String tileSourceName = prefs.getString(PREFS_TILE_SOURCE, null);
+        if (tileSourceName != null) {
+            ITileSource tileSource = TileSourceFactory.getTileSource(tileSourceName);
+            mapView.setTileSource(tileSource);
         }
+
+        float zoom = prefs.getFloat(PREFS_ZOOM, DEFAULT_ZOOM_LEVEL);
+        // correct toom level according to tile source
+        ITileSource tileSource = mapView.getTileProvider().getTileSource();
+        int minZoom = tileSource.getMinimumZoomLevel();
+        int maxZoom = tileSource.getMaximumZoomLevel();
+        zoom = zoom < minZoom ? minZoom : zoom;
+        zoom = zoom > maxZoom ? maxZoom : zoom;
+        setZoomLevel(zoom);
 
         GpsMyLocationProvider provider = this.getProvider();
         // Update location of location overlay
@@ -223,7 +242,6 @@ public class ConfiguredMapFragment extends Fragment {
         if (zoomLevel != DEFAULT_ZOOM_LEVEL) {
             editor.putFloat(PREFS_ZOOM, zoomLevel);
         }
-        editor.putString(PREFS_TILE_SOURCE, mapView.getTileProvider().getTileSource().name());
         editor.commit();
     }
 
@@ -245,7 +263,7 @@ public class ConfiguredMapFragment extends Fragment {
         this.mapSpecificTileSource = mapSpecificTileSource;
     }
 
-    public ConfiguredMapView getMapView() {
+    public MapView getMapView() {
         return mapView;
     }
 

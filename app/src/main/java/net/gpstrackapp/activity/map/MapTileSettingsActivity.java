@@ -2,6 +2,7 @@ package net.gpstrackapp.activity.map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,14 +17,16 @@ import android.support.v7.widget.Toolbar;
 
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
-import net.gpstrackapp.mapview.ConfiguredMapView;
+import net.gpstrackapp.mapview.DownloadableTilesMapView;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static net.gpstrackapp.mapview.ConfiguredMapFragment.PREFS_NAME;
 import static net.gpstrackapp.mapview.ConfiguredMapFragment.PREFS_TILE_SOURCE;
@@ -49,17 +52,20 @@ public class MapTileSettingsActivity extends AppCompatActivity implements Activi
         }
         descriptionView.setText(description);
 
-        List<ITileSource> tileSources = new ArrayList<>(ConfiguredMapView.getValidTileSources());
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item);
+        List<ITileSource> tileSources = new ArrayList<>(TileSourceFactory.getTileSources());
+        //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         for (ITileSource tileSource : tileSources) {
             tileSourceMap.put(tileSource.name(), tileSource);
             arrayAdapter.add(tileSource.name());
         }
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tileSourceSpinner = findViewById(R.id.spinner);
         tileSourceSpinner.setAdapter(arrayAdapter);
         tileSourceSpinner.setPrompt("Select a file format");
-        tileSourceSpinner.setSelection(arrayAdapter.getPosition(ConfiguredMapView.getDefaultTileSource().name()));
+        tileSourceSpinner.setSelection(arrayAdapter.getPosition(sharedPreferences.getString(PREFS_TILE_SOURCE, TileSourceFactory.DEFAULT_TILE_SOURCE.name())));
     }
 
     @Override
