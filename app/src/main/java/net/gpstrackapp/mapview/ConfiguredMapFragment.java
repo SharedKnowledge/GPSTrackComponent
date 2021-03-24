@@ -40,6 +40,7 @@ public class ConfiguredMapFragment extends Fragment {
     public static final String PREFS_LATITUDE = "prefsLat";
     public static final String PREFS_LONGITUDE = "prefsLon";
     public static final String PREFS_ZOOM = "prefsZoom";
+    public static final String PREFS_TILE_SOURCE = "prefsTileSource";
 
     private Context ctx;
     private boolean mapViewReady = false;
@@ -191,11 +192,13 @@ public class ConfiguredMapFragment extends Fragment {
         GeoPoint lastLocation = new GeoPoint(lat, lon);
         setCenterCoordinates(lastLocation);
 
-        Log.d(getLogStart(), "lat: " + lat);
-        Log.d(getLogStart(), "lon: " + lon);
-
         float zoom = prefs.getFloat(PREFS_ZOOM, DEFAULT_ZOOM_LEVEL);
         setZoomLevel(zoom);
+
+        String tileSourceString = prefs.getString(PREFS_TILE_SOURCE, null);
+        if (tileSourceString != null) {
+            ConfiguredMapView.setDefaultTileSourceByName(tileSourceString);
+        }
 
         GpsMyLocationProvider provider = this.getProvider();
         // Update location of location overlay
@@ -215,14 +218,12 @@ public class ConfiguredMapFragment extends Fragment {
         if (lastLocation != null) {
             editor.putString(PREFS_LATITUDE, String.valueOf(lastLocation.getLatitude()));
             editor.putString(PREFS_LONGITUDE, String.valueOf(lastLocation.getLongitude()));
-
-            Log.d(getLogStart(), "lat: " + lastLocation.getLatitude());
-            Log.d(getLogStart(), "lon: " + lastLocation.getLongitude());
         }
         float zoomLevel = (float) mapView.getZoomLevelDouble();
         if (zoomLevel != DEFAULT_ZOOM_LEVEL) {
             editor.putFloat(PREFS_ZOOM, zoomLevel);
         }
+        editor.putString(PREFS_TILE_SOURCE, mapView.getTileProvider().getTileSource().name());
         editor.commit();
     }
 

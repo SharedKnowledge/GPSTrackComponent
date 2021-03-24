@@ -1,5 +1,7 @@
 package net.gpstrackapp.activity.map;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +24,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static net.gpstrackapp.mapview.ConfiguredMapFragment.PREFS_NAME;
+import static net.gpstrackapp.mapview.ConfiguredMapFragment.PREFS_TILE_SOURCE;
 
 public class MapTileSettingsActivity extends AppCompatActivity implements ActivityWithDescription {
     private Spinner tileSourceSpinner;
@@ -85,8 +90,10 @@ public class MapTileSettingsActivity extends AppCompatActivity implements Activi
 
     public void onSaveAsDefaultButtonClicked(View view) {
         String tileSourceName = tileSourceSpinner.getSelectedItem().toString();
-        ITileSource tileSource = tileSourceMap.get(tileSourceName);
-        ConfiguredMapView.setDefaultTileSource(tileSource);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit()
+                .putString(PREFS_TILE_SOURCE, tileSourceName)
+                .commit();
         finish();
     }
 

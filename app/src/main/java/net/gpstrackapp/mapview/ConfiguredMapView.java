@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ConfiguredMapView extends MapView {
+    // this is only the default on first start, from the second start onwards the previously last used tile source is used
     private static ITileSource defaultTileSource = TileSourceFactory.OpenTopo;
     private ITileSource selectedTileSource = defaultTileSource;
     // add Tile Sources to use for the maps here, make sure to read the terms of service before adding them
@@ -64,7 +65,7 @@ public class ConfiguredMapView extends MapView {
             }
         } else {
             Log.e(getLogStart(), "The passed TileSource parameter is invalid." + System.lineSeparator() +
-                    "For policy reasons only the following TileSources are valid:" + System.lineSeparator() +
+                    "For policy reasons only the following TileSources are available:" + System.lineSeparator() +
                     getValidTileSourcesAsString());
         }
     }
@@ -74,8 +75,17 @@ public class ConfiguredMapView extends MapView {
             ConfiguredMapView.defaultTileSource = defaultTileSource;
         } else {
             Log.e(getLogStart(), "The passed TileSource parameter is invalid." + System.lineSeparator() +
-                    "For policy reasons only the following TileSources are valid:" + System.lineSeparator() +
+                    "For policy reasons only the following TileSources are available:" + System.lineSeparator() +
                     getValidTileSourcesAsString());
+        }
+    }
+
+    public static void setDefaultTileSourceByName(String name) {
+        for (ITileSource tileSource : validTileSources) {
+            if (tileSource.name().equals(name)) {
+                setDefaultTileSource(tileSource);
+                return;
+            }
         }
     }
 
