@@ -43,7 +43,7 @@ dependencies {
 
     // newer versions (2.0.0 and above) require java 11
     implementation 'io.jenetics:jpx:1.7.0'
-    // javax.xml.stream is not included in jdk but is needed for JPX (GPX export and import) so it has to be imported
+    // javax.xml.stream is not included in android but is needed for JPX (GPX export and import) so it has to be imported
     implementation 'stax:stax:1.2.0'
     // encountered problems with 6.1.10 on tile download (https://github.com/osmdroid/osmdroid/issues/1313) and
     // encountered problems with 6.1.7 and 6.1.8 on restart after not granting write external storage permission (https://github.com/osmdroid/osmdroid/issues/1621)

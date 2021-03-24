@@ -30,11 +30,9 @@ public class ConfiguredMapView extends MapView {
             TileSourceFactory.USGS_SAT: https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer
              */
     ));
-    private Context ctx;
 
     public ConfiguredMapView(Context ctx) {
         super(ctx);
-        this.ctx = ctx;
         this.setTileSource(selectedTileSource);
     }
 

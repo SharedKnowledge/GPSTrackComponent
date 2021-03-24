@@ -19,12 +19,15 @@ import android.support.v7.widget.Toolbar;
 
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
+import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.format.FormatManager;
 import net.gpstrackapp.format.ImportFileFormat;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -103,6 +106,12 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                 Uri result = data.getData();
                 String mimeType = getContentResolver().getType(result);
                 ImportFileFormat importFileFormat = FormatManager.getImportFormatByMimeType(mimeType);
+
+                // it is possible that the mime type is not set (then it is "application/octet-stream"), in this case try to determine the file type from the file extension
+                if (importFileFormat == null) {
+                    String extension = MimeTypeMap.getFileExtensionFromUrl(FileUtils.getPath(this, result));
+                    importFileFormat = FormatManager.getImportFormatByFileExtension(extension);
+                }
                 try {
                     if (importFileFormat != null) {
                         InputStream inputStream = getContentResolver().openInputStream(result);
@@ -114,7 +123,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                         Toast.makeText(this, "Import was successful.", Toast.LENGTH_SHORT).show();
                         finish();
                     } else {
-                        Toast.makeText(this, "The file could not be imported because the file type " + mimeType + " is not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "The file could not be imported because the file format is not supported", Toast.LENGTH_SHORT).show();
                     }
                 } catch (FileNotFoundException e) {
                     Log.e(getLogStart(), e.getLocalizedMessage());

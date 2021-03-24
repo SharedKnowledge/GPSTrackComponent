@@ -50,7 +50,7 @@ public class GPSComponent implements ASAPApplicationComponent {
         return GPSComponent.instance;
     }
 
-    public static GPSComponent getGPSComponent() throws ASAPComponentNotYetInitializedException {
+    public static synchronized GPSComponent getGPSComponent() throws ASAPComponentNotYetInitializedException {
         if (instance == null) {
             throw new ASAPComponentNotYetInitializedException("GPSComponent not yet initialized");
         }
