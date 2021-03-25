@@ -23,8 +23,8 @@ public class TrackSegment implements Serializable {
 
     public List<GeoPoint> getGeoPoints() {
         List<GeoPoint> geoPoints = new ArrayList<>();
-        for (int i = 0; i < trackPoints.size(); i++) {
-            geoPoints.add(trackPoints.get(i).getGeoPoint());
+        for (TrackPoint trackPoint : trackPoints) {
+            geoPoints.add(trackPoint.getGeoPoint());
         }
         return geoPoints;
     }

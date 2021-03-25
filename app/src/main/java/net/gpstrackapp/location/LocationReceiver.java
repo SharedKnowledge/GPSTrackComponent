@@ -19,8 +19,8 @@ public class LocationReceiver extends BroadcastReceiver {
         Bundle bundle = intent.getExtras();
         Location location = (Location) bundle.get("location");
         if (!consumers.isEmpty()) {
-            for (int i = 0; i < consumers.size(); i++) {
-                consumers.get(i).onLocationChanged(location);
+            for (ILocationConsumer consumer : consumers) {
+                consumer.onLocationChanged(location);
             }
             Log.d(getLogStart(), "Location added");
         }

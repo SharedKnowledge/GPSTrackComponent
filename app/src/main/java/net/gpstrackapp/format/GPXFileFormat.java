@@ -110,8 +110,7 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
         // import Tracks
         List<io.jenetics.jpx.Track> gpxTracks = gpx.tracks().collect(Collectors.toList());
         // iterate over Tracks
-        for (int i = 0; i < gpxTracks.size(); i++) {
-            io.jenetics.jpx.Track gpxTrack = gpxTracks.get(i);
+        for (io.jenetics.jpx.Track gpxTrack : gpxTracks) {
             String trackName = gpxTrack.getName().isPresent() ? gpxTrack.getName().get() : null;
             String creator = null;
             LocalDateTime dateOfCreation = null;

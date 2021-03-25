@@ -52,9 +52,9 @@ public abstract class GeoModelManager<T extends GeoModel> {
     }
 
     public T getGeoModelByUUID(CharSequence UUID) {
-        for (int i = 0; i < geoModels.size(); i++) {
-            if (geoModels.get(i).getObjectId().equals(UUID)) {
-                return geoModels.get(i);
+        for (T geoModel : geoModels) {
+            if (geoModel.getObjectId().equals(UUID)) {
+                return geoModel;
             }
         }
         return null;
@@ -73,9 +73,9 @@ public abstract class GeoModelManager<T extends GeoModel> {
     }
 
     public static GeoModel getGeoModelByUUIDFromGlobal(CharSequence UUID) {
-        for (int i = 0; i < geoModelsGlobal.size(); i++) {
-            if (geoModelsGlobal.get(i).getObjectId().equals(UUID)) {
-                return geoModelsGlobal.get(i);
+        for (GeoModel geoModel : geoModelsGlobal) {
+            if (geoModel.getObjectId().equals(UUID)) {
+                return geoModel;
             }
         }
         return null;

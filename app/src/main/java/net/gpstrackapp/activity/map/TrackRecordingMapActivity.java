@@ -411,8 +411,8 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Log.d(getLogStart(), "onRequestPermissionsResult");
-        for (int i = 0; i < grantResults.length; i++) {
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+        for (int grantResult : grantResults) {
+            if (grantResult == PackageManager.PERMISSION_GRANTED) {
                 // recreate this activity if any permissions were granted
                 recreate();
                 break;
