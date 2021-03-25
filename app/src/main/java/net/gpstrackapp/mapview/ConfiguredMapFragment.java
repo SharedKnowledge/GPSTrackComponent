@@ -57,7 +57,6 @@ public class ConfiguredMapFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(getLogStart(), "onCreateView");
-
         Bundle bundle = getArguments();
         this.downloadable = bundle != null ? bundle.getBoolean("downloadable") : false;
         if (downloadable) {
@@ -159,17 +158,6 @@ public class ConfiguredMapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(getLogStart(), "onResume");
-        /* if the user changes the default tilesource in the settings then set the new tilesource here
-         if the subclass does not specify a specific tilesource to be used in getMapSpecificTileSource() */
-
-        /*
-        if (mapSpecificTileSource != null) {
-            mapView.setTileSource(mapSpecificTileSource);
-        } else {
-            mapView.setTileSource(DownloadableTilesMapView.getDefaultTileSource());
-        }
-
-         */
 
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onResume();
@@ -198,16 +186,20 @@ public class ConfiguredMapFragment extends Fragment {
         prefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         String latString = prefs.getString(PREFS_LATITUDE, DEFAULT_LATITUDE);
-        float lat = Float.valueOf(latString);
+        float lat = Float.parseFloat(latString);
         String lonString = prefs.getString(PREFS_LONGITUDE, DEFAULT_LONGITUDE);
-        float lon = Float.valueOf(lonString);
+        float lon = Float.parseFloat(lonString);
         GeoPoint lastLocation = new GeoPoint(lat, lon);
         setCenterCoordinates(lastLocation);
 
-        String tileSourceName = prefs.getString(PREFS_TILE_SOURCE, null);
-        if (tileSourceName != null) {
-            ITileSource tileSource = TileSourceFactory.getTileSource(tileSourceName);
-            mapView.setTileSource(tileSource);
+        if (mapSpecificTileSource != null) {
+            String tileSourceName = prefs.getString(PREFS_TILE_SOURCE, null);
+            if (tileSourceName != null) {
+                ITileSource tileSource = TileSourceFactory.getTileSource(tileSourceName);
+                mapView.setTileSource(tileSource);
+            }
+        } else {
+            mapView.setTileSource(mapSpecificTileSource);
         }
 
         float zoom = prefs.getFloat(PREFS_ZOOM, DEFAULT_ZOOM_LEVEL);
@@ -233,7 +225,6 @@ public class ConfiguredMapFragment extends Fragment {
         Log.d(getLogStart(), "saveMapPreferences");
         SharedPreferences.Editor editor = prefs.edit();
         IGeoPoint lastLocation = mapView.getMapCenter();
-        //IGeoPoint lastLocation = mapView.getLastLocation();
         if (lastLocation != null) {
             editor.putString(PREFS_LATITUDE, String.valueOf(lastLocation.getLatitude()));
             editor.putString(PREFS_LONGITUDE, String.valueOf(lastLocation.getLongitude()));
@@ -242,7 +233,7 @@ public class ConfiguredMapFragment extends Fragment {
         if (zoomLevel != DEFAULT_ZOOM_LEVEL) {
             editor.putFloat(PREFS_ZOOM, zoomLevel);
         }
-        editor.commit();
+        editor.apply();
     }
 
     public void setZoomLevel(double zoom) {

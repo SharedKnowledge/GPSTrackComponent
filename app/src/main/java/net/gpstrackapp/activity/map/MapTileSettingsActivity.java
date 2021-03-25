@@ -99,7 +99,7 @@ public class MapTileSettingsActivity extends AppCompatActivity implements Activi
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit()
                 .putString(PREFS_TILE_SOURCE, tileSourceName)
-                .commit();
+                .apply();
         finish();
     }
 
