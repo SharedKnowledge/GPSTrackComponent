@@ -5,9 +5,9 @@ import android.content.Context;
 import java.util.Set;
 
 public interface GeoModelStorage<T extends GeoModel> {
-    void saveGeoModelToFile(Context ctx, T geoModelToSave);
-    void saveGeoModelsToFiles(Context ctx, Set<T> geoModelsToSave);
-    void deleteGeoModelFromFile(Context ctx, T geoModelToDelete);
-    void deleteGeoModelsFromFiles(Context ctx, Set<T> geoModelsToDelete);
-    void loadAllGeoModelsFromFiles(Context ctx);
+    boolean saveGeoModelToFile(Context ctx, T geoModelToSave);
+    boolean saveGeoModelsToFiles(Context ctx, Set<T> geoModelsToSave);
+    boolean deleteGeoModelFromFile(Context ctx, T geoModelToDelete);
+    boolean deleteGeoModelsFromFiles(Context ctx, Set<T> geoModelsToDelete);
+    boolean loadAllGeoModelsFromFiles(Context ctx);
 }

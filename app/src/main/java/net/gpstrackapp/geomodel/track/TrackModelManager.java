@@ -36,7 +36,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
     }
 
     @Override
-    public void saveGeoModelToFile(Context ctx, Track trackToSave) {
+    public boolean saveGeoModelToFile(Context ctx, Track trackToSave) {
         try {
             File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
             dir.mkdirs();
@@ -47,67 +47,69 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             oos.writeObject(trackToSave);
             oos.close();
             Log.d(getLogStart(), "Saved track: " + trackToSave.getObjectName());
+            return true;
         } catch (IOException e) {
             Log.e(getLogStart(), "A problem occurred while trying to save a track." + System.lineSeparator() + e.getLocalizedMessage());
             Toast.makeText(ctx, "A problem occurred while trying to save a track.", Toast.LENGTH_LONG).show();
+            return false;
         }
     }
 
     @Override
-    public void saveGeoModelsToFiles(Context ctx, Set<Track> tracksToSave) {
-        Iterator<Track> iterator = tracksToSave.iterator();
-        while (iterator.hasNext()) {
-            Track trackToSave = iterator.next();
-            saveGeoModelToFile(ctx, trackToSave);
+    public boolean saveGeoModelsToFiles(Context ctx, Set<Track> tracksToSave) {
+        boolean allSaved = true;
+        for (Track trackToSave : tracksToSave) {
+            allSaved = saveGeoModelToFile(ctx, trackToSave) && allSaved;
         }
         Toast.makeText(ctx, "The Tracks have been successfully saved.", Toast.LENGTH_SHORT).show();
+        return allSaved;
     }
 
     @Override
-    public void deleteGeoModelFromFile(Context ctx, Track trackToDelete) {
+    public boolean deleteGeoModelFromFile(Context ctx, Track trackToDelete) {
         File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
         dir.mkdirs();
         File fileToDelete = new File(dir, trackToDelete.getObjectId().toString());
-        // just returns false if file does not exist
-        fileToDelete.delete();
         Log.d(getLogStart(), "Deleted track: " + trackToDelete.getObjectName());
+        // just returns false if file does not exist
+        return fileToDelete.delete();
     }
 
     @Override
-    public void deleteGeoModelsFromFiles(Context ctx, Set<Track> tracksToDelete) {
-        Iterator<Track> iterator = tracksToDelete.iterator();
-        while (iterator.hasNext()) {
-            Track trackToDelete = iterator.next();
-            deleteGeoModelFromFile(ctx, trackToDelete);
+    public boolean deleteGeoModelsFromFiles(Context ctx, Set<Track> tracksToDelete) {
+        boolean allDeleted = true;
+        for (Track trackToDelete : tracksToDelete) {
+            allDeleted = deleteGeoModelFromFile(ctx, trackToDelete) && allDeleted;
         }
         Toast.makeText(ctx, "The Tracks have been successfully deleted.", Toast.LENGTH_SHORT).show();
+        return allDeleted;
     }
 
     @Override
-    public void loadAllGeoModelsFromFiles(Context ctx) {
+    public boolean loadAllGeoModelsFromFiles(Context ctx) {
+        boolean allLoaded = true;
         File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
         Log.d(getLogStart(), dir.getAbsolutePath());
         dir.mkdirs();
-        File[] files = dir.listFiles(pathname -> pathname.isFile());
+        File[] files = dir.listFiles(File::isFile);
         Log.d(getLogStart(), "Attempt to load " + files.length + " tracks from storage");
         Set<Track> tracks = new HashSet<>();
-        for (int i = 0; i < files.length; i++) {
+        for (File file : files) {
             try {
-                FileInputStream fis = new FileInputStream(files[i]);
+                FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 Track loadedTrack = (Track) ois.readObject();
                 tracks.add(loadedTrack);
                 Log.d(getLogStart(), "Loaded track with UUID: " + loadedTrack.getObjectId());
             } catch (IOException | ClassNotFoundException e) {
                 Log.e(getLogStart(), "A problem occurred while trying to load a track." + System.lineSeparator() + e.getLocalizedMessage());
+                allLoaded = false;
             }
         }
-
-        Iterator<Track> iterator = tracks.iterator();
-        while (iterator.hasNext()) {
-            Track track = iterator.next();
+        for (Track track : tracks) {
             this.addGeoModel(track);
         }
+        return allLoaded;
     }
 
     private String getLogStart() {
