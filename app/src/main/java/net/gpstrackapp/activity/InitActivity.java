@@ -17,7 +17,11 @@ public class InitActivity extends AppCompatActivity {
             Log.d(this.getLogStart(), "Startup GPSApp");
             GPSApp.initializeGPSApp(this);
         }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         Log.d(getLogStart(), "start TrackRecordingMapActivity");
         Intent intent = new Intent(this, TrackRecordingMapActivity.class);
         startActivity(intent);

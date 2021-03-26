@@ -35,6 +35,7 @@ import net.gpstrackapp.activity.geomodel.track.SaveTracksActivity;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackSegment;
+import net.gpstrackapp.location.LocationService;
 import net.gpstrackapp.mapview.ConfiguredMapFragment;
 import net.gpstrackapp.recording.TrackRecorder;
 
@@ -263,19 +264,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
 
                 // --- tracks ---
                 case R.id.record_item:
-                    if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION_PERMISSION)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        if (!trackRecorder.isRecordingTrack()) {
-                            showTrackNameDialog();
-                        } else {
-                            Track recordedTrack = trackRecorder.getRecordedTrack();
-                            trackRecorder.unregisterLocationConsumer(recordedTrack);
-                            invalidateOptionsMenu();
-                            showSaveTrackDialog(recordedTrack);
-                        }
-                    } else {
-                        Toast.makeText(this, "You cannot record tracks without granting location permission", Toast.LENGTH_LONG).show();
-                    }
+                    onRecordItemClicked();
                     return true;
                 case R.id.display_item:
                     startDisplayTracksActivity();
@@ -304,6 +293,31 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
         return false;
     }
 
+    // ----- methods needed for recording -----
+    private void onRecordItemClicked() {
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION_PERMISSION)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (!trackRecorder.isRecordingTrack()) {
+                Intent serviceIntent = new Intent(this, LocationService.class);
+                if (!LocationService.hasAskedUserPermission()) {
+                    LocationService.showStartInForegroundDialog(serviceIntent, this);
+                    LocationService.setAskedUserPermission(true);
+                } else {
+                    LocationService.startLocationService(serviceIntent, this);
+                }
+                showTrackNameDialog();
+            } else {
+                Track recordedTrack = trackRecorder.getRecordedTrack();
+                trackRecorder.unregisterLocationConsumer(recordedTrack);
+                Toast.makeText(this, "Recording stopped", Toast.LENGTH_SHORT).show();
+                invalidateOptionsMenu();
+                showSaveTrackDialog(recordedTrack);
+            }
+        } else {
+            Toast.makeText(this, "You cannot record tracks without granting location permission", Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void showTrackNameDialog() {
         final EditText input = new EditText(this);
 
@@ -328,6 +342,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
                     LocalDateTime.now(), trackSegment);
             trackModelManager.addGeoModel(track);
             trackRecorder.registerLocationConsumer(track);
+            Toast.makeText(this, "Recording started", Toast.LENGTH_SHORT).show();
             invalidateOptionsMenu();
         };
 
@@ -350,6 +365,8 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
                 .show();
     }
 
+
+    // ----- methods to start other activities -----
     private void startMapTileSettingsActivity() {
         Intent intent = new Intent(this, MapTileSettingsActivity.class);
         startActivity(intent);
@@ -407,6 +424,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
         startActivity(intent);
     }
 
+    // ----- permission handling -----
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

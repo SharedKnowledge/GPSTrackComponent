@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 public class LocationService extends Service {
@@ -64,7 +65,36 @@ public class LocationService extends Service {
         return startInForeground;
     }
 
+    public static void showStartInForegroundDialog(Intent serviceIntent, Context ctx) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setMessage("Run location service in foreground? Recording can only continue in doze mode if you select "
+                + "\'Yes\', but it will drain the battery more. In case this is not needed select \'No\'.")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    LocationService.setStartInForeground(true);
+                    startLocationService(serviceIntent, ctx);
+                    dialog.dismiss();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    LocationService.setStartInForeground(false);
+                    startLocationService(serviceIntent, ctx);
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    public static void startLocationService(Intent serviceIntent, Context ctx) {
+        if (LocationService.shouldStartInForeground() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ctx.startForegroundService(serviceIntent);
+            Log.d(getLogStart(), "start location service as foreground service");
+        } else {
+            ctx.startService(serviceIntent);
+            Log.d(getLogStart(), "start location service as normal service");
+        }
+    }
+
     private void startInForeground() {
+        // In newer SDK versions the notification channel may not be needed anymore.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             String NOTIFICATION_CHANNEL_ID = "location_service";
             String channelName = "Location Service";
@@ -143,8 +173,8 @@ public class LocationService extends Service {
         }
     }
 
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
+    private static String getLogStart() {
+        return LocationService.class.getSimpleName();
     }
 
     public class GpsLocationListener implements LocationListener {

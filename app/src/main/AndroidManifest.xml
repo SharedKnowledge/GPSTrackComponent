@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <!--
+    <!-- TODO
     if target SDK Version is API Level 28 or higher
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     -->
@@ -42,9 +42,10 @@
 
         <service android:name=".location.LocationService"
             android:enabled="true"
+            android:stopWithTask="true"
             />
-        <!--
-            if target SDK Version is API Level 29 or higher add this to the Location Service
+        <!-- TODO
+            if target SDK Version is API Level 29 or higher add this to the Location Service:
             android:foregroundServiceType="location"
         -->
     </application>
