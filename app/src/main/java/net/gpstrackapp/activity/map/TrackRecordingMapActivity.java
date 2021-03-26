@@ -242,11 +242,9 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
         if (trackRecorder.isRecordingTrack()) {
             recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_stop_record_button_text));
             menu.findItem(R.id.track_item).getSubMenu().setGroupEnabled(R.id.group_track_actions, false);
-            menu.findItem(R.id.map_item).getSubMenu().setGroupEnabled(R.id.group_map_actions, false);
         } else {
             recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_start_record_button_text));
             menu.findItem(R.id.track_item).getSubMenu().setGroupEnabled(R.id.group_track_actions, true);
-            menu.findItem(R.id.map_item).getSubMenu().setGroupEnabled(R.id.group_map_actions, true);
         }
     }
 

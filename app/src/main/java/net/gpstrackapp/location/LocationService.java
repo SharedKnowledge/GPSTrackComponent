@@ -38,6 +38,7 @@ public class LocationService extends Service {
 
     @Override
     public void onCreate() {
+        Log.d(getLogStart(), "onCreate");
         super.onCreate();
         if (startInForeground && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // this is necessary because startForeground() has to be called within 5 seconds of startForegroundService()
@@ -159,6 +160,7 @@ public class LocationService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d(getLogStart(), "onDestroy");
         super.onDestroy();
         locationManager.removeUpdates(locationListener);
         if (locationChannel != null && notificationManager != null) {
