@@ -53,7 +53,7 @@ public abstract class GeoModelManager<T extends GeoModel> {
 
     public T getGeoModelByUUID(CharSequence UUID) {
         for (T geoModel : geoModels) {
-            if (geoModel.getObjectId().equals(UUID)) {
+            if (geoModel.getObjectID().equals(UUID)) {
                 return geoModel;
             }
         }
@@ -74,7 +74,7 @@ public abstract class GeoModelManager<T extends GeoModel> {
 
     public static GeoModel getGeoModelByUUIDFromGlobal(CharSequence UUID) {
         for (GeoModel geoModel : geoModelsGlobal) {
-            if (geoModel.getObjectId().equals(UUID)) {
+            if (geoModel.getObjectID().equals(UUID)) {
                 return geoModel;
             }
         }

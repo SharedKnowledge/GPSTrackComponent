@@ -66,13 +66,13 @@ public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends
         V geoModelOverlay = createGeoModelOverlay(geoModel);
         geoModelWithOverlayHolder.put(geoModel, geoModelOverlay);
         geoModelOverlaysToAddToMap.put(geoModel, geoModelOverlay);
-        Log.d(getLogStart(), "Add Overlay with UUID " + geoModel.getObjectId());
+        Log.d(getLogStart(), "Add Overlay with UUID " + geoModel.getObjectID());
     }
 
     private void removeGeoModelFromHolder(K geoModel) {
         V geoModelOverlay = geoModelWithOverlayHolder.get(geoModel);
         geoModelWithOverlayHolder.remove(geoModel);
-        Log.d(getLogStart(), "Remove Overlay with UUID " + geoModel.getObjectId());
+        Log.d(getLogStart(), "Remove Overlay with UUID " + geoModel.getObjectID());
     }
 
     public String createToastText(List<K> addedGeoModels, List<K> removedGeoModels) {

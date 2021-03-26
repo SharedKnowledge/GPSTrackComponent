@@ -65,11 +65,11 @@ public class GeoModelListContentAdapter extends
         Log.d(this.getLogStart(), "onBindViewHolder with position: " + position);
         GeoModel geoModel = requestGeoModelsCommand.getGeoModels().get(position);
 
-        CharSequence geoModelID = geoModel.getObjectId();
+        CharSequence geoModelID = geoModel.getObjectID();
         helper.setSelectedText(Integer.toString(position), geoModelID,
                 holder.itemView, holder.geoModelSelected);
 
-        CharSequence id = geoModel.getObjectId();
+        CharSequence id = geoModel.getObjectID();
         CharSequence name = geoModel.getObjectName();
         name = name != null ? name : "No name assigned";
         String date = geoModel.getDateOfCreationAsFormattedString();

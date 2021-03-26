@@ -9,7 +9,6 @@ import net.gpstrackapp.geomodel.GeoModelManager;
 import net.gpstrackapp.geomodel.GeoModelStorage;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,7 +38,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
         try {
             File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
             dir.mkdirs();
-            File fileToSave = new File(dir, trackToSave.getObjectId().toString());
+            File fileToSave = new File(dir, trackToSave.getObjectID().toString());
             Log.d(getLogStart(), fileToSave.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(fileToSave);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -69,7 +67,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
     public boolean deleteGeoModelFromFile(Context ctx, Track trackToDelete) {
         File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
         dir.mkdirs();
-        File fileToDelete = new File(dir, trackToDelete.getObjectId().toString());
+        File fileToDelete = new File(dir, trackToDelete.getObjectID().toString());
         Log.d(getLogStart(), "Deleted track: " + trackToDelete.getObjectName());
         // just returns false if file does not exist
         return fileToDelete.delete();
@@ -100,7 +98,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 Track loadedTrack = (Track) ois.readObject();
                 tracks.add(loadedTrack);
-                Log.d(getLogStart(), "Loaded track with UUID: " + loadedTrack.getObjectId());
+                Log.d(getLogStart(), "Loaded track with UUID: " + loadedTrack.getObjectID());
             } catch (IOException | ClassNotFoundException e) {
                 Log.e(getLogStart(), "A problem occurred while trying to load a track." + System.lineSeparator() + e.getLocalizedMessage());
                 allLoaded = false;

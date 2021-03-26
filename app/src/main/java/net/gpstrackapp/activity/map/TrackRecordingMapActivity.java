@@ -217,7 +217,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putCharSequenceArrayList("itemIDsToRestore", new ArrayList<>(trackRecordingPresenter.getSelectedItemIDs()));
         if (trackRecorder.getRecordedTrack() != null) {
-            savedInstanceState.putCharSequence("recordedTrack", trackRecorder.getRecordedTrack().getObjectId());
+            savedInstanceState.putCharSequence("recordedTrack", trackRecorder.getRecordedTrack().getObjectID());
         }
     }
 
@@ -386,7 +386,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     private void startSaveTracksActivity(Track trackToSave) {
         Intent intent = new Intent(this, SaveTracksActivity.class);
         if (trackToSave != null) {
-            ArrayList<CharSequence> list = new ArrayList<>(Arrays.asList(trackToSave.getObjectId()));
+            ArrayList<CharSequence> list = new ArrayList<>(Arrays.asList(trackToSave.getObjectID()));
             intent.putCharSequenceArrayListExtra("selectedItemIDs", list);
         }
         startActivity(intent);
