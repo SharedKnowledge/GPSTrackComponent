@@ -192,7 +192,7 @@ public class ConfiguredMapFragment extends Fragment {
         GeoPoint lastLocation = new GeoPoint(lat, lon);
         setCenterCoordinates(lastLocation);
 
-        if (mapSpecificTileSource != null) {
+        if (mapSpecificTileSource == null) {
             String tileSourceName = prefs.getString(PREFS_TILE_SOURCE, null);
             if (tileSourceName != null) {
                 ITileSource tileSource = TileSourceFactory.getTileSource(tileSourceName);

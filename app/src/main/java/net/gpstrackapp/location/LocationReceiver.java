@@ -17,12 +17,12 @@ public class LocationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getExtras();
-        Location location = (Location) bundle.get("location");
-        if (!consumers.isEmpty()) {
+        if (bundle.containsKey("location")) {
+            Location location = (Location) bundle.get("location");
             for (ILocationConsumer consumer : consumers) {
                 consumer.onLocationChanged(location);
+                Log.d(getLogStart(), "Location added to consumer " + consumer.toString());
             }
-            Log.d(getLogStart(), "Location added");
         }
     }
 

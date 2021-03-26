@@ -33,9 +33,8 @@ public class TrackRecorder implements LifecycleObject, Recorder {
         serviceIntent = new Intent(ctx, LocationService.class);
         /*
         Start the location service here (and stop it in onDestroy) to enable the user to navigate to other
-        components in SN2 while recording as the service isn't ended. Alternatively move this block to onStart
-        and stopLocationService to onStop to record only while using this component.
-        In newer SDK versions the notification channel may not be needed anymore.
+        components in SN2 while recording because the service isn't destroyed. In newer SDK versions the
+        notification channel may not be needed anymore.
         */
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (!LocationService.hasAskedUserPermission()) {
@@ -54,17 +53,7 @@ public class TrackRecorder implements LifecycleObject, Recorder {
 
     @Override
     public void onStart() {
-        /*
-        // see comment in onCreate
-        if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (!LocationService.hasAskedUserPermission()) {
-                showStartInForegroundDialog();
-                LocationService.setAskedUserPermission(true);
-            } else {
-                startLocationService();
-            }
-        }
-        */
+
     }
 
     @Override
@@ -79,10 +68,7 @@ public class TrackRecorder implements LifecycleObject, Recorder {
 
     @Override
     public void onStop() {
-        /*
-        // see comment in onCreate
-        stopLocationService();
-         */
+
     }
 
     @Override
