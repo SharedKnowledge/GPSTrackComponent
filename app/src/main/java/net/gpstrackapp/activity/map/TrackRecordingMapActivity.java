@@ -295,6 +295,10 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
 
     // ----- methods needed for recording -----
     private void onRecordItemClicked() {
+        /*
+         This check is used just to tell the user that he needs location permission, this can be removed but the
+          location service will not deliver any location updates
+        */
         if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION_PERMISSION)
                 == PackageManager.PERMISSION_GRANTED) {
             if (!trackRecorder.isRecordingTrack()) {

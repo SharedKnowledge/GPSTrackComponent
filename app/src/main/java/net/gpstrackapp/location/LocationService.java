@@ -39,14 +39,11 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         if (startInForeground && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // this is necessary because startForeground() has to be called within 5 seconds of startForegroundService()
             // see https://developer.android.com/about/versions/oreo/android-8.0-changes.html for more infos
             startInForeground();
         }
-
-        Log.d(getLogStart(), "onCreate");
     }
 
     public static void setAskedUserPermission(boolean askedUserPermission) {
@@ -118,17 +115,16 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(getLogStart(), "onStartCommand");
+        super.onStartCommand(intent, flags, startId);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new GpsLocationListener();
-        // check location permission
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(getLogStart(), "Start sticky");
-            return START_STICKY;
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, updateMinTime, updateMinDistance, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, updateMinTime, updateMinDistance, locationListener);
+        } catch (SecurityException e) {
+            Log.e(getLogStart(), "Cannot request location updates. Is location permission granted?");
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, updateMinTime, updateMinDistance, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, updateMinTime, updateMinDistance, locationListener);
-
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Nullable
@@ -164,7 +160,6 @@ public class LocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(getLogStart(), "onDestroy");
         locationManager.removeUpdates(locationListener);
         if (locationChannel != null && notificationManager != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
