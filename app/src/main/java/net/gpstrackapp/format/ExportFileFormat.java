@@ -8,5 +8,5 @@ import java.io.OutputStream;
 import java.util.Set;
 
 public interface ExportFileFormat extends FileFormat {
-    void exportToFile(Context ctx, Set<Track> tracksToExport, String trackName, OutputStream outputStream) throws Exception;
+    void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream) throws Exception;
 }
