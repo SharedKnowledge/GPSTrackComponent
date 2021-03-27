@@ -1,10 +1,10 @@
 package net.gpstrackapp;
 
 import android.content.Context;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import net.gpstrackapp.geomodel.track.TrackModelManager;
+import net.gpstrackapp.mapview.ConfiguredMapFragment;
 import net.sharksystem.asap.ASAPException;
 import net.sharksystem.asap.android.apps.ASAPApplication;
 import net.sharksystem.asap.android.apps.ASAPApplicationComponent;
@@ -34,7 +34,9 @@ public class GPSComponent implements ASAPApplicationComponent {
             Context ctx = GPSComponent.instance.getContext().getApplicationContext();
 
             IConfigurationProvider conf = Configuration.getInstance();
-            conf.load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+            //conf.load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+            conf.load(ctx, ctx.getSharedPreferences(ConfiguredMapFragment.PREFS_NAME, Context.MODE_PRIVATE));
+            // see https://github.com/osmdroid/osmdroid/wiki/Important-notes-on-using-osmdroid-in-your-app
             conf.setUserAgentValue(BuildConfig.APPLICATION_ID);
 
             // Debug options

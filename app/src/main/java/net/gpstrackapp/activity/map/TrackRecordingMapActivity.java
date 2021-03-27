@@ -110,11 +110,14 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
         Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
         setSupportActionBar(toolbar);
 
-        configuredMapFragment = new ConfiguredMapFragment();
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .add(R.id.gpstracker_mapfragment_container, configuredMapFragment)
-                .commit();
+        // to ensure that the fragment is only attached once
+        if (savedInstanceState == null) {
+            configuredMapFragment = new ConfiguredMapFragment();
+            FragmentManager fragmentManager = this.getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .add(R.id.gpstracker_mapfragment_container, configuredMapFragment)
+                    .commit();
+        }
 
         registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 

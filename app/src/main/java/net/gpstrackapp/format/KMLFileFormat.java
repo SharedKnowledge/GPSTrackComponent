@@ -26,7 +26,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-//TODO use OsmdroidBonusPack once they implement <gx:MultiTrack>
+//TODO use OSMBonusPack once they implement <gx:MultiTrack>
 public class KMLFileFormat implements ExportFileFormat {
     private Document document;
     private String trackStyleTag = "trackStyle";
