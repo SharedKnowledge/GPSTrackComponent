@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends GeoModelOverlay> {
+public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends GeoModelOverlay<K>> {
     protected Map<K, V> geoModelWithOverlayHolder = new HashMap<>();
     protected Map<K, V> geoModelOverlaysToAddToMap = new HashMap<>();
     protected Map<K, V> geoModelOverlaysToRemoveFromMap = new HashMap<>();
