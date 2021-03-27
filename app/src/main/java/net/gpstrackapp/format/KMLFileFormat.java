@@ -38,7 +38,7 @@ public class KMLFileFormat implements ExportFileFormat {
     }
 
     @Override
-    public String getMIMEDataType() {
+    public String getMediaType() {
         return "application/vnd.google-earth.kml+xml";
     }
 

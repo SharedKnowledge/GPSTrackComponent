@@ -23,11 +23,9 @@ import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.format.FormatManager;
 import net.gpstrackapp.format.ImportFileFormat;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,7 +79,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
     public void onImportButtonClicked(View view) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         Set<String> importFormats = FormatManager.getImportFormats().keySet();
-        Set<String> mimeTypes = importFormats.stream()
+        Set<String> mediaTypes = importFormats.stream()
                 .map(format -> MimeTypeMap.getSingleton().getMimeTypeFromExtension(format))
                 .collect(Collectors.toSet());
 
@@ -90,9 +88,9 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
          it doesn't get refreshed by the storage access framework for some reason. In the Device File Explorer the files
          don't exist anymore. After a restart of the device the files won't be shown anymore, but that's not really a solution.
         */
-        String[] mimeTypesArray = mimeTypes.toArray(new String[mimeTypes.size()]);
+        String[] mediaTypesArray = mediaTypes.toArray(new String[mediaTypes.size()]);
         intent.setType("*/*");
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypesArray);
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mediaTypesArray);
         intent = Intent.createChooser(intent, "Choose a file to import");
         intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.getExternalStorageDirectory().toURI());
         startActivityForResult(intent, CHOOSE_FILE_CODE);
@@ -104,10 +102,10 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
         if (requestCode == CHOOSE_FILE_CODE) {
             if (resultCode == RESULT_OK) {
                 Uri result = data.getData();
-                String mimeType = getContentResolver().getType(result);
-                ImportFileFormat importFileFormat = FormatManager.getImportFormatByMimeType(mimeType);
+                String mediaType = getContentResolver().getType(result);
+                ImportFileFormat importFileFormat = FormatManager.getImportFormatByMediaType(mediaType);
 
-                // it is possible that the mime type is not set (then it is "application/octet-stream"), in this case try to determine the file type from the file extension
+                // it is possible that the media type is not set (then it is "application/octet-stream"), in this case try to determine the file type from the file extension
                 if (importFileFormat == null) {
                     String extension = MimeTypeMap.getFileExtensionFromUrl(FileUtils.getPath(this, result));
                     importFileFormat = FormatManager.getImportFormatByFileExtension(extension);

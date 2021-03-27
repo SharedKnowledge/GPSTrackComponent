@@ -37,7 +37,7 @@ public class FileUtils {
     }
 
     /* The following code is taken from https://stackoverflow.com/a/55469368/10155363 to get a path
-     * from a URI, this is needed for import if the mime-type is not set and the file extension needs to be determined
+     * from a URI, this is needed for import if the media type is not set and the file extension needs to be determined
      */
 
     private static Uri contentUri = null;

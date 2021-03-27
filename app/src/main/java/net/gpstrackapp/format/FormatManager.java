@@ -39,10 +39,10 @@ public class FormatManager {
         return exportFormats.get(format);
     }
 
-    public static ImportFileFormat getImportFormatByMimeType(String mime) {
+    public static ImportFileFormat getImportFormatByMediaType(String mediaType) {
         List<ImportFileFormat> formats = new ArrayList<>(importFormats.values());
         for (ImportFileFormat format : formats) {
-            if (format.getMIMEDataType().equals(mime))
+            if (format.getMediaType().equals(mediaType))
                 return format;
         }
         return null;

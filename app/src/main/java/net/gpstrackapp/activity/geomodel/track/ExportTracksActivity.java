@@ -172,7 +172,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
 
         public void exportToFile(DocumentFile dir) {
             try {
-                DocumentFile newFile = dir.createFile(format.getMIMEDataType(), fileName);
+                DocumentFile newFile = dir.createFile(format.getMediaType(), fileName);
                 OutputStream outputStream = getContentResolver().openOutputStream(newFile.getUri());
                 format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream);
             } catch (Exception e) {

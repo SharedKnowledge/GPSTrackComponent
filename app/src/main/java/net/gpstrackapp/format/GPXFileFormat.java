@@ -38,7 +38,7 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
     private String delimiter = String.valueOf('\u003B');
 
     @Override
-    public String getMIMEDataType() {
+    public String getMediaType() {
         return "application/gpx+xml";
     }
 
