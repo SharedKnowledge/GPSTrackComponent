@@ -1,28 +1,19 @@
 package net.gpstrackapp.recording;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.widget.Toast;
 
 import net.gpstrackapp.activity.LifecycleObject;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.location.ILocationConsumer;
 import net.gpstrackapp.location.LocationReceiver;
-import net.gpstrackapp.location.LocationService;
 
 public class TrackRecorder implements LifecycleObject, Recorder {
     private LocationReceiver locationReceiver;
     private Context ctx;
     private Track recordedTrack;
 
-    //TODO
     public TrackRecorder(Context ctx) {
         this.ctx = ctx;
     }
