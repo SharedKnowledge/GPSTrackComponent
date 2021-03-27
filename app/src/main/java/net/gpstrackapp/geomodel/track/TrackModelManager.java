@@ -39,7 +39,6 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
             dir.mkdirs();
             File fileToSave = new File(dir, trackToSave.getObjectID().toString());
-            Log.d(getLogStart(), fileToSave.getAbsolutePath());
             FileOutputStream fos = new FileOutputStream(fileToSave);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(trackToSave);
@@ -87,7 +86,6 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
     public boolean loadAllGeoModelsFromFiles(Context ctx) {
         boolean allLoaded = true;
         File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
-        Log.d(getLogStart(), dir.getAbsolutePath());
         dir.mkdirs();
         File[] files = dir.listFiles(File::isFile);
         Log.d(getLogStart(), "Attempt to load " + files.length + " tracks from storage");
