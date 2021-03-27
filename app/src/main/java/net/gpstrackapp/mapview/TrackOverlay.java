@@ -10,12 +10,9 @@ import java.util.List;
 
 public class TrackOverlay extends GeoModelOverlay<Track> {
     private List<TrackSegmentOverlay> trackSegmentOverlays = new ArrayList<>();
-    private Track track;
 
     public TrackOverlay(Track track) {
         super(track);
-        this.track = track;
-
         String polylineToastText = "Track name: " + geoModel.getObjectName() + System.lineSeparator() +
                 "Creator: " + geoModel.getCreator() + System.lineSeparator() +
                 "Date of creation: " + geoModel.getDateOfCreationAsFormattedString();
