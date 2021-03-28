@@ -30,11 +30,6 @@ public class TrackRecordingPresenter implements LifecycleObject {
     }
 
     @Override
-    public void onPause() {
-
-    }
-
-    @Override
     public void onResume() {
         //add and remove TrackOverlays
         trackVisualizer.updateGeoModelHolder();
@@ -53,6 +48,11 @@ public class TrackRecordingPresenter implements LifecycleObject {
         toastText = trackVisualizer.createToastText(
                 addToMap.keySet().stream().collect(Collectors.toList()),
                 removeFromMap.keySet().stream().collect(Collectors.toList()));
+    }
+
+    @Override
+    public void onPause() {
+
     }
 
     @Override
