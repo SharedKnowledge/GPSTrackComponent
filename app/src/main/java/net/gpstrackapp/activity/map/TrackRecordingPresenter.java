@@ -31,14 +31,14 @@ public class TrackRecordingPresenter implements LifecycleObject {
         //add and remove TrackOverlays
         trackVisualizer.updateGeoModelHolder();
 
-        Set<TrackOverlay> addToMap = trackVisualizer.getGeoModelOverlaysToAddToMap();
-        Set<TrackOverlay> removeFromMap = trackVisualizer.getGeoModelOverlaysToRemoveFromMap();
-
-        for (TrackOverlay trackOverlay : addToMap) {
-            view.addOverlay(trackOverlay);
+        Set<TrackOverlay> overlaysToAddToMap = trackVisualizer.getGeoModelOverlaysToAddToMap();
+        for (TrackOverlay overlay : overlaysToAddToMap) {
+            view.addOverlay(overlay);
         }
-        for (TrackOverlay trackOverlay : removeFromMap) {
-            view.removeOverlay(trackOverlay);
+
+        Set<TrackOverlay> overlaysToRemoveFromMap = trackVisualizer.getGeoModelOverlaysToRemoveFromMap();
+        for (TrackOverlay overlay : overlaysToRemoveFromMap) {
+            view.removeOverlay(overlay);
         }
         toastText = trackVisualizer.createToastText();
     }
