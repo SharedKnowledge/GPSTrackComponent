@@ -81,7 +81,7 @@ public abstract class GeoModelListActivity extends SelectableListGeoModelActivit
                 + addUserDescription() + " You can also edit items by clicking on them longer.";
     }
 
-    public abstract String addUserDescription();
+    protected abstract String addUserDescription();
 
     private String getLogStart() {
         return GeoModelListActivity.class.getSimpleName();
