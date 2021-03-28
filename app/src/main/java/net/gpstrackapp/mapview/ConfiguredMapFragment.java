@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -210,15 +209,6 @@ public class ConfiguredMapFragment extends Fragment {
         zoom = zoom < minZoom ? minZoom : zoom;
         zoom = zoom > maxZoom ? maxZoom : zoom;
         setZoomLevel(zoom);
-
-        GpsMyLocationProvider provider = this.getProvider();
-        // Update location of location overlay
-        if (provider != null) {
-            Location location = new Location("");
-            location.setLatitude(lastLocation.getLatitude());
-            location.setLongitude(lastLocation.getLongitude());
-            provider.onLocationChanged(location);
-        }
     }
 
     private void saveMapPreferences() {
