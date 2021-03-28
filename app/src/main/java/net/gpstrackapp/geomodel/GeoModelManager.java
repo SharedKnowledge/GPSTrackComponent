@@ -2,7 +2,6 @@ package net.gpstrackapp.geomodel;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,8 +14,8 @@ public abstract class GeoModelManager<T extends GeoModel> {
         return geoModels.add(geoModel);
     }
 
-    public boolean removeGeoModelByUUID(CharSequence UUID) {
-        T geoModel = getGeoModelByUUID(UUID);
+    public boolean removeGeoModelByUUID(CharSequence uuid) {
+        T geoModel = getGeoModelByUUID(uuid);
         if (geoModel != null) {
             geoModelsGlobal.remove(geoModel);
             return geoModels.remove(geoModel);
@@ -25,11 +24,10 @@ public abstract class GeoModelManager<T extends GeoModel> {
         }
     }
 
-    public boolean removeGeoModelsByUUIDs(Set<CharSequence> UUIDs) {
+    public boolean removeGeoModelsByUUIDs(Set<CharSequence> uuids) {
         boolean allRemoved = true;
-        Iterator<CharSequence> iterator = UUIDs.iterator();
-        while (iterator.hasNext()) {
-            boolean removed = removeGeoModelByUUID(iterator.next());
+        for (CharSequence uuid : uuids) {
+            boolean removed = removeGeoModelByUUID(uuid);
             allRemoved = allRemoved ? removed : false;
         }
         return allRemoved;
@@ -51,20 +49,19 @@ public abstract class GeoModelManager<T extends GeoModel> {
         return geoModelsGlobal.size();
     }
 
-    public T getGeoModelByUUID(CharSequence UUID) {
+    public T getGeoModelByUUID(CharSequence uuid) {
         for (T geoModel : geoModels) {
-            if (geoModel.getObjectID().equals(UUID)) {
+            if (geoModel.getObjectID().equals(uuid)) {
                 return geoModel;
             }
         }
         return null;
     }
 
-    public Set<T> getGeoModelsByUUIDs(Set<CharSequence> UUIDs) {
-        Iterator<CharSequence> iterator = UUIDs.iterator();
+    public Set<T> getGeoModelsByUUIDs(Set<CharSequence> uuids) {
         Set<T> selectedGeoModels = new HashSet<>();
-        while (iterator.hasNext()) {
-            T geoModel = getGeoModelByUUID(iterator.next());
+        for (CharSequence uuid : uuids) {
+            T geoModel = getGeoModelByUUID(uuid);
             if (geoModel != null) {
                 selectedGeoModels.add(geoModel);
             }
@@ -72,20 +69,19 @@ public abstract class GeoModelManager<T extends GeoModel> {
         return selectedGeoModels;
     }
 
-    public static GeoModel getGeoModelByUUIDFromGlobal(CharSequence UUID) {
+    public static GeoModel getGeoModelByUUIDFromGlobal(CharSequence uuid) {
         for (GeoModel geoModel : geoModelsGlobal) {
-            if (geoModel.getObjectID().equals(UUID)) {
+            if (geoModel.getObjectID().equals(uuid)) {
                 return geoModel;
             }
         }
         return null;
     }
 
-    public static Set<GeoModel> getGeoModelsByUUIDsFromGlobal(Set<CharSequence> UUIDs) {
-        Iterator<CharSequence> iterator = UUIDs.iterator();
+    public static Set<GeoModel> getGeoModelsByUUIDsFromGlobal(Set<CharSequence> uuids) {
         Set<GeoModel> selectedGeoModels = new HashSet<>();
-        while (iterator.hasNext()) {
-            GeoModel geoModel = getGeoModelByUUIDFromGlobal(iterator.next());
+        for (CharSequence uuid : uuids) {
+            GeoModel geoModel = getGeoModelByUUIDFromGlobal(uuid);
             if (geoModel != null) {
                 selectedGeoModels.add(geoModel);
             }

@@ -6,7 +6,6 @@ import net.gpstrackapp.mapview.GeoModelOverlay;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,9 +39,7 @@ public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends
         geoModelOverlaysToRemoveFromMap = new HashMap<>(geoModelWithOverlayHolder);
 
         geoModelOverlaysToAddToMap = new HashMap<>();
-        Iterator<CharSequence> iterSelect = selectedItemIDs.iterator();
-        while (iterSelect.hasNext()) {
-            CharSequence itemID = iterSelect.next();
+        for (CharSequence itemID : selectedItemIDs) {
             K geoModel = getGeoModelByUUID(itemID);
             // if geoModel is null then it was deleted since the last map update
             if (geoModel != null) {
@@ -55,9 +52,7 @@ public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends
             }
         }
 
-        Iterator<K> iterRemove = geoModelOverlaysToRemoveFromMap.keySet().iterator();
-        while (iterRemove.hasNext()) {
-            K geoModelToRemove = iterRemove.next();
+        for (K geoModelToRemove : geoModelOverlaysToRemoveFromMap.keySet()) {
             removeGeoModelFromHolder(geoModelToRemove);
         }
     }
