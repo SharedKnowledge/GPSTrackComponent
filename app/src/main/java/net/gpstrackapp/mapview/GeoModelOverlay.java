@@ -10,5 +10,9 @@ public abstract class GeoModelOverlay<T extends GeoModel> extends FolderOverlay 
     public GeoModelOverlay(T geomodel) {
         this.geoModel = geomodel;
     }
+
+    public T getGeoModel() {
+        return geoModel;
+    }
 }
 

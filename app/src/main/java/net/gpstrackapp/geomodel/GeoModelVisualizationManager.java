@@ -6,7 +6,6 @@ import net.gpstrackapp.mapview.GeoModelOverlay;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,12 +26,12 @@ public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends
         return selectedItemIDs;
     }
 
-    public Map<K, V> getGeoModelOverlaysToAddToMap() {
-        return geoModelOverlaysToAddToMap;
+    public Set<V> getGeoModelOverlaysToAddToMap() {
+        return new HashSet<>(geoModelOverlaysToAddToMap.values());
     }
 
-    public Map<K, V> getGeoModelOverlaysToRemoveFromMap() {
-        return geoModelOverlaysToRemoveFromMap;
+    public Set<V> getGeoModelOverlaysToRemoveFromMap() {
+        return new HashSet<>(geoModelOverlaysToRemoveFromMap.values());
     }
 
     public void updateGeoModelHolder() {
@@ -70,20 +69,20 @@ public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends
         Log.d(getLogStart(), "Remove Overlay with UUID " + geoModel.getObjectID());
     }
 
-    public String createToastText(List<K> addedGeoModels, List<K> removedGeoModels) {
+    public String createToastText() {
         String toastText = "";
-        if (addedGeoModels.size() > 0) {
-            toastText += "Added \"" + addedGeoModels.get(0).getObjectName() + "\"";
-            if (addedGeoModels.size() > 1) {
-                toastText += " and " + (addedGeoModels.size() - 1) + " more";
+        if (geoModelOverlaysToAddToMap.size() > 0) {
+            toastText += "Added \"" + geoModelOverlaysToAddToMap.get(0).getGeoModel().getObjectName() + "\"";
+            if (geoModelOverlaysToAddToMap.size() > 1) {
+                toastText += " and " + (geoModelOverlaysToAddToMap.size() - 1) + " more";
             }
             toastText += " to the map.";
         }
-        if (removedGeoModels.size() > 0) {
+        if (geoModelOverlaysToAddToMap.size() > 0) {
             toastText += toastText.equals("") ? "" : System.lineSeparator();
-            toastText += "Removed \"" + removedGeoModels.get(0).getObjectName() + "\"";
-            if (removedGeoModels.size() > 1) {
-                toastText += " and " + (removedGeoModels.size() - 1) + " more";
+            toastText += "Removed \"" + geoModelOverlaysToRemoveFromMap.get(0).getGeoModel().getObjectName() + "\"";
+            if (geoModelOverlaysToRemoveFromMap.size() > 1) {
+                toastText += " and " + (geoModelOverlaysToRemoveFromMap.size() - 1) + " more";
             }
             toastText += " from the map.";
         }

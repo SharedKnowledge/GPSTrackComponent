@@ -1,13 +1,10 @@
 package net.gpstrackapp.activity.map;
 
 import net.gpstrackapp.activity.LifecycleObject;
-import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackVisualizationManager;
 import net.gpstrackapp.mapview.TrackOverlay;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class TrackRecordingPresenter implements LifecycleObject {
     private TrackVisualizationManager trackVisualizer;
@@ -34,20 +31,16 @@ public class TrackRecordingPresenter implements LifecycleObject {
         //add and remove TrackOverlays
         trackVisualizer.updateGeoModelHolder();
 
-        Map<Track, TrackOverlay> addToMap = trackVisualizer.getGeoModelOverlaysToAddToMap();
-        Map<Track, TrackOverlay> removeFromMap = trackVisualizer.getGeoModelOverlaysToRemoveFromMap();
+        Set<TrackOverlay> addToMap = trackVisualizer.getGeoModelOverlaysToAddToMap();
+        Set<TrackOverlay> removeFromMap = trackVisualizer.getGeoModelOverlaysToRemoveFromMap();
 
-        for (Map.Entry<Track, TrackOverlay> entry : addToMap.entrySet()) {
-            TrackOverlay trackOverlay = entry.getValue();
+        for (TrackOverlay trackOverlay : addToMap) {
             view.addOverlay(trackOverlay);
         }
-        for (Map.Entry<Track, TrackOverlay> entry : removeFromMap.entrySet()) {
-            TrackOverlay trackOverlay = entry.getValue();
+        for (TrackOverlay trackOverlay : removeFromMap) {
             view.removeOverlay(trackOverlay);
         }
-        toastText = trackVisualizer.createToastText(
-                addToMap.keySet().stream().collect(Collectors.toList()),
-                removeFromMap.keySet().stream().collect(Collectors.toList()));
+        toastText = trackVisualizer.createToastText();
     }
 
     @Override
