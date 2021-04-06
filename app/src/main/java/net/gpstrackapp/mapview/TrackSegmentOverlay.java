@@ -17,14 +17,17 @@ public class TrackSegmentOverlay extends FolderOverlay {
     private TrackSegment trackSegment;
     private Marker start, end;
     private Polyline line;
+    private String polyLineToastText;
 
     public TrackSegmentOverlay(TrackSegment trackSegment, String polyLineToastText) {
         this.trackSegment = trackSegment;
-        this.line = createLine(trackSegment.getGeoPoints(), polyLineToastText);
-        this.add(line);
+        this.polyLineToastText = polyLineToastText;
     }
 
-    public void addStartEndMarkers(MapView mapView) {
+    public void initComponents(MapView mapView) {
+        line = createLine(mapView, trackSegment.getGeoPoints(), polyLineToastText);
+        add(line);
+
         if (!trackSegment.getTrackPoints().isEmpty()) {
             List<GeoPoint> geoPoints = line.getActualPoints();
             start = createStart(trackSegment.getTrackPoints().get(0), mapView);
@@ -34,12 +37,12 @@ public class TrackSegmentOverlay extends FolderOverlay {
         }
     }
 
-    private Polyline createLine(List<GeoPoint> linePoints, String polyLineToastText) {
-        Polyline polyline = new Polyline();
+    private Polyline createLine(MapView mapView, List<GeoPoint> linePoints, String polyLineToastText) {
+        Polyline polyline = new Polyline(mapView);
         polyline.setPoints(linePoints);
 
-        polyline.setOnClickListener((polyline1, mapView, eventPos) -> {
-            Toast.makeText(mapView.getContext(), polyLineToastText, Toast.LENGTH_LONG).show();
+        polyline.setOnClickListener((polylineClicked, mapViewClicked, eventPos) -> {
+            Toast.makeText(mapViewClicked.getContext(), polyLineToastText, Toast.LENGTH_LONG).show();
             return false;
         });
         return polyline;

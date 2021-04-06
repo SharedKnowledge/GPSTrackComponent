@@ -1,11 +1,14 @@
 package net.gpstrackapp.geomodel.track;
 
-import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModelVisualizationManager;
 import net.gpstrackapp.mapview.TrackOverlay;
 
 public class TrackVisualizationManager extends GeoModelVisualizationManager<Track, TrackOverlay> {
-    private TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private TrackModelManager trackModelManager;
+
+    public TrackVisualizationManager(TrackModelManager trackModelManager) {
+        this.trackModelManager = trackModelManager;
+    }
 
     @Override
     protected TrackOverlay createGeoModelOverlay(Track track) {

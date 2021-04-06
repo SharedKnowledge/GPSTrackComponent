@@ -174,7 +174,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
             try {
                 DocumentFile newFile = dir.createFile(format.getMediaType(), fileName);
                 OutputStream outputStream = getContentResolver().openOutputStream(newFile.getUri());
-                format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream);
+                format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream, GPSComponent.getGPSComponent().getASAPApplication().getOwnerName());
             } catch (Exception e) {
                 Log.e(getLogStart(), e.getLocalizedMessage());
             }

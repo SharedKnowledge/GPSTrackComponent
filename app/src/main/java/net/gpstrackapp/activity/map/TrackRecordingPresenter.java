@@ -1,5 +1,6 @@
 package net.gpstrackapp.activity.map;
 
+import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.activity.LifecycleObject;
 import net.gpstrackapp.geomodel.track.TrackVisualizationManager;
 import net.gpstrackapp.mapview.TrackOverlay;
@@ -12,7 +13,7 @@ public class TrackRecordingPresenter implements LifecycleObject {
     private String toastText = "";
 
     public TrackRecordingPresenter(ViewWithOverlays view) {
-        this.trackVisualizer = new TrackVisualizationManager();
+        this.trackVisualizer = new TrackVisualizationManager(GPSComponent.getGPSComponent().getTrackModelManager());
         this.view = view;
     }
 

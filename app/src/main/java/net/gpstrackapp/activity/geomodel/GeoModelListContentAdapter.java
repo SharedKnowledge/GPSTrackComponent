@@ -62,7 +62,7 @@ public class GeoModelListContentAdapter extends
 
     @Override
     public void onBindViewHolder(@NonNull GeoModelListContentAdapter.MyViewHolder holder, int position) {
-        Log.d(this.getLogStart(), "onBindViewHolder with position: " + position);
+        Log.d(getLogStart(), "onBindViewHolder with position: " + position);
         GeoModel geoModel = requestGeoModelsCommand.getGeoModels().get(position);
 
         CharSequence geoModelID = geoModel.getObjectID();
@@ -71,11 +71,11 @@ public class GeoModelListContentAdapter extends
 
         CharSequence id = geoModel.getObjectID();
         CharSequence name = geoModel.getObjectName();
-        name = name != null ? name : "No name assigned";
+        name = !name.toString().isEmpty() ? name : "No name assigned";
         String date = geoModel.getDateOfCreationAsFormattedString();
         date = date != null ? date : "Unknown date of creation";
         CharSequence creator = geoModel.getCreator();
-        creator = creator != null ? creator : "Unknown creator";
+        creator = !creator.toString().isEmpty() ? creator : "Unknown creator";
 
         holder.itemView.setTag(R.id.geomodel_id_tag, geoModelID);
         holder.geoModelID.setText(id);

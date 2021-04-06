@@ -3,7 +3,6 @@ package net.gpstrackapp.format;
 import android.content.Context;
 import android.util.Log;
 
-import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackPoint;
@@ -32,7 +31,11 @@ import io.jenetics.jpx.Metadata;
 import io.jenetics.jpx.WayPoint;
 
 public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
-    private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private final TrackModelManager trackModelManager;
+
+    public GPXFileFormat(TrackModelManager trackModelManager) {
+        this.trackModelManager = trackModelManager;
+    }
 
     // semicolon
     private String delimiter = String.valueOf('\u003B');
@@ -48,15 +51,15 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
     }
 
     @Override
-    public void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream) throws IOException {
+    public void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream, CharSequence ownerName) throws IOException {
         String appName = ctx.getApplicationInfo().loadLabel(ctx.getPackageManager()).toString();
-        GPX gpx = generateGPX(tracksToExport, fileName, appName);
+        GPX gpx = generateGPX(tracksToExport, fileName, appName, ownerName);
         GPX.write(gpx, outputStream);
     }
 
-    private GPX generateGPX(Set<Track> tracksToExport, String fileName, String appName) {
+    public GPX generateGPX(Set<Track> tracksToExport, String fileName, String appName, CharSequence ownerName) {
         Metadata metadata = Metadata.builder()
-                .author(GPSComponent.getGPSComponent().getASAPApplication().getOwnerName().toString())
+                .author(ownerName.toString())
                 .time(System.currentTimeMillis())
                 .name(fileName)
                 .build();
@@ -73,7 +76,8 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
             LocalDateTime dateOfCreation = track.getDateOfCreation();
             desc += dateOfCreation == null ? "" : dateOfCreation.toString();
 
-            io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(track.getObjectName().toString()).desc(desc);
+            CharSequence objectName = track.getObjectName() == null ? "" : track.getObjectName();
+            io.jenetics.jpx.Track.Builder trackBuilder = io.jenetics.jpx.Track.builder().name(objectName.toString()).desc(desc);
             List<TrackSegment> trackSegments = track.getTrackSegments();
 
             // iterate over TrackSegments
@@ -106,7 +110,10 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
     public void importFromFile(Context ctx, InputStream inputStream) throws IOException {
         String appName = ctx.getApplicationInfo().loadLabel(ctx.getPackageManager()).toString();
         GPX gpx = GPX.read(inputStream);
+        parseObjectsFromGPX(gpx, appName);
+    }
 
+    public void parseObjectsFromGPX(GPX gpx, String appName) {
         // import Tracks
         List<io.jenetics.jpx.Track> gpxTracks = gpx.tracks().collect(Collectors.toList());
         // iterate over Tracks
@@ -118,10 +125,10 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
             if (gpx.getCreator().equals(appName)) {
                 String desc = gpxTrack.getDescription().orElse("");
                 if (!desc.isEmpty()) {
-                    String[] descParts = desc.split(delimiter);
+                    String[] descParts = desc.split(delimiter, 2);
                     if (descParts.length == 2) {
                         // creator
-                        creator = descParts[0].isEmpty() ? null : descParts[0];
+                        creator = descParts[0];
                         // date
                         String dateString = descParts[1];
                         if (!dateString.isEmpty()) {

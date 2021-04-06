@@ -18,21 +18,21 @@ public abstract class GeoModel implements Serializable {
 
     public GeoModel(CharSequence objectID, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation) {
         this.objectID = objectID == null ? UUID.randomUUID().toString() : objectID;
-        this.objectName = objectName;
-        this.creator = creator;
+        this.objectName = objectName == null ? "" : objectName;
+        this.creator = creator == null ? "" : creator;
         this.dateOfCreation = dateOfCreation;
     }
 
     public void setObjectName(CharSequence objectName) {
-        this.objectName = objectName;
+        this.objectName = objectName == null ? "" : objectName;
+    }
+
+    public void setCreator(CharSequence creator) {
+        this.creator = creator == null ? "" : creator;
     }
 
     public void setDateOfCreation(LocalDateTime dateOfCreation) {
         this.dateOfCreation = dateOfCreation;
-    }
-
-    public void setCreator(CharSequence creator) {
-        this.creator = creator;
     }
 
     public CharSequence getObjectID() {

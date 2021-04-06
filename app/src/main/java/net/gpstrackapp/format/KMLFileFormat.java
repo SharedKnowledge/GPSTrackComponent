@@ -28,7 +28,6 @@ import javax.xml.transform.stream.StreamResult;
 
 //TODO use OSMBonusPack once they implement <gx:MultiTrack>
 public class KMLFileFormat implements ExportFileFormat {
-    private Document document;
     private String trackStyleTag = "trackStyle";
     private DateTimeFormatter formatterWhen = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -43,11 +42,27 @@ public class KMLFileFormat implements ExportFileFormat {
     }
 
     @Override
-    public void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream) throws Exception {
+    public void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream, CharSequence ownerName) throws Exception {
+        Document document = generateKML(fileName, tracksToExport);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(document);
+        StreamResult result = new StreamResult(outputStream);
+        transformer.transform(source, result);
+    }
+
+    public Document generateKML(String fileName, Set<Track> tracksToExport) throws Exception {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        document = dBuilder.newDocument();
+        Document document = dBuilder.newDocument();
 
+        Element kmlDocumentTag = generateKMLDocumentTag(document);
+        attachMetadataToDocumentTag(document, kmlDocumentTag, fileName);
+        attachTracksToDocumentTag(document, kmlDocumentTag, tracksToExport);
+        return document;
+    }
+
+    private Element generateKMLDocumentTag(Document document) throws Exception {
         // root element
         Element kmlElement = document.createElement("kml");
         Attr namespaceKML = document.createAttribute("xmlns");
@@ -65,17 +80,10 @@ public class KMLFileFormat implements ExportFileFormat {
         Element kmlDocument = document.createElement("Document");
         kmlElement.appendChild(kmlDocument);
 
-        attachMetadataToDocumentTag(kmlDocument, fileName);
-        attachTracksToDocumentTag(kmlDocument, tracksToExport);
-
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(outputStream);
-        transformer.transform(source, result);
+        return kmlDocument;
     }
 
-    private void attachMetadataToDocumentTag(Element parent, String fileName) {
+    private void attachMetadataToDocumentTag(Document document, Element parent, String fileName) {
         //visibility (whether to draw in 3D viewer when initially loaded)
         Element visibility = document.createElement("visibility");
         visibility.appendChild(document.createTextNode("1"));
@@ -123,7 +131,7 @@ public class KMLFileFormat implements ExportFileFormat {
         parent.appendChild(trackStyle);
     }
 
-    private void attachTracksToDocumentTag(Element parent, Set<Track> tracksToExport) {
+    private void attachTracksToDocumentTag(Document document, Element parent, Set<Track> tracksToExport) {
         for (Track track : tracksToExport) {
             //placemark
             Element placemark = document.createElement("Placemark");

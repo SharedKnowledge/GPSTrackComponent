@@ -237,9 +237,13 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
         String chooseDifferentTileSourceMessage = "Please choose a different tile source in the tile source settings and try again.";
         String downloadNotAllowedMessage = "Osmdroid does not allow downloads from this tile source. " + chooseDifferentTileSourceMessage;
         if (cacheNorth != null &&
+                !cacheNorth.getText().toString().isEmpty() &&
                 cacheEast != null &&
+                !cacheEast.getText().toString().isEmpty() &&
                 cacheSouth != null &&
+                !cacheSouth.getText().toString().isEmpty() &&
                 cacheWest != null &&
+                !cacheWest.getText().toString().isEmpty() &&
                 zoomMaxSeekBar != null &&
                 zoomMinSeekBar != null &&
                 cacheOutput != null) {
@@ -250,7 +254,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                 s = Double.parseDouble(cacheSouth.getText().toString());
                 w = Double.parseDouble(cacheWest.getText().toString());
             } catch (Exception ex) {
-                Toast.makeText(this, "Input cannot be parsed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Input cannot be parsed: " + ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 Log.e(getLogStart(), ex.getLocalizedMessage());
                 return;
             }
@@ -297,17 +301,24 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
             int zoomMax = zoomMaxSeekBar.getProgress() + zoomMinTileSource;
             zoomMinCurrent.setText(String.valueOf(zoomMin));
             zoomMaxCurrent.setText(String.valueOf(zoomMax));
-            //nesw
-            BoundingBox bb = new BoundingBox(n, e, s, w);
+
+            BoundingBox bb;
+            try {
+                bb = new BoundingBox(n, e, s, w);
+            } catch (Exception ex) {
+                Toast.makeText(this, ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                return;
+            }
             int tilecount = mgr.possibleTilesInArea(bb, zoomMin, zoomMax);
             cacheEstimate.setText(tilecount + " tiles");
             if (tilecount > TILE_DOWNLOAD_LIMIT_COUNT) {
                 cacheEstimate.setError("The tile count exceeds the allowed download limit of " + TILE_DOWNLOAD_LIMIT_COUNT + " Tiles per Download!");
-                cacheEstimate.requestFocus();
+                cacheEstimate.setClickable(true);
                 executeJob.setEnabled(false);
                 return;
             } else if (!executeJob.isEnabled()) {
                 cacheEstimate.setError(null);
+                cacheEstimate.setClickable(false);
                 executeJob.setEnabled(true);
             }
 

@@ -25,7 +25,7 @@ public class TrackOverlay extends GeoModelOverlay<Track> {
 
     public void initializeComponents(MapView mapView) {
         for (TrackSegmentOverlay trackSegmentOverlay : trackSegmentOverlays) {
-            trackSegmentOverlay.addStartEndMarkers(mapView);
+            trackSegmentOverlay.initComponents(mapView);
         }
     }
 }

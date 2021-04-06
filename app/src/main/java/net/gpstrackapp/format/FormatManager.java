@@ -1,5 +1,7 @@
 package net.gpstrackapp.format;
 
+import net.gpstrackapp.GPSComponent;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +13,7 @@ public class FormatManager {
 
     static {
         registerFormat(new KMLFileFormat());
-        registerFormat(new GPXFileFormat());
+        registerFormat(new GPXFileFormat(GPSComponent.getGPSComponent().getTrackModelManager()));
     }
 
     public static Map<String, ImportFileFormat> getImportFormats() {

@@ -88,29 +88,22 @@ public class EditGeoModelActivity extends AppCompatActivity {
 
     public void onSaveButtonClicked(View view) {
         String name = nameText.getText().toString();
-        String date = dateText.getText().toString();
         String creator = creatorText.getText().toString();
-
-        if (name.isEmpty()) {
-            name = null;
-        }
-        geoModel.setObjectName(name);
+        String date = dateText.getText().toString();
 
         LocalDateTime dateOfCreation = null;
         if (!date.isEmpty()) {
             try {
-                dateOfCreation = (LocalDateTime) formatter.parse(date);
+                dateOfCreation = LocalDateTime.parse(date, formatter);
             } catch (Exception e) {
                 dateText.setError("Enter the date in the format: " + formatterPattern);
                 return;
             }
         }
-        geoModel.setDateOfCreation(dateOfCreation);
 
-        if (creator.isEmpty()) {
-            creator = null;
-        }
+        geoModel.setObjectName(name);
         geoModel.setCreator(creator);
+        geoModel.setDateOfCreation(dateOfCreation);
 
         String changed = "Changes were applied to geomodel";
         Toast.makeText(this, changed, Toast.LENGTH_SHORT).show();
