@@ -1,5 +1,7 @@
 package net.gpstrackapp.activity.geomodel.track;
 
+import android.widget.Toast;
+
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
@@ -17,6 +19,7 @@ public class DeleteTracksActivity extends GeoModelListSelectionActivity {
         Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
         trackModelManager.deleteGeoModelsFromFiles(this, selectedTracks);
         trackModelManager.removeGeoModelsByUUIDs(selectedItemIDs);
+        Toast.makeText(this, "The Tracks have been successfully deleted.", Toast.LENGTH_SHORT).show();
         finish();
     }
 

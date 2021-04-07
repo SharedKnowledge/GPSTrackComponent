@@ -35,6 +35,9 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
 
     @Override
     public boolean saveGeoModelToFile(Context ctx, Track trackToSave) {
+        if (trackToSave == null) {
+            return false;
+        }
         try {
             File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
             dir.mkdirs();
@@ -47,23 +50,27 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             return true;
         } catch (IOException e) {
             Log.e(getLogStart(), "A problem occurred while trying to save a track." + System.lineSeparator() + e.getLocalizedMessage());
-            Toast.makeText(ctx, "A problem occurred while trying to save a track.", Toast.LENGTH_LONG).show();
             return false;
         }
     }
 
     @Override
     public boolean saveGeoModelsToFiles(Context ctx, Set<Track> tracksToSave) {
+        if (tracksToSave == null) {
+            return false;
+        }
         boolean allSaved = true;
         for (Track trackToSave : tracksToSave) {
             allSaved = saveGeoModelToFile(ctx, trackToSave) && allSaved;
         }
-        Toast.makeText(ctx, "The Tracks have been successfully saved.", Toast.LENGTH_SHORT).show();
         return allSaved;
     }
 
     @Override
     public boolean deleteGeoModelFromFile(Context ctx, Track trackToDelete) {
+        if (trackToDelete == null) {
+            return false;
+        }
         File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
         dir.mkdirs();
         File fileToDelete = new File(dir, trackToDelete.getObjectID().toString());
@@ -74,11 +81,13 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
 
     @Override
     public boolean deleteGeoModelsFromFiles(Context ctx, Set<Track> tracksToDelete) {
+        if (tracksToDelete == null) {
+            return false;
+        }
         boolean allDeleted = true;
         for (Track trackToDelete : tracksToDelete) {
             allDeleted = deleteGeoModelFromFile(ctx, trackToDelete) && allDeleted;
         }
-        Toast.makeText(ctx, "The Tracks have been successfully deleted.", Toast.LENGTH_SHORT).show();
         return allDeleted;
     }
 

@@ -1,5 +1,7 @@
 package net.gpstrackapp.activity.geomodel.track;
 
+import android.widget.Toast;
+
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
@@ -15,7 +17,11 @@ public class SaveTracksActivity extends GeoModelListSelectionActivity {
     @Override
     protected void onSelectionFinished(Set<CharSequence> selectedItemIDs) {
         Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
-        trackModelManager.saveGeoModelsToFiles(this, selectedTracks);
+        if (trackModelManager.saveGeoModelsToFiles(this, selectedTracks)) {
+            Toast.makeText(this, "The Tracks have been successfully saved.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "At least one track could not be saved.", Toast.LENGTH_SHORT).show();
+        }
         finish();
     }
 
