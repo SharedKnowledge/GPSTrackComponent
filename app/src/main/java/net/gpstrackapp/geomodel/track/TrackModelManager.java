@@ -2,9 +2,7 @@ package net.gpstrackapp.geomodel.track;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
-import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModelManager;
 import net.gpstrackapp.geomodel.GeoModelStorage;
 
@@ -22,15 +20,13 @@ import java.util.stream.Collectors;
 
 public class TrackModelManager extends GeoModelManager<Track> implements GeoModelStorage<Track> {
     private static final String SUBDIR_NAME = "tracks";
-    public void mergeTracks(Context ctx, Set<Track> tracksToMerge, String newTrackName) {
+    public void mergeTracks(Set<Track> tracksToMerge, String newTrackName, String ownerName) {
         List<TrackSegment> trackSegments = tracksToMerge.stream()
                 .flatMap(track -> track.getTrackSegments().stream())
                 .collect(Collectors.toList());
-        Track track = new Track(null, newTrackName,
-                GPSComponent.getGPSComponent().getASAPApplication().getOwnerName(),
+        Track track = new Track(null, newTrackName, ownerName,
                 LocalDateTime.now(), trackSegments);
         addGeoModel(track);
-        Toast.makeText(ctx, "The Tracks have been successfully merged.", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.gpstrackapp.activity.geomodel.track;
 
 import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.activity.geomodel.GeoModelListSelectionActivity;
@@ -42,7 +43,9 @@ public class MergeTracksActivity extends GeoModelListSelectionActivity {
 
     private void mergeTracks(Set<CharSequence> selectedItemIDs, String trackName) {
         Set<Track> selectedTracks = trackModelManager.getGeoModelsByUUIDs(selectedItemIDs);
-        trackModelManager.mergeTracks(this, selectedTracks, trackName);
+        String ownerName = GPSComponent.getGPSComponent().getASAPApplication().getOwnerName().toString();
+        trackModelManager.mergeTracks(selectedTracks, trackName, ownerName);
+        Toast.makeText(this, "The Tracks have been successfully merged.", Toast.LENGTH_SHORT).show();
         finish();
     }
 
