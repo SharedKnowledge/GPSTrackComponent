@@ -18,9 +18,9 @@ public abstract class GeoModel implements Serializable {
 
     public GeoModel(CharSequence objectID, CharSequence objectName, CharSequence creator, LocalDateTime dateOfCreation) {
         this.objectID = objectID == null ? UUID.randomUUID().toString() : objectID;
-        this.objectName = objectName == null ? "" : objectName;
-        this.creator = creator == null ? "" : creator;
-        this.dateOfCreation = dateOfCreation;
+        setObjectName(objectName);
+        setCreator(creator);
+        setDateOfCreation(dateOfCreation);
     }
 
     public void setObjectName(CharSequence objectName) {
@@ -32,6 +32,12 @@ public abstract class GeoModel implements Serializable {
     }
 
     public void setDateOfCreation(LocalDateTime dateOfCreation) {
+        if (dateOfCreation != null) {
+            if (dateOfCreation.isAfter(LocalDateTime.now())) {
+                this.dateOfCreation = LocalDateTime.now();
+                return;
+            }
+        }
         this.dateOfCreation = dateOfCreation;
     }
 

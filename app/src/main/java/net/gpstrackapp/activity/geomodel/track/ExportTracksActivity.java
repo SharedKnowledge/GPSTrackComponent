@@ -121,7 +121,12 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
             if (resultCode == RESULT_OK) {
                 Uri result = data.getData();
                 DocumentFile dir = DocumentFile.fromTreeUri(this, result);
-                exportHelper.exportToFile(dir);
+                try {
+                    exportHelper.exportToFile(dir);
+                } catch (Exception e) {
+                    Toast.makeText(this, "Export was not successful. Error message: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                    Log.e(getLogStart(), e.getLocalizedMessage());
+                }
                 Toast.makeText(this, "Export was successful.", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -170,14 +175,10 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
             this.fileName = fileName;
         }
 
-        public void exportToFile(DocumentFile dir) {
-            try {
-                DocumentFile newFile = dir.createFile(format.getMediaType(), fileName);
-                OutputStream outputStream = getContentResolver().openOutputStream(newFile.getUri());
-                format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream, GPSComponent.getGPSComponent().getASAPApplication().getOwnerName());
-            } catch (Exception e) {
-                Log.e(getLogStart(), e.getLocalizedMessage());
-            }
+        public void exportToFile(DocumentFile dir) throws Exception {
+            DocumentFile newFile = dir.createFile(format.getMediaType(), fileName);
+            OutputStream outputStream = getContentResolver().openOutputStream(newFile.getUri());
+            format.exportToFile(ExportTracksActivity.this, tracksToExport, fileName, outputStream, GPSComponent.getGPSComponent().getASAPApplication().getOwnerName());
         }
     }
 }

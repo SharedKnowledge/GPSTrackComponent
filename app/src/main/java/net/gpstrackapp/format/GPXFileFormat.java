@@ -51,7 +51,7 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
     }
 
     @Override
-    public void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream, CharSequence ownerName) throws IOException {
+    public void exportToFile(Context ctx, Set<Track> tracksToExport, String fileName, OutputStream outputStream, CharSequence ownerName) throws Exception {
         String appName = ctx.getApplicationInfo().loadLabel(ctx.getPackageManager()).toString();
         GPX gpx = generateGPX(tracksToExport, fileName, appName, ownerName);
         GPX.write(gpx, outputStream);

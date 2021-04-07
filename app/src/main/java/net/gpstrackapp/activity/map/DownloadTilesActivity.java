@@ -237,13 +237,9 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
         String chooseDifferentTileSourceMessage = "Please choose a different tile source in the tile source settings and try again.";
         String downloadNotAllowedMessage = "Osmdroid does not allow downloads from this tile source. " + chooseDifferentTileSourceMessage;
         if (cacheNorth != null &&
-                !cacheNorth.getText().toString().isEmpty() &&
                 cacheEast != null &&
-                !cacheEast.getText().toString().isEmpty() &&
                 cacheSouth != null &&
-                !cacheSouth.getText().toString().isEmpty() &&
                 cacheWest != null &&
-                !cacheWest.getText().toString().isEmpty() &&
                 zoomMaxSeekBar != null &&
                 zoomMinSeekBar != null &&
                 cacheOutput != null) {

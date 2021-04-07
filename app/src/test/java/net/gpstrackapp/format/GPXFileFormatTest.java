@@ -5,6 +5,7 @@ import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackPoint;
 import net.gpstrackapp.geomodel.track.TrackSegment;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.osmdroid.util.GeoPoint;
 
@@ -21,11 +22,14 @@ import static org.junit.Assert.fail;
 
 public class GPXFileFormatTest {
     private static TrackModelManager trackModelManager = new TrackModelManager();
+    private GPXFileFormat gpxFileFormat = new GPXFileFormat(trackModelManager);
     private String appName = "appName";
     private String ownerName = "creator1";
 
-    @Test
-    public void conversionToAndFromGPXShouldReturnInput() {
+    private Track track1, track2;
+
+    @Before
+    public void setup() {
         TrackPoint trackPoint1_1_1 = new TrackPoint(new GeoPoint(80.0, 63.0), LocalDateTime.of(2021, 1, 1, 0, 10));
         TrackPoint trackPoint1_1_2 = new TrackPoint(new GeoPoint(35.0, -27.0), LocalDateTime.of(2021, 1, 1, 0, 11));
         TrackSegment trackSegment1_1 = new TrackSegment(new ArrayList<>(Arrays.asList(trackPoint1_1_1, trackPoint1_1_2)));
@@ -34,15 +38,17 @@ public class GPXFileFormatTest {
         TrackPoint trackPoint1_2_2 = new TrackPoint(new GeoPoint(-83.0, 61.0), LocalDateTime.of(2021, 1, 1, 0, 21));
         TrackSegment trackSegment1_2 = new TrackSegment(new ArrayList<>(Arrays.asList(trackPoint1_2_1, trackPoint1_2_2)));
 
-        Track track1 = new Track(null, "track1", ownerName, LocalDateTime.now(), new ArrayList<>(Arrays.asList(trackSegment1_1, trackSegment1_2)));
+        track1 = new Track(null, "track1", ownerName, LocalDateTime.now(), new ArrayList<>(Arrays.asList(trackSegment1_1, trackSegment1_2)));
 
         TrackPoint trackPoint2_1_1 = new TrackPoint(new GeoPoint(72.0, 39.0), LocalDateTime.of(2021, 1, 2, 0, 5));
         TrackPoint trackPoint2_1_2 = new TrackPoint(new GeoPoint(74.0, -127.0), LocalDateTime.of(2021, 1, 2, 0, 6));
         TrackSegment trackSegment2_1 = new TrackSegment(new ArrayList<>(Arrays.asList(trackPoint2_1_1, trackPoint2_1_2)));
 
-        Track track2 = new Track(null, null, null, null, new ArrayList<>(Arrays.asList(trackSegment2_1)));
+        track2 = new Track(null, null, null, null, new ArrayList<>(Arrays.asList(trackSegment2_1)));
+    }
 
-        GPXFileFormat gpxFileFormat = new GPXFileFormat(trackModelManager);
+    @Test
+    public void conversionToAndFromGPXWithValidValuesShouldResultInSameValues() {
         GPX gpxFile = gpxFileFormat.generateGPX(new HashSet<>(Arrays.asList(track1, track2)), "gpxFile", appName, ownerName);
 
         gpxFileFormat.parseObjectsFromGPX(gpxFile, appName);
