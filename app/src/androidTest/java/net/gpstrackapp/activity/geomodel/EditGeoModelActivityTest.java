@@ -23,10 +23,10 @@ import java.util.UUID;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(AndroidJUnit4.class)
 public class EditGeoModelActivityTest {
@@ -82,7 +82,7 @@ public class EditGeoModelActivityTest {
         assertEquals(track.getObjectName(), nameString);
         assertEquals(track.getCreator(), creatorString);
         // date cannot be empty and should be null instead
-        assertEquals(track.getDateOfCreation(), null);
+        assertNull(track.getDateOfCreation());
     }
 
     @Test
@@ -110,9 +110,9 @@ public class EditGeoModelActivityTest {
     }
 
     private void typeUserInputAndSave(String nameString, String creatorString, String dateString) {
-        onView(withId(R.id.gpstracker_geomodel_edit_name_value)).perform(replaceText(nameString), closeSoftKeyboard());
-        onView(withId(R.id.gpstracker_geomodel_edit_creator_value)).perform(replaceText(creatorString), closeSoftKeyboard());
-        onView(withId(R.id.gpstracker_geomodel_edit_date_value)).perform(replaceText(dateString), closeSoftKeyboard());
+        onView(withId(R.id.gpstracker_geomodel_edit_name_value)).perform(replaceText(nameString));
+        onView(withId(R.id.gpstracker_geomodel_edit_creator_value)).perform(replaceText(creatorString));
+        onView(withId(R.id.gpstracker_geomodel_edit_date_value)).perform(replaceText(dateString));
         onView(withId(R.id.gpstracker_geomodel_edit_save_button)).perform(click());
     }
 }
