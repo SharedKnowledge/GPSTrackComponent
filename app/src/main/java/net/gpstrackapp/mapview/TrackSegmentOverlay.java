@@ -24,7 +24,7 @@ public class TrackSegmentOverlay extends FolderOverlay {
         this.polyLineToastText = polyLineToastText;
     }
 
-    public void initComponents(MapView mapView) {
+    public void initializeComponents(MapView mapView) {
         line = createLine(mapView, trackSegment.getGeoPoints(), polyLineToastText);
         add(line);
 
