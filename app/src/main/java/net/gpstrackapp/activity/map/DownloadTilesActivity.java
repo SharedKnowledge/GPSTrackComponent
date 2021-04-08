@@ -71,15 +71,15 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
         }
         descriptionView.setText(description);
 
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
         // to ensure that the fragment is only attached once
-        if (savedInstanceState == null) {
+        if (fragmentManager.findFragmentByTag(ConfiguredMapFragment.TAG) == null) {
             Bundle bundle = new Bundle();
             bundle.putBoolean("downloadable", true);
             configuredMapFragment = new ConfiguredMapFragment();
             configuredMapFragment.setArguments(bundle);
-            FragmentManager fragmentManager = this.getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .add(R.id.gpstracker_mapfragment_container, configuredMapFragment)
+                    .add(R.id.gpstracker_mapfragment_container, configuredMapFragment, ConfiguredMapFragment.TAG)
                     .commit();
         }
     }
