@@ -22,6 +22,7 @@ import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.format.FormatManager;
 import net.gpstrackapp.format.ImportFileFormat;
+import net.sharksystem.asap.android.Util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init action buttons");
+        Log.d(Util.getLogStart(this), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_abort_action_button, menu);
         return true;
@@ -71,7 +72,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.e(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
+            Log.e(Util.getLogStart(this), "problem on options item selected: " + e.getLocalizedMessage());
         }
         return false;
     }
@@ -116,7 +117,7 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                         try {
                             importFileFormat.importFromFile(this, inputStream);
                         } catch (IOException e) {
-                            Log.e(getLogStart(), e.getLocalizedMessage());
+                            Log.e(Util.getLogStart(this), e.getLocalizedMessage());
                         }
                         Toast.makeText(this, "Import was successful.", Toast.LENGTH_SHORT).show();
                         finish();
@@ -124,14 +125,10 @@ public class ImportTracksActivity extends AppCompatActivity implements ActivityW
                         Toast.makeText(this, "The file could not be imported because the file format is not supported", Toast.LENGTH_SHORT).show();
                     }
                 } catch (FileNotFoundException e) {
-                    Log.e(getLogStart(), e.getLocalizedMessage());
+                    Log.e(Util.getLogStart(this), e.getLocalizedMessage());
                 }
             }
         }
-    }
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
     }
 
     @Override

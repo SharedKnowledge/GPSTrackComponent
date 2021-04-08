@@ -38,6 +38,7 @@ import net.gpstrackapp.geomodel.track.TrackSegment;
 import net.gpstrackapp.location.LocationService;
 import net.gpstrackapp.mapview.ConfiguredMapFragment;
 import net.gpstrackapp.recording.TrackRecorder;
+import net.sharksystem.asap.android.Util;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.config.IConfigurationProvider;
@@ -66,7 +67,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     private ConfiguredMapFragment configuredMapFragment;
     private TrackRecorder trackRecorder;
     private TrackRecordingPresenter trackRecordingPresenter;
-    private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private final TrackModelManager trackModelManager = GPSComponent.getTrackModelManager();
     private boolean askedForPermissions = false;
 
     // invalidate map when going online
@@ -76,7 +77,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
             try {
                 configuredMapFragment.invalidateMapView();
             } catch (NullPointerException e) {
-                Log.e(getLogStart(), "mapView is null");
+                Log.e(Util.getLogStart(this), "mapView is null");
             }
         }
     };
@@ -84,7 +85,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(getLogStart(), "onCreate");
+        Log.d(Util.getLogStart(this), "onCreate");
         if (!askedForPermissions) {
             askedForPermissions = true;
             requestPermissionsIfNecessary(new String[] {
@@ -110,12 +111,12 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
         Toolbar toolbar = findViewById(R.id.gpstracker_tracker_mapview_toolbar);
         setSupportActionBar(toolbar);
 
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
         // to ensure that the fragment is only attached once
-        if (savedInstanceState == null) {
+        if (fragmentManager.findFragmentByTag(ConfiguredMapFragment.TAG) == null) {
             configuredMapFragment = new ConfiguredMapFragment();
-            FragmentManager fragmentManager = this.getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .add(R.id.gpstracker_mapfragment_container, configuredMapFragment)
+                    .add(R.id.gpstracker_mapfragment_container, configuredMapFragment, ConfiguredMapFragment.TAG)
                     .commit();
         }
 
@@ -134,7 +135,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
             public void removeOverlay(Overlay overlay) {
                 configuredMapFragment.removeOverlay(overlay);
             }
-        });
+        }, GPSComponent.getTrackModelManager());
         trackRecordingPresenter.onCreate();
     }
 
@@ -173,7 +174,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
 
     @Override
     protected void onDestroy() {
-        Log.d(getLogStart(), "onDestroy");
+        Log.d(Util.getLogStart(this), "onDestroy");
         trackRecorder.onDestroy();
         trackRecordingPresenter.onDestroy();
         unregisterReceiver(networkReceiver);
@@ -191,7 +192,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init action buttons");
+        Log.d(Util.getLogStart(this), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_tracker_mapview_action_buttons, menu);
         return true;
@@ -240,7 +241,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     }
 
     private void adjustMenuToRecordingState(Menu menu) {
-        Log.d(getLogStart(), "Adjust menu");
+        Log.d(Util.getLogStart(this), "Adjust menu");
         MenuItem recordingItem = menu.findItem(R.id.record_item);
         if (trackRecorder.isRecordingTrack()) {
             recordingItem.setTitle(getResources().getString(R.string.gpstracker_item_tracks_stop_record_button_text));
@@ -289,7 +290,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.e(getLogStart(), e.getLocalizedMessage());
+            Log.e(Util.getLogStart(this), e.getLocalizedMessage());
         }
         return false;
     }
@@ -433,7 +434,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(getLogStart(), "onRequestPermissionsResult");
+        Log.d(Util.getLogStart(this), "onRequestPermissionsResult");
         for (int grantResult : grantResults) {
             if (grantResult == PackageManager.PERMISSION_GRANTED) {
                 // recreate this activity if any permissions were granted
@@ -444,7 +445,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
     }
 
     private void requestPermissionsIfNecessary(String[] permissions) {
-        Log.d(getLogStart(), "requestPermissionsIfNecessary");
+        Log.d(Util.getLogStart(this), "requestPermissionsIfNecessary");
         ArrayList<String> permissionsToRequest = new ArrayList<>();
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission)
@@ -460,9 +461,5 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
                     permissionsToRequest.toArray(new String[0]),
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
-    }
-
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
     }
 }

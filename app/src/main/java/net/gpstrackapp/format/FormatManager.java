@@ -13,7 +13,7 @@ public class FormatManager {
 
     static {
         registerFormat(new KMLFileFormat());
-        registerFormat(new GPXFileFormat(GPSComponent.getGPSComponent().getTrackModelManager()));
+        registerFormat(new GPXFileFormat(GPSComponent.getTrackModelManager()));
     }
 
     public static Map<String, ImportFileFormat> getImportFormats() {

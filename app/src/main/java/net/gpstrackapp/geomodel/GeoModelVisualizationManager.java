@@ -68,15 +68,17 @@ public abstract class GeoModelVisualizationManager<K extends GeoModel, V extends
     public String createToastText() {
         String toastText = "";
         if (geoModelOverlaysToAddToMap.size() > 0) {
-            toastText += "Added \"" + geoModelOverlaysToAddToMap.get(0).getGeoModel().getObjectName() + "\"";
+            // use the name of any object in the map
+            toastText += "Added \"" + geoModelOverlaysToAddToMap.values().iterator().next().getGeoModel().getObjectName() + "\"";
             if (geoModelOverlaysToAddToMap.size() > 1) {
                 toastText += " and " + (geoModelOverlaysToAddToMap.size() - 1) + " more";
             }
             toastText += " to the map.";
         }
-        if (geoModelOverlaysToAddToMap.size() > 0) {
+        if (geoModelOverlaysToRemoveFromMap.size() > 0) {
             toastText += toastText.equals("") ? "" : System.lineSeparator();
-            toastText += "Removed \"" + geoModelOverlaysToRemoveFromMap.get(0).getGeoModel().getObjectName() + "\"";
+            // use the name of any object in the map
+            toastText += "Removed \"" + geoModelOverlaysToRemoveFromMap.values().iterator().next().getGeoModel().getObjectName() + "\"";
             if (geoModelOverlaysToRemoveFromMap.size() > 1) {
                 toastText += " and " + (geoModelOverlaysToRemoveFromMap.size() - 1) + " more";
             }

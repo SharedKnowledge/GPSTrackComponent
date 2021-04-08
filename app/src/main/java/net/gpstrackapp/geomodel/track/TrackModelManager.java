@@ -5,6 +5,7 @@ import android.util.Log;
 
 import net.gpstrackapp.geomodel.GeoModelManager;
 import net.gpstrackapp.geomodel.GeoModelStorage;
+import net.sharksystem.asap.android.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,10 +43,10 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(trackToSave);
             oos.close();
-            Log.d(getLogStart(), "Saved track: " + trackToSave.getObjectName());
+            Log.d(Util.getLogStart(this), "Saved track: " + trackToSave.getObjectName());
             return true;
         } catch (IOException e) {
-            Log.e(getLogStart(), "A problem occurred while trying to save a track." + System.lineSeparator() + e.getLocalizedMessage());
+            Log.e(Util.getLogStart(this), "A problem occurred while trying to save a track." + System.lineSeparator() + e.getLocalizedMessage());
             return false;
         }
     }
@@ -70,7 +71,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
         File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
         dir.mkdirs();
         File fileToDelete = new File(dir, trackToDelete.getObjectID().toString());
-        Log.d(getLogStart(), "Deleted track: " + trackToDelete.getObjectName());
+        Log.d(Util.getLogStart(this), "Deleted track: " + trackToDelete.getObjectName());
         // just returns false if file does not exist
         return fileToDelete.delete();
     }
@@ -93,7 +94,7 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
         File dir = new File(ctx.getFilesDir(), SUBDIR_NAME);
         dir.mkdirs();
         File[] files = dir.listFiles(File::isFile);
-        Log.d(getLogStart(), "Attempt to load " + files.length + " tracks from storage");
+        Log.d(Util.getLogStart(this), "Attempt to load " + files.length + " tracks from storage");
         Set<Track> tracks = new HashSet<>();
         for (File file : files) {
             try {
@@ -101,9 +102,9 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 Track loadedTrack = (Track) ois.readObject();
                 tracks.add(loadedTrack);
-                Log.d(getLogStart(), "Loaded track with UUID: " + loadedTrack.getObjectID());
+                Log.d(Util.getLogStart(this), "Loaded track with UUID: " + loadedTrack.getObjectID());
             } catch (IOException | ClassNotFoundException e) {
-                Log.e(getLogStart(), "A problem occurred while trying to load a track." + System.lineSeparator() + e.getLocalizedMessage());
+                Log.e(Util.getLogStart(this), "A problem occurred while trying to load a track." + System.lineSeparator() + e.getLocalizedMessage());
                 allLoaded = false;
             }
         }
@@ -111,9 +112,5 @@ public class TrackModelManager extends GeoModelManager<Track> implements GeoMode
             this.addGeoModel(track);
         }
         return allLoaded;
-    }
-
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
     }
 }

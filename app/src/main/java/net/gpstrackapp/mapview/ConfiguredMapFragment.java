@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.gpstrackapp.activity.map.ActivityWithAdditionalMapOverlays;
+import net.sharksystem.asap.android.Util;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -30,6 +31,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 public class ConfiguredMapFragment extends Fragment {
+    public static final String TAG = "ConfiguredMapFragment";
     public static final float DEFAULT_ZOOM_LEVEL = 17;
     // set HTW Campus Wilhelminenhof as default location
     public static final String DEFAULT_LATITUDE = "52.457563642191246";
@@ -55,7 +57,7 @@ public class ConfiguredMapFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(getLogStart(), "onCreateView");
+        Log.d(Util.getLogStart(this), "onCreateView");
         Bundle bundle = getArguments();
         this.downloadable = bundle != null ? bundle.getBoolean("downloadable") : false;
         if (downloadable) {
@@ -64,6 +66,7 @@ public class ConfiguredMapFragment extends Fragment {
             mapView = new MapView(inflater.getContext());
         }
         mapView.setDestroyMode(false);
+        mapView.setTag("mapView");
         return mapView;
     }
 
@@ -80,7 +83,7 @@ public class ConfiguredMapFragment extends Fragment {
     }
 
     private void setupOverlays(Context ctx) {
-        Log.d(getLogStart(), "setup Overlays");
+        Log.d(Util.getLogStart(this), "setup Overlays");
         mapView.getOverlays().clear();
         if (copyrightOverlay == null) {
             copyrightOverlay = new CopyrightOverlay(ctx);
@@ -124,7 +127,7 @@ public class ConfiguredMapFragment extends Fragment {
                 trackOverlay.initializeComponents(mapView);
             }
         } else {
-            Log.e(getLogStart(), "Could not add Overlay because the activity is not yet created");
+            Log.e(Util.getLogStart(this), "Could not add Overlay because the activity is not yet created");
         }
     }
 
@@ -132,7 +135,7 @@ public class ConfiguredMapFragment extends Fragment {
         if (mapViewReady) {
             mapView.getOverlays().remove(overlay);
         } else {
-            Log.e(getLogStart(), "Could not add Overlay because the activity is not yet created");
+            Log.e(Util.getLogStart(this), "Could not add Overlay because the activity is not yet created");
         }
     }
 
@@ -156,7 +159,7 @@ public class ConfiguredMapFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(getLogStart(), "onResume");
+        Log.d(Util.getLogStart(this), "onResume");
 
         // refresh the osmdroid configuration so that overlays can adjust
         mapView.onResume();
@@ -164,7 +167,7 @@ public class ConfiguredMapFragment extends Fragment {
 
     @Override
     public void onPause() {
-        Log.d(getLogStart(), "onPause");
+        Log.d(Util.getLogStart(this), "onPause");
         saveMapPreferences();
 
         // refresh the osmdroid configuration so that overlays can adjust
@@ -174,14 +177,14 @@ public class ConfiguredMapFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        Log.d(getLogStart(), "onDestroyView");
+        Log.d(Util.getLogStart(this), "onDestroyView");
         super.onDestroyView();
         mapView.onDetach();
         mapViewReady = false;
     }
 
     private void loadMapPreferences() {
-        Log.d(getLogStart(), "loadMapPreferences");
+        Log.d(Util.getLogStart(this), "loadMapPreferences");
         prefs = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         String latString = prefs.getString(PREFS_LATITUDE, DEFAULT_LATITUDE);
@@ -212,7 +215,7 @@ public class ConfiguredMapFragment extends Fragment {
     }
 
     private void saveMapPreferences() {
-        Log.d(getLogStart(), "saveMapPreferences");
+        Log.d(Util.getLogStart(this), "saveMapPreferences");
         SharedPreferences.Editor editor = prefs.edit();
         IGeoPoint lastLocation = mapView.getMapCenter();
         if (lastLocation != null) {
@@ -250,9 +253,5 @@ public class ConfiguredMapFragment extends Fragment {
 
     public void invalidateMapView() {
         mapView.invalidate();
-    }
-
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
     }
 }

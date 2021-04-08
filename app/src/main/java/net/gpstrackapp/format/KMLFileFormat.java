@@ -7,6 +7,7 @@ import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackPoint;
 import net.gpstrackapp.geomodel.track.TrackSegment;
+import net.sharksystem.asap.android.Util;
 
 import org.osmdroid.util.GeoPoint;
 import org.w3c.dom.Attr;
@@ -197,15 +198,11 @@ public class KMLFileFormat implements ExportFileFormat {
                             coord.appendChild(document.createTextNode(formattedCoord));
                             kmlTrack.appendChild(coord);
                         } else {
-                            Log.d(getLogStart(), "A TrackPoint was skipped because values were missing");
+                            Log.d(Util.getLogStart(this), "A TrackPoint was skipped because values were missing");
                         }
                     }
                 }
             }
         }
-    }
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
     }
 }

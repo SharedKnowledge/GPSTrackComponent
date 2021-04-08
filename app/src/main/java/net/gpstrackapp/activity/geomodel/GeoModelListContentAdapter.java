@@ -13,6 +13,7 @@ import android.widget.TextView;
 import net.gpstrackapp.R;
 import net.gpstrackapp.geomodel.GeoModel;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
+import net.sharksystem.asap.android.Util;
 
 public class GeoModelListContentAdapter extends
         RecyclerView.Adapter<GeoModelListContentAdapter.MyViewHolder>
@@ -42,7 +43,7 @@ public class GeoModelListContentAdapter extends
     }
 
     public GeoModelListContentAdapter(Context ctx, SelectableGeoModelListContentAdapterHelper helper, RequestGeoModelsCommand requestGeoModelsCommand) {
-        Log.d(this.getLogStart(), "constructor");
+        Log.d(Util.getLogStart(this), "constructor");
         this.ctx = ctx;
         this.clickListener = this;
         this.longClickListener = this;
@@ -53,7 +54,7 @@ public class GeoModelListContentAdapter extends
     @NonNull
     @Override
     public GeoModelListContentAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(this.getLogStart(), "onCreateViewHolder");
+        Log.d(Util.getLogStart(this), "onCreateViewHolder");
         View itemView = LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.gpstracker_list_geomodels_row, parent, false);
@@ -62,7 +63,7 @@ public class GeoModelListContentAdapter extends
 
     @Override
     public void onBindViewHolder(@NonNull GeoModelListContentAdapter.MyViewHolder holder, int position) {
-        Log.d(getLogStart(), "onBindViewHolder with position: " + position);
+        Log.d(Util.getLogStart(this), "onBindViewHolder with position: " + position);
         GeoModel geoModel = requestGeoModelsCommand.getGeoModels().get(position);
 
         CharSequence geoModelID = geoModel.getObjectID();
@@ -91,7 +92,7 @@ public class GeoModelListContentAdapter extends
 
     @Override
     public boolean onLongClick(View view) {
-        Log.d(getLogStart(), "onLongClick");
+        Log.d(Util.getLogStart(this), "onLongClick");
         CharSequence geoModelID = (CharSequence) view.getTag(R.id.geomodel_id_tag);
         Intent intent = new Intent(ctx, EditGeoModelActivity.class);
         intent.putExtra("geoModelID", geoModelID);
@@ -106,9 +107,5 @@ public class GeoModelListContentAdapter extends
         }
         CharSequence geoModelID = (CharSequence) view.getTag(R.id.geomodel_id_tag);
         helper.onAction(this, view, geoModelID);
-    }
-
-    protected String getLogStart() {
-        return this.getClass().getSimpleName();
     }
 }

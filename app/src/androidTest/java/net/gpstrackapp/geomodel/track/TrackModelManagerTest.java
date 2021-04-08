@@ -1,7 +1,6 @@
 package net.gpstrackapp.geomodel.track;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -54,14 +53,9 @@ public class TrackModelManagerTest {
     @Test
     public void saveAndLoadAndDeleteForValidTracksShouldWork() {
         int savedTracksCount = trackModelManager.count();
-        Log.d("TrackModelManagerTest", "" + savedTracksCount);
         trackModelManager.saveGeoModelsToFiles(ctx, new HashSet<>(Arrays.asList(track1, track2)));
 
         trackModelManager.loadAllGeoModelsFromFiles(ctx);
-
-        for (Track track : trackModelManager.getAll()) {
-            Log.d("TrackModelManagerTest", track.getObjectName().toString());
-        }
 
         // make sure tracks were saved and loaded, 2 new tracks should be now in trackModelManager
         assertEquals(savedTracksCount + 2, trackModelManager.count());

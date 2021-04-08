@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import net.gpstrackapp.R;
 import net.gpstrackapp.activity.ActivityWithDescription;
+import net.sharksystem.asap.android.Util;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -67,7 +68,7 @@ public class MapTileSettingsActivity extends AppCompatActivity implements Activi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init action buttons");
+        Log.d(Util.getLogStart(this), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_abort_action_button, menu);
         return true;
@@ -86,7 +87,7 @@ public class MapTileSettingsActivity extends AppCompatActivity implements Activi
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.e(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
+            Log.e(Util.getLogStart(this), "problem on options item selected: " + e.getLocalizedMessage());
         }
         return false;
     }
@@ -108,9 +109,5 @@ public class MapTileSettingsActivity extends AppCompatActivity implements Activi
     @Override
     public String addOptionalAdditionalInfo() {
         return "Choose the tile source you want to set as default. All maps that don't specify a custom tile source will use this source.";
-    }
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
     }
 }

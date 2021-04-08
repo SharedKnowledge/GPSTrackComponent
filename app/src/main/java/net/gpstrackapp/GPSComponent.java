@@ -69,11 +69,11 @@ public class GPSComponent implements ASAPApplicationComponent {
         return this.asapComponentHelper.getASAPApplication();
     }
 
-    public TrackModelManager getTrackModelManager() {
-        if (this.trackModelManager == null) {
-            this.trackModelManager = new TrackModelManager();
+    public static TrackModelManager getTrackModelManager() {
+        if (trackModelManager == null) {
+            trackModelManager = new TrackModelManager();
         }
-        return this.trackModelManager;
+        return trackModelManager;
     }
 
     private static String getLogStart() {

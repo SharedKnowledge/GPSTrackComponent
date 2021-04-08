@@ -1,7 +1,6 @@
 package net.gpstrackapp.activity.geomodel;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,7 +17,6 @@ class SelectableGeoModelListContentAdapterHelper {
     }
 
     void setSelectedText(CharSequence itemID, View selectableItemView, TextView selectedTextView) {
-        Log.d(getLogStart(), "setSelectedText()");
         selectableItemView.setTag(itemID);
         selectedTextView.setText(
                 this.selectedItemIDs.contains(itemID) ? "SELECTED" : "");
@@ -53,9 +51,5 @@ class SelectableGeoModelListContentAdapterHelper {
 
     Set<CharSequence> getSelectedUUIDs() {
         return this.uuidSet;
-    }
-
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
     }
 }

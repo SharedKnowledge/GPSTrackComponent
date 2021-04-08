@@ -7,6 +7,7 @@ import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
 import net.gpstrackapp.geomodel.track.TrackPoint;
 import net.gpstrackapp.geomodel.track.TrackSegment;
+import net.sharksystem.asap.android.Util;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -135,13 +136,13 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
                             try {
                                 dateOfCreation = LocalDateTime.parse(dateString);
                             } catch (DateTimeParseException e) {
-                                Log.d(getLogStart(), "Could not parse date string of a track. " + System.lineSeparator()
+                                Log.d(Util.getLogStart(this), "Could not parse date string of a track. " + System.lineSeparator()
                                         + "String to parse was: " + e.getParsedString() + System.lineSeparator()
                                         + "Error message: " + e.getLocalizedMessage());
                             }
                         }
                     } else {
-                        Log.d(getLogStart(), "The description parameter was not properly formatted on export from this app. "
+                        Log.d(Util.getLogStart(this), "The description parameter was not properly formatted on export from this app. "
                                 + "For this reason some attributes of a track could not be properly imported");
                     }
                 }
@@ -172,9 +173,5 @@ public class GPXFileFormat implements ExportFileFormat, ImportFileFormat {
             Track track = new Track(null, trackName, creator, dateOfCreation, trackSegments);
             trackModelManager.addGeoModel(track);
         }
-    }
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
     }
 }

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import net.gpstrackapp.GPSApp;
 import net.gpstrackapp.activity.map.TrackRecordingMapActivity;
+import net.sharksystem.asap.android.Util;
 
 public class InitActivity extends AppCompatActivity {
     @Override
@@ -14,7 +15,7 @@ public class InitActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (!GPSApp.isStarted()) {
-            Log.d(this.getLogStart(), "Startup GPSApp");
+            Log.d(Util.getLogStart(this), "Startup GPSApp");
             GPSApp.initializeGPSApp(this);
         }
     }
@@ -22,12 +23,8 @@ public class InitActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(getLogStart(), "start TrackRecordingMapActivity");
+        Log.d(Util.getLogStart(this), "start TrackRecordingMapActivity");
         Intent intent = new Intent(this, TrackRecordingMapActivity.class);
         startActivity(intent);
-    }
-
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
     }
 }

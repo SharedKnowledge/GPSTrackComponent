@@ -3,6 +3,8 @@ package net.gpstrackapp.mapview;
 import android.content.Context;
 import android.util.Log;
 
+import net.sharksystem.asap.android.Util;
+
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
@@ -34,13 +36,13 @@ public class DownloadableTilesMapView extends MapView {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(getLogStart(), "onResume");
+        Log.d(Util.getLogStart(this), "onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(getLogStart(), "onPause");
+        Log.d(Util.getLogStart(this), "onPause");
     }
 
     @Override
@@ -67,9 +69,5 @@ public class DownloadableTilesMapView extends MapView {
 
     public static Set<ITileSource> getValidTileSources() {
         return validTileSources;
-    }
-
-    private static String getLogStart() {
-        return DownloadableTilesMapView.class.getSimpleName();
     }
 }

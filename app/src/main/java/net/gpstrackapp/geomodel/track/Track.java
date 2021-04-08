@@ -5,6 +5,7 @@ import android.util.Log;
 
 import net.gpstrackapp.geomodel.GeoModel;
 import net.gpstrackapp.location.ILocationConsumer;
+import net.sharksystem.asap.android.Util;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -45,7 +46,7 @@ public class Track extends GeoModel implements ILocationConsumer, Serializable {
         if (trackSegments.size() > 0) {
             return trackSegments.get(trackSegments.size() - 1);
         } else {
-            Log.d(getLogStart(), "Track hat keine Segmente");
+            Log.d(Util.getLogStart(this), "Track hat keine Segmente");
             return null;
         }
     }
@@ -59,9 +60,5 @@ public class Track extends GeoModel implements ILocationConsumer, Serializable {
         LocalDateTime date = Instant.ofEpochMilli(location.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
         TrackPoint trackPoint = new TrackPoint(geoPoint, date);
         getLastTrackSegment().addTrackPoint(trackPoint);
-    }
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
     }
 }

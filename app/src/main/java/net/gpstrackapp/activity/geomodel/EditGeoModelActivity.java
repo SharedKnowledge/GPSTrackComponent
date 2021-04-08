@@ -1,6 +1,8 @@
 package net.gpstrackapp.activity.geomodel;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,12 +11,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import net.gpstrackapp.R;
 import net.gpstrackapp.geomodel.GeoModel;
 import net.gpstrackapp.geomodel.GeoModelManager;
+import net.sharksystem.asap.android.Util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,7 +39,7 @@ public class EditGeoModelActivity extends AppCompatActivity {
         CharSequence geoModelID = getIntent().getCharSequenceExtra("geoModelID");
         if (geoModelID == null) {
             Toast.makeText(this, "A problem occured while trying to load the geomodel in question", Toast.LENGTH_LONG).show();
-            Log.e(getLogStart(), "geoModelID is null, finish activity");
+            Log.e(Util.getLogStart(this), "geoModelID is null, finish activity");
             finish();
         }
         geoModel = GeoModelManager.getGeoModelByUUIDFromGlobal(geoModelID);
@@ -62,7 +63,7 @@ public class EditGeoModelActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init action buttons");
+        Log.d(Util.getLogStart(this), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_abort_action_button, menu);
         return true;
@@ -81,7 +82,7 @@ public class EditGeoModelActivity extends AppCompatActivity {
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.e(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
+            Log.e(Util.getLogStart(this), "problem on options item selected: " + e.getLocalizedMessage());
         }
         return false;
     }
@@ -107,11 +108,7 @@ public class EditGeoModelActivity extends AppCompatActivity {
 
         String changed = "Changes were applied to geomodel";
         Toast.makeText(this, changed, Toast.LENGTH_SHORT).show();
-        Log.d(getLogStart(), changed);
+        Log.d(Util.getLogStart(this), changed);
         finish();
-    }
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
     }
 }

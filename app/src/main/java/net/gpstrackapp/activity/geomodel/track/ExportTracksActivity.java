@@ -26,6 +26,7 @@ import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import net.gpstrackapp.geomodel.track.RequestTracksCommand;
 import net.gpstrackapp.geomodel.track.Track;
 import net.gpstrackapp.geomodel.track.TrackModelManager;
+import net.sharksystem.asap.android.Util;
 
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 public class ExportTracksActivity extends GeoModelListSelectionActivity implements AdapterView.OnItemSelectedListener {
     private final int CREATE_FILE_CODE = 1;
     private Spinner spinner;
-    private final TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    private final TrackModelManager trackModelManager = GPSComponent.getTrackModelManager();
     private String selectedFormat;
     private String[] availableFormats;
     private ExportTracksActivity.ExportHelper exportHelper;
@@ -125,7 +126,7 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
                     exportHelper.exportToFile(dir);
                 } catch (Exception e) {
                     Toast.makeText(this, "Export was not successful. Error message: " + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                    Log.e(getLogStart(), e.getLocalizedMessage());
+                    Log.e(Util.getLogStart(this), e.getLocalizedMessage());
                 }
                 Toast.makeText(this, "Export was successful.", Toast.LENGTH_SHORT).show();
                 finish();
@@ -159,10 +160,6 @@ public class ExportTracksActivity extends GeoModelListSelectionActivity implemen
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) { }
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
-    }
 
     protected class ExportHelper {
         private ExportFileFormat format;

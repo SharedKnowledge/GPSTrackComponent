@@ -7,6 +7,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
+import net.sharksystem.asap.android.Util;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class LocationReceiver extends BroadcastReceiver {
             Location location = (Location) bundle.get("location");
             for (ILocationConsumer consumer : consumers) {
                 consumer.onLocationChanged(location);
-                Log.d(getLogStart(), "Location added to consumer " + consumer.toString());
+                Log.d(Util.getLogStart(this), "Location added to consumer " + consumer.toString());
             }
         }
     }
@@ -40,9 +42,5 @@ public class LocationReceiver extends BroadcastReceiver {
 
     public boolean hasLocationConsumers() {
         return consumers.isEmpty() ? false : true;
-    }
-
-    private String getLogStart() {
-        return this.getClass().getSimpleName();
     }
 }

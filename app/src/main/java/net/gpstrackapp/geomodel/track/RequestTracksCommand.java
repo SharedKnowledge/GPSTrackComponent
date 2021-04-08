@@ -7,7 +7,7 @@ import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 import java.util.List;
 
 public class RequestTracksCommand implements RequestGeoModelsCommand {
-    TrackModelManager trackModelManager = GPSComponent.getGPSComponent().getTrackModelManager();
+    TrackModelManager trackModelManager = GPSComponent.getTrackModelManager();
 
     @Override
     public List<? extends GeoModel> getGeoModels() {

@@ -24,6 +24,7 @@ import net.gpstrackapp.activity.ActivityWithDescription;
 import net.gpstrackapp.format.FileUtils;
 import net.gpstrackapp.mapview.ConfiguredMapFragment;
 import net.gpstrackapp.mapview.DownloadableTilesMapView;
+import net.sharksystem.asap.android.Util;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
@@ -96,7 +97,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(getLogStart(), "init action buttons");
+        Log.d(Util.getLogStart(this), "init action buttons");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.gpstracker_tile_download_action_buttons, menu);
         return true;
@@ -118,7 +119,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                     return super.onOptionsItemSelected(item);
             }
         } catch (Exception e) {
-            Log.e(getLogStart(), "problem on options item selected: " + e.getLocalizedMessage());
+            Log.e(Util.getLogStart(this), "problem on options item selected: " + e.getLocalizedMessage());
         }
         return false;
     }
@@ -142,7 +143,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                             try {
                                 mgr = new CacheManager(mapView);
                             } catch (TileSourcePolicyException e) {
-                                Log.e(getLogStart(), e.getLocalizedMessage());
+                                Log.e(Util.getLogStart(this), e.getLocalizedMessage());
                                 dialog.dismiss();
                                 return;
                             }
@@ -251,16 +252,16 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                 w = Double.parseDouble(cacheWest.getText().toString());
             } catch (Exception ex) {
                 Toast.makeText(this, "Input cannot be parsed: " + ex.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                Log.e(getLogStart(), ex.getLocalizedMessage());
+                Log.e(Util.getLogStart(this), ex.getLocalizedMessage());
                 return;
             }
 
             if (startJob) {
                 String cacheOutputName = cacheOutput.getText().toString();
-                Log.d(getLogStart(), "outputName: " + cacheOutputName);
+                Log.d(Util.getLogStart(this), "outputName: " + cacheOutputName);
                 if (!FileUtils.isValidFileName(cacheOutputName)) {
                     Toast.makeText(this, "File name contains illegal character(s)", Toast.LENGTH_SHORT).show();
-                    Log.e(getLogStart(), "File name contains illegal character(s)");
+                    Log.e(Util.getLogStart(this), "File name contains illegal character(s)");
                     return;
                 }
                 String outputName = Configuration.getInstance().getOsmdroidBasePath()
@@ -270,7 +271,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                     writer = new SqliteArchiveTileWriter(outputName);
                 } catch (Exception ex) {
                     Toast.makeText(this, "Could not create database at " + outputName, Toast.LENGTH_LONG).show();
-                    Log.e(getLogStart(), "Could not create database at " + outputName
+                    Log.e(Util.getLogStart(this), "Could not create database at " + outputName
                             + System.lineSeparator() + "Error was: " + ex.getLocalizedMessage());
                     return;
                 }
@@ -279,7 +280,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                     mgr = new CacheManager(mapView, writer);
                 } catch (TileSourcePolicyException ex) {
                     Toast.makeText(this, downloadNotAllowedMessage, Toast.LENGTH_LONG).show();
-                    Log.e(getLogStart(), ex.getLocalizedMessage());
+                    Log.e(Util.getLogStart(this), ex.getLocalizedMessage());
                     return;
                 }
             } else {
@@ -288,7 +289,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                         mgr = new CacheManager(mapView);
                     } catch (TileSourcePolicyException ex) {
                         Toast.makeText(this, downloadNotAllowedMessage, Toast.LENGTH_LONG).show();
-                        Log.e(getLogStart(), ex.getLocalizedMessage());
+                        Log.e(Util.getLogStart(this), ex.getLocalizedMessage());
                         return;
                     }
                 }
@@ -328,11 +329,11 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                 if (!(currentTileSource instanceof OnlineTileSourceBase)) {
                     String notOnlineTileSourceMessage = "TileSource is not an online tile source.";
                     Toast.makeText(this, notOnlineTileSourceMessage + chooseDifferentTileSourceMessage, Toast.LENGTH_LONG).show();
-                    Log.e(getLogStart(), notOnlineTileSourceMessage);
+                    Log.e(Util.getLogStart(this), notOnlineTileSourceMessage);
                     return;
                 } else if (!((OnlineTileSourceBase) currentTileSource).getTileSourcePolicy().acceptsBulkDownload()) {
                     Toast.makeText(this, downloadNotAllowedMessage, Toast.LENGTH_LONG).show();
-                    Log.e(getLogStart(), downloadNotAllowedMessage);
+                    Log.e(Util.getLogStart(this), downloadNotAllowedMessage);
                     return;
                 } else {
                     try {
@@ -341,7 +342,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                             @Override
                             public void onTaskComplete() {
                                 Toast.makeText(DownloadTilesActivity.this, "Download complete!", Toast.LENGTH_LONG).show();
-                                Log.d(getLogStart(), "Download complete");
+                                Log.d(Util.getLogStart(this), "Download complete");
                                 if (writer != null) {
                                     writer.onDetach();
                                 }
@@ -350,7 +351,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                             @Override
                             public void onTaskFailed(int errors) {
                                 Toast.makeText(DownloadTilesActivity.this, "Download complete with " + errors + " errors", Toast.LENGTH_LONG).show();
-                                Log.d(getLogStart(), "Download complete with " + errors + " errors");
+                                Log.d(Util.getLogStart(this), "Download complete with " + errors + " errors");
                                 if (writer != null) {
                                     writer.onDetach();
                                 }
@@ -373,7 +374,7 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                         });
                     } catch (TileSourcePolicyException ex) {
                         Toast.makeText(this, downloadNotAllowedMessage, Toast.LENGTH_LONG).show();
-                        Log.e(getLogStart(), ex.getLocalizedMessage());
+                        Log.e(Util.getLogStart(this), ex.getLocalizedMessage());
                         return;
                     }
                 }
@@ -405,12 +406,6 @@ public class DownloadTilesActivity extends AppCompatActivity implements Activity
                 alertDialog.show();
             });
         }).start();
-    }
-
-
-
-    private String getLogStart() {
-        return getClass().getSimpleName();
     }
 
     @Override
