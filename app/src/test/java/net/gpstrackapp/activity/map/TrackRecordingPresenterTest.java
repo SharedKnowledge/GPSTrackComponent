@@ -53,7 +53,7 @@ public class TrackRecordingPresenterTest {
     }
 
     @Test
-    public void selectingTracksInManagerShouldUpdateOverlaysProperly() {
+    public void selectingTracksShouldUpdateOverlaysProperly() {
         // simulates that user selects two tracks to be displayed
         Set<CharSequence> selectedTrackIDs = new HashSet<>(Arrays.asList(track1.getObjectID(), track2.getObjectID()));
         trackRecordingPresenter.setSelectedItemIDs(selectedTrackIDs);
