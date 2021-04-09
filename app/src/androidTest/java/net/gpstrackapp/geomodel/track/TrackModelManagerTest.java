@@ -52,6 +52,9 @@ public class TrackModelManagerTest {
 
     @Test
     public void saveAndLoadAndDeleteForValidTracksShouldWork() {
+        // load already existing geoModels
+        trackModelManager.loadAllGeoModelsFromFiles(ctx);
+
         int savedTracksCount = trackModelManager.count();
         trackModelManager.saveGeoModelsToFiles(ctx, new HashSet<>(Arrays.asList(track1, track2)));
 

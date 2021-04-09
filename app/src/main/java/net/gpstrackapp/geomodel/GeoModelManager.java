@@ -1,13 +1,11 @@
 package net.gpstrackapp.geomodel;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public abstract class GeoModelManager<T extends GeoModel> {
-    protected List<T> geoModels = new ArrayList<>();
-    protected static List<GeoModel> geoModelsGlobal = new ArrayList<>();
+    protected Set<T> geoModels = new HashSet<>();
+    protected static Set<GeoModel> geoModelsGlobal = new HashSet<>();
 
     public boolean addGeoModel(T geoModel) {
         geoModelsGlobal.add(geoModel);
@@ -33,11 +31,11 @@ public abstract class GeoModelManager<T extends GeoModel> {
         return allRemoved;
     }
 
-    public List<T> getAll() {
+    public Set<T> getAll() {
         return geoModels;
     }
 
-    public static List<GeoModel> getAllFromGlobal() {
+    public static Set<GeoModel> getAllFromGlobal() {
         return geoModelsGlobal;
     }
 

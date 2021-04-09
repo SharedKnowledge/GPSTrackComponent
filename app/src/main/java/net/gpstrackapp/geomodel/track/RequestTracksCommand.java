@@ -4,6 +4,7 @@ import net.gpstrackapp.GPSComponent;
 import net.gpstrackapp.geomodel.GeoModel;
 import net.gpstrackapp.geomodel.RequestGeoModelsCommand;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RequestTracksCommand implements RequestGeoModelsCommand {
@@ -11,7 +12,7 @@ public class RequestTracksCommand implements RequestGeoModelsCommand {
 
     @Override
     public List<? extends GeoModel> getGeoModels() {
-        return trackModelManager.getAll();
+        return new ArrayList<>(trackModelManager.getAll());
     }
 
     @Override
