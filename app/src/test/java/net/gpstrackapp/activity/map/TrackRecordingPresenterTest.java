@@ -49,7 +49,7 @@ public class TrackRecordingPresenterTest {
                 trackOverlayList.remove(trackOverlay);
                 countRemovedOverlays++;
             }
-        }, trackModelManager);
+        });
     }
 
     @Test

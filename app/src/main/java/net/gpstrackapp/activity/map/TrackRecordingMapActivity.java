@@ -135,7 +135,7 @@ public class TrackRecordingMapActivity extends AppCompatActivity implements Acti
             public void removeOverlay(Overlay overlay) {
                 configuredMapFragment.removeOverlay(overlay);
             }
-        }, GPSComponent.getTrackModelManager());
+        });
         trackRecordingPresenter.onCreate();
     }
 
